@@ -81,10 +81,9 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 clear all
-clc
+%clc
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Define all needed user inputs
-
 
 maxl=100;                 % maximum for lambda
 timesteps=20000;            % number of time steps between \lambda=0, and \lambda=maxl, %DJN 4/10/13
@@ -92,6 +91,7 @@ a=.5;                    % a is the amplutude of our pulse
 s0=15;                   % so is the mean of out pulse
 p=1.5;                   % p is the  varence in pulse
 keeprate=timesteps/100;              % keep every \it{keeprate}-th step.
+seconds_per_update = 3;
 g=9.81;                  % Set gravity
 alpha=.05;               % Set slope
 plotb=1;                 % Bool to plot
@@ -106,9 +106,12 @@ DJN_slopes=0.5; 1/2;
 %We generate the space-determined variables sigma, F, H, H0, intF, dF, W,
 %and dW.
 
+last_update = start_time = time();
+
 %[sigma,F,H,H0,intF,dF,W,dW] = trapF(1,1,dsigma,maxsigma,340,g);
 [sigma,F,H,H0,intF,dF,W,dW] = trapF(DJN_slopes,DJN_beachwidth/2,dsigma,maxsigma,DJN_beachwidth+alpha*xmax/DJN_slopes,g);
 W(1)=1e100; %W(1) is the infinity, just make it huge, instead of the Inf, DJN 4/10/13
+W = W';
 
 n = length(sigma);
 
@@ -126,15 +129,15 @@ dlambda2=dlambda*dlambda;
 A=sparse(n,n);
 b=zeros(n,1);
 
-
 A(1,1)=1;               % Define the matrix A, W and dW needed for our model
-for i=2:n-1
-    A(i, i-1)=   -(    dlambda2/(dsigma2) - dlambda2/(2*dsigma)*W(i)                    );
-    A(i, i)  = 1 -( -2*dlambda2/(dsigma2)                           + dlambda2*dW(i)    );
-    A(i, i+1)=   -(    dlambda2/(dsigma2) + dlambda2/(2*dsigma)*W(i)                    );
-end
+
+A(2:n-1, 1:n-2) = A(2:n-1, 1:n-2) + diag(   -(   dlambda2/dsigma2 - dlambda2/(2*dsigma).*W(2:n-1)));
+A(2:n-1, 2:n-1) = A(2:n-1, 2:n-1) + diag(1 .-(-2*dlambda2/dsigma2                                + dlambda2*dW(2:n-1)));
+A(2:n-1, 3:n  ) = A(2:n-1, 3:n  ) + diag(   -(   dlambda2/dsigma2 + dlambda2/(2*dsigma).*W(2:n-1)));
+
 A(n,n)=dsigma+dlambda;
 A(n,n-1)=-dlambda;
+
 
 %DJN
 %Define the initial profile
@@ -174,11 +177,10 @@ Phi_nm1=Phi_nm1';   %Make it the column, DJN 4/10/13
 
 %Define the initial Psi and then the next time step (wave velocity)
 G=zeros(n,1);                                                % Pre-allocate for speed
-G(1)=(-Phi_nm1(3)+4*Phi_nm1(2)-3*Phi_nm1(1))/(2*dsigma);     % Second order forwards difference
-for i=2:n-1
-    G(i)=(Phi_nm1(i+1)-Phi_nm1(i-1))/(2*dsigma);             % Second order central difference
-end
-G(n)=(-3*Phi_nm1(n)+4*Phi_nm1(n-1)-Phi_nm1(n-2))/(2*dsigma); % Second order backwards difference
+
+G(1)     =  (-Phi_nm1(3) + 4*Phi_nm1(2)-3*Phi_nm1(1))/(2*dsigma);     % Second order forwards difference
+G(2:n-1) = (Phi_nm1(3:n) - Phi_nm1(1:n-2)) / (2*dsigma);
+G(n)     =(-3*Phi_nm1(n) + 4*Phi_nm1(n-1)-Phi_nm1(n-2))/(2*dsigma); % Second order backwards difference
 
 
 
@@ -197,10 +199,9 @@ Psi_n=Psi_nm1+G*dlambda;                                     % Compute psi at th
 
 %Find Phi at the next time step using Psi_n
 G(1)=(-Psi_nm1(3)+4*Psi_nm1(2)-3*Psi_nm1(1))/(2*dsigma)+Psi_nm1(1)*W(1);     % Second order forwards difference
-for i=2:n-1
-    G(i)=(Psi_nm1(i+1)-Psi_nm1(i-1))/(2*dsigma)+Psi_nm1(i)*W(i);             % Second order central difference
-end
+G(2:n-1) = (Psi_nm1(3:n)-Psi_nm1(1:n-2)) / (2*dsigma) + Psi_nm1(2:n-1) .* W(2:n-1);
 G(n)=(-3*Psi_nm1(n)+4*Psi_nm1(n-1)-Psi_nm1(n-2))/(2*dsigma)+Psi_nm1(n)*W(n); % Second order backwards difference
+
 Phi_n=Phi_nm1+dlambda*(G);                                                   % Compute phi at the nth step
 %DJN 4/10/13 %Phi=Phi_n;                                                                   % Define Psi as the nth step
 
@@ -234,8 +235,6 @@ end
 
 l=l+1;
 
-elapsed_time = time();
-
 for step=2:timesteps    %we start from the third step, since the first two are already computed, DJN 4/10/13
 %DJN  b(1)=0;                     % Define b as the right side of our system
 %     for i=2:n-1
@@ -255,7 +254,7 @@ for step=2:timesteps    %we start from the third step, since the first two are a
     Psi_nm1=Psi_n;              %We don't really need Psi vector, it just got eliminated to save time, DJN 4/10/13
     Psi_n=A\b;
     G(1)=(-Psi_n(3)+4*Psi_n(2)-3*Psi_n(1))/(2*dsigma)+W(1)*Psi_n(1);     % Second order forwards differene
-    G(2:n-1) = ((Psi_n(3:n) - Psi_n(1:n-2)) ./ (2*dsigma)) + W(2:n-1)'.*Psi_n(2:n-1);
+    G(2:n-1) = ((Psi_n(3:n) - Psi_n(1:n-2)) ./ (2*dsigma)) + W(2:n-1).*Psi_n(2:n-1);
     G(n)=(-3*Psi_n(n)+4*Psi_n(n-1)-Psi_n(n-2))/(2*dsigma)+W(n)*Psi_n(n); % Second order backwards differene
     Phi=4/3*Phi_n-1/3*Phi_nm1+2/3*G*dlambda;                             % Define the next Phi
     Phi_nm1=Phi_n;
@@ -269,19 +268,28 @@ for step=2:timesteps    %we start from the third step, since the first two are a
         plot(sigma(1,:),Phiout(l,:))
         pause(.000000000000001);
         l=l+1;
-        fprintf('Step = %d, or %5.2f%% (%2ds)\n',step,step/timesteps*100,time()-elapsed_time)
-%        display(['Step = ', num2str(step),', or ', num2str(step/timesteps*100,'%5.2f'),'%'])
+        if time() - last_update > seconds_per_update
+            last_update = time();
+            fprintf('Step = %d, or %5.2f%% (%2ds)\n',step,step/timesteps*100,time()-start_time);
+        end
+        if inoctave()
+            fflush(stdout);
+        end
     end
+<<<<<<< HEAD
 <<<<<<< HEAD
     fflush(stdout);
 =======
 >>>>>>> Nothing changed
+=======
+>>>>>>> a84f1e8beb3a8605b45e2d88dca1776f63e8e5f8
 end
 
 
 
-
-clearvars -except 'Phiout' 'Psiout' 'a' 'p' 's0' 'sigma' 'lambda' 'sigma' 'm' 'g' 'alpha' 'plotb' 'F' 'intF' 'DJN_beachwidth' 'DJN_slopes' 'dlambda' 'dsigma' 'DJN_x' 'DJN_eta'
+if ~inoctave()
+    clearvars -except 'Phiout' 'Psiout' 'a' 'p' 's0' 'sigma' 'lambda' 'sigma' 'm' 'g' 'alpha' 'plotb' 'F' 'intF' 'DJN_beachwidth' 'DJN_slopes' 'dlambda' 'dsigma' 'DJN_x' 'DJN_eta'
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Convert back to physical varables
@@ -308,7 +316,9 @@ t2=abs(t2);
 
 % [J, UL, US]=Jacobian(F,g,alpha,u2,sigma,lambda,dsigma,dlambda);
 
-clearvars -except  'u2'  'eta2' 'x2' 't2' 'm' 'g' 'alpha' 'lambda' 'sigma' 'Exact' 'plotb' 'DJN_beachwidth' 'DJN_slopes' 'DJN_x' 'DJN_eta' 'J' 'UL' 'US' 
+if ~inoctave()
+    clearvars -except  'u2'  'eta2' 'x2' 't2' 'm' 'g' 'alpha' 'lambda' 'sigma' 'Exact' 'plotb' 'DJN_beachwidth' 'DJN_slopes' 'DJN_x' 'DJN_eta' 'J' 'UL' 'US' 
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Plot the data
@@ -392,12 +402,14 @@ if plotb
         results.snapshot{i}.time=t2(2,i);
         results.max_runup=max(max(eta2));
         results.case=['case_',num2str(DJN_beachwidth),'m_',num2str(1/DJN_slopes),'_',num2str(alpha)];
-        pause(0.1)
+        pause(0.03)
     end
     hold on
     plot(DJN_x, DJN_eta,'-b')
     hold off
     
 end
+
+fprintf('Simulation compeleted in %d seconds\n', time() - start_time);
 
 %save(['analytical_nw_',results.case,'.mat'], 'results')
