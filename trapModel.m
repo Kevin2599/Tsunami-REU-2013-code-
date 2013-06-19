@@ -233,8 +233,10 @@ if(mod(step,keeprate)==0) %Check if we need to keep it.
 end
 
 l=l+1;
+
+elapsed_time = time();
+
 for step=2:timesteps    %we start from the third step, since the first two are already computed, DJN 4/10/13
-    
 %DJN  b(1)=0;                     % Define b as the right side of our system
 %     for i=2:n-1
 %         b(i)=2*Psi_n(i)-Psi_nm1(i);
@@ -254,9 +256,7 @@ for step=2:timesteps    %we start from the third step, since the first two are a
     Psi_n=A\b;
     
     G(1)=(-Psi_n(3)+4*Psi_n(2)-3*Psi_n(1))/(2*dsigma)+W(1)*Psi_n(1);     % Second order forwards differene
-    for i=2:n-1
-        G(i)=(Psi_n(i+1)-Psi_n(i-1))/(2*dsigma)+W(i)*Psi_n(i);           % Second order centeral differene
-    end
+    G(2:n-1) = ((Psi_n(3:n) - Psi_n(1:n-2)) ./ (2*dsigma)) + W(2:n-1)'.*Psi_n(2:n-1);
     G(n)=(-3*Psi_n(n)+4*Psi_n(n-1)-Psi_n(n-2))/(2*dsigma)+W(n)*Psi_n(n); % Second order backwards differene
     
     Phi=4/3*Phi_n-1/3*Phi_nm1+2/3*G*dlambda;                             % Define the next Phi
@@ -269,11 +269,12 @@ for step=2:timesteps    %we start from the third step, since the first two are a
         lambda(l)=step*dlambda;
        
         plot(sigma(1,:),Phiout(l,:))
-        pause(.000000000000001)
+        pause(.000000000000001);
         l=l+1;
-        display(['Step = ', num2str(step),', or ', num2str(step/timesteps*100,'%5.2f'),'%'])
+        fprintf('Step = %d, or %5.2f%% (%2ds)\n',step,step/timesteps*100,time()-elapsed_time)
+%        display(['Step = ', num2str(step),', or ', num2str(step/timesteps*100,'%5.2f'),'%'])
     end
-    
+    fflush(stdout);
 end
 
 
