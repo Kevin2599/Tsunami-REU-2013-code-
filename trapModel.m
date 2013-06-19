@@ -254,11 +254,9 @@ for step=2:timesteps    %we start from the third step, since the first two are a
     
     Psi_nm1=Psi_n;              %We don't really need Psi vector, it just got eliminated to save time, DJN 4/10/13
     Psi_n=A\b;
-    
     G(1)=(-Psi_n(3)+4*Psi_n(2)-3*Psi_n(1))/(2*dsigma)+W(1)*Psi_n(1);     % Second order forwards differene
     G(2:n-1) = ((Psi_n(3:n) - Psi_n(1:n-2)) ./ (2*dsigma)) + W(2:n-1)'.*Psi_n(2:n-1);
     G(n)=(-3*Psi_n(n)+4*Psi_n(n-1)-Psi_n(n-2))/(2*dsigma)+W(n)*Psi_n(n); % Second order backwards differene
-    
     Phi=4/3*Phi_n-1/3*Phi_nm1+2/3*G*dlambda;                             % Define the next Phi
     Phi_nm1=Phi_n;
     Phi_n=Phi;
@@ -274,7 +272,10 @@ for step=2:timesteps    %we start from the third step, since the first two are a
         fprintf('Step = %d, or %5.2f%% (%2ds)\n',step,step/timesteps*100,time()-elapsed_time)
 %        display(['Step = ', num2str(step),', or ', num2str(step/timesteps*100,'%5.2f'),'%'])
     end
+<<<<<<< HEAD
     fflush(stdout);
+=======
+>>>>>>> Nothing changed
 end
 
 
