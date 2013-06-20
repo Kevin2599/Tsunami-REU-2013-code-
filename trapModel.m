@@ -75,39 +75,43 @@
 % x1       - Our distance output for the exact solution. NOTE MATRIX
 % x2       - Our distance output for the aprox solution. NOTE MATRIX
 
+function trapModel(options)
 
+% passing a dictionary of options lets us modify the conditions without changing the program
+if ~exist('options')
+    options.dummyVar = 0;
+elseif ~isstruct(options)
+    options.dummyVar = 0;   
+end
+getOption = @(name,defaultValue) getOption_(options,name,defaultValue);
 
+start_time = clock();
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-clear all
-%clc
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Define all needed user inputs
 
-maxl=100;                 % maximum for lambda
-timesteps=20000;            % number of time steps between \lambda=0, and \lambda=maxl, %DJN 4/10/13
-a=.5;                    % a is the amplutude of our pulse
-s0=15;                   % so is the mean of out pulse
-p=1.5;                   % p is the  varence in pulse
-keeprate=timesteps/100;              % keep every \it{keeprate}-th step.
-seconds_per_update = 3;
-g=9.81;                  % Set gravity
-alpha=.05;               % Set slope
-plotb=1;                 % Bool to plot
-dsigma=.01;              % Our change in Sigma from program
-maxsigma=150;             % The maximum value for sigma that we want.
-xmax=5000;               %max for x
+% strmatch, who, eval are necessary for passing by name
 
-DJN_beachwidth=50;
-DJN_slopes=0.5; 1/2;
+maxl=       getOption('maxl',100);                 % maximum for lambda
+timesteps=  getOption('timesteps',20000);            % number of time steps between \lambda=0, and \lambda=maxl, %DJN 4/10/13
+a=getOption('a',.5);                    % a is the amplutude of our pulse
+s0=getOption('s0',15);                   % so is the mean of out pulse
+p=getOption('p',1.5);                   % p is the  varence in pulse
+keeprate=getOption('keeprate',timesteps/100);              % keep every \it{keeprate}-th step.
+seconds_per_update = getOption('seconds_per_update',3);
+g=getOption('g',9.81);                  % Set gravity
+alpha=getOption('alpha',.05);               % Set slope
+plotb=getOption('plotb',1);                 % Bool to plot
+dsigma=getOption('dsigma',.01);              % Our change in Sigma from program
+maxsigma=getOption('maxsigma',150);             % The maximum value for sigma that we want.
+xmax=getOption('xmax',5000);               %max for x
+
+DJN_beachwidth=getOption('DJN_beachwidth',50);
+DJN_slopes=getOption('DJN_slopes',0.5);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %We generate the space-determined variables sigma, F, H, H0, intF, dF, W,
 %and dW.
-
-start_time = clock();
-last_update = start_time;
 
 %[sigma,F,H,H0,intF,dF,W,dW] = trapF(1,1,dsigma,maxsigma,340,g);
 [sigma,F,H,H0,intF,dF,W,dW] = trapF(DJN_slopes,DJN_beachwidth/2,dsigma,maxsigma,DJN_beachwidth+alpha*xmax/DJN_slopes,g);
@@ -255,9 +259,11 @@ for step=2:timesteps    %we start from the third step, since the first two are a
     
     Psi_nm1=Psi_n;              %We don't really need Psi vector, it just got eliminated to save time, DJN 4/10/13
     Psi_n=A\b;
-    G(1)=(-Psi_n(3)+4*Psi_n(2)-3*Psi_n(1))/(2*dsigma)+W(1)*Psi_n(1);     % Second order forwards differene
+
+    G(1)=(-Psi_n(3)+4*Psi_n(2)-3*Psi_n(1))/(2*dsigma)+W(1)*Psi_n(1);     % Second order forwards difference
     G(2:n-1) = ((Psi_n(3:n) - Psi_n(1:n-2)) ./ (2*dsigma)) + W(2:n-1).*Psi_n(2:n-1);
-    G(n)=(-3*Psi_n(n)+4*Psi_n(n-1)-Psi_n(n-2))/(2*dsigma)+W(n)*Psi_n(n); % Second order backwards differene
+    G(n)=(-3*Psi_n(n)+4*Psi_n(n-1)-Psi_n(n-2))/(2*dsigma)+W(n)*Psi_n(n); % Second order backwards difference
+
     Phi=4/3*Phi_n-1/3*Phi_nm1+2/3*G*dlambda;                             % Define the next Phi
     Phi_nm1=Phi_n;
     Phi_n=Phi;
@@ -275,10 +281,6 @@ for step=2:timesteps    %we start from the third step, since the first two are a
 end
 
 
-
-if ~inoctave()
-    clearvars -except 'Phiout' 'Psiout' 'a' 'p' 's0' 'sigma' 'lambda' 'sigma' 'm' 'g' 'alpha' 'plotb' 'F' 'intF' 'DJN_beachwidth' 'DJN_slopes' 'dlambda' 'dsigma' 'DJN_x' 'DJN_eta'
-end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Convert back to physical varables
@@ -305,9 +307,6 @@ t2=abs(t2);
 
 % [J, UL, US]=Jacobian(F,g,alpha,u2,sigma,lambda,dsigma,dlambda);
 
-if ~inoctave()
-    clearvars -except  'u2'  'eta2' 'x2' 't2' 'm' 'g' 'alpha' 'lambda' 'sigma' 'Exact' 'plotb' 'DJN_beachwidth' 'DJN_slopes' 'DJN_x' 'DJN_eta' 'J' 'UL' 'US' 
-end
 
 fprintf('Simulation compeleted in %d seconds\n', ceil(etime(clock(),start_time)));
 
@@ -376,7 +375,7 @@ if plotb
         index2=~index1;
         plot(x2(index1,i),eta2(index1,i), '.r')
         hold on
-        plot(x2(index2,i),eta2(index2,i), '.b')
+%        plot(x2(index2,i),eta2(index2,i), '.b')
         plot(x,alpha*x)
         plot(0,0,'^b')
         hold off
@@ -401,3 +400,15 @@ if plotb
 end
 
 %save(['analytical_nw_',results.case,'.mat'], 'results')
+end %function
+
+function value = getOption_(options,name,defaultValue)
+    if isfield(options,name)
+        value = getfield(options,name);
+    else
+        value = defaultValue;
+    end
+end
+
+
+
