@@ -106,10 +106,8 @@ DJN_slopes=0.5; 1/2;
 %We generate the space-determined variables sigma, F, H, H0, intF, dF, W,
 %and dW.
 
-if inoctave()
-    start_time = time();
-    last_update = start_time;
-end
+start_time = clock();
+last_update = start_time;
 
 %[sigma,F,H,H0,intF,dF,W,dW] = trapF(1,1,dsigma,maxsigma,340,g);
 [sigma,F,H,H0,intF,dF,W,dW] = trapF(DJN_slopes,DJN_beachwidth/2,dsigma,maxsigma,DJN_beachwidth+alpha*xmax/DJN_slopes,g);
@@ -133,16 +131,10 @@ A=sparse(n,n);
 b=zeros(n,1);
 
 A(1,1)=1;               % Define the matrix A, W and dW needed for our model
-if inoctave()
-    A(2:n-1, 1:n-2) = A(2:n-1, 1:n-2) + diag(   -(   dlambda2/dsigma2 - dlambda2/(2*dsigma).*W(2:n-1)));
-    A(2:n-1, 2:n-1) = A(2:n-1, 2:n-1) + diag(1  -(-2*dlambda2/dsigma2                                + dlambda2*dW(2:n-1)));
-    A(2:n-1, 3:n  ) = A(2:n-1, 3:n  ) + diag(   -(   dlambda2/dsigma2 + dlambda2/(2*dsigma).*W(2:n-1)));
-else 
-    for i=2:n-1
-        A(i, i-1)=   -(    dlambda2/(dsigma2) - dlambda2/(2*dsigma)*W(i)                    );
-        A(i, i)  = 1 -( -2*dlambda2/(dsigma2)                           + dlambda2*dW(i)    );
-        A(i, i+1)=   -(    dlambda2/(dsigma2) + dlambda2/(2*dsigma)*W(i)                    );
-    end
+for i=2:n-1
+    A(i, i-1)=   -(    dlambda2/(dsigma2) - dlambda2/(2*dsigma)*W(i)                    );
+    A(i, i)  = 1 -( -2*dlambda2/(dsigma2)                           + dlambda2*dW(i)    );
+    A(i, i+1)=   -(    dlambda2/(dsigma2) + dlambda2/(2*dsigma)*W(i)                    );
 end
 
 A(n,n)=dsigma+dlambda;
@@ -276,17 +268,9 @@ for step=2:timesteps    %we start from the third step, since the first two are a
         lambda(l)=step*dlambda;
        
         plot(sigma(1,:),Phiout(l,:))
+        title(['Step ',num2str(step),' (',num2str(step/timesteps*100),'%)']);
         pause(.000000000000001);
         l=l+1;
-        if inoctave()
-            if time() - last_update > seconds_per_update
-                last_update = time();
-                fprintf('Step = %d, or %5.2f%% (%2ds)\n',step,step/timesteps*100,time()-start_time);
-                fflush(stdout);
-            end
-        else
-            fprintf('Step = %d, or %5.2f%%\n',step,step/timesteps*100);
-        end
     end
 end
 
@@ -325,6 +309,8 @@ if ~inoctave()
     clearvars -except  'u2'  'eta2' 'x2' 't2' 'm' 'g' 'alpha' 'lambda' 'sigma' 'Exact' 'plotb' 'DJN_beachwidth' 'DJN_slopes' 'DJN_x' 'DJN_eta' 'J' 'UL' 'US' 
 end
 
+fprintf('Simulation compeleted in %d seconds\n', ceil(etime(clock(),start_time)));
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Plot the data
 
@@ -340,7 +326,6 @@ for j=1:length(t2(1,:))
         break
     end
 end
-
 
 if plotb
     
@@ -413,10 +398,6 @@ if plotb
     plot(DJN_x, DJN_eta,'-b')
     hold off
     
-end
-
-if inoctave()
-    fprintf('Simulation compeleted in %d seconds\n', time() - start_time);
 end
 
 %save(['analytical_nw_',results.case,'.mat'], 'results')
