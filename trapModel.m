@@ -133,10 +133,17 @@ A=sparse(n,n);
 b=zeros(n,1);
 
 A(1,1)=1;               % Define the matrix A, W and dW needed for our model
-
-A(2:n-1, 1:n-2) = A(2:n-1, 1:n-2) + diag(   -(   dlambda2/dsigma2 - dlambda2/(2*dsigma).*W(2:n-1)));
-A(2:n-1, 2:n-1) = A(2:n-1, 2:n-1) + diag(1  -(-2*dlambda2/dsigma2                                + dlambda2*dW(2:n-1)));
-A(2:n-1, 3:n  ) = A(2:n-1, 3:n  ) + diag(   -(   dlambda2/dsigma2 + dlambda2/(2*dsigma).*W(2:n-1)));
+if inoctave()
+    A(2:n-1, 1:n-2) = A(2:n-1, 1:n-2) + diag(   -(   dlambda2/dsigma2 - dlambda2/(2*dsigma).*W(2:n-1)));
+    A(2:n-1, 2:n-1) = A(2:n-1, 2:n-1) + diag(1  -(-2*dlambda2/dsigma2                                + dlambda2*dW(2:n-1)));
+    A(2:n-1, 3:n  ) = A(2:n-1, 3:n  ) + diag(   -(   dlambda2/dsigma2 + dlambda2/(2*dsigma).*W(2:n-1)));
+else 
+    for i=2:n-1
+        A(i, i-1)=   -(    dlambda2/(dsigma2) - dlambda2/(2*dsigma)*W(i)                    );
+        A(i, i)  = 1 -( -2*dlambda2/(dsigma2)                           + dlambda2*dW(i)    );
+        A(i, i+1)=   -(    dlambda2/(dsigma2) + dlambda2/(2*dsigma)*W(i)                    );
+    end
+end
 
 A(n,n)=dsigma+dlambda;
 A(n,n-1)=-dlambda;
