@@ -92,22 +92,22 @@ start_time = clock();
 
 % strmatch, who, eval are necessary for passing by name
 
-maxl=       getOption('maxl',100);                 % maximum for lambda
-timesteps=  getOption('timesteps',20000);            % number of time steps between \lambda=0, and \lambda=maxl, %DJN 4/10/13
-a=getOption('a',.5);                    % a is the amplutude of our pulse
-s0=getOption('s0',15);                   % so is the mean of out pulse
-p=getOption('p',1.5);                   % p is the  varence in pulse
-keeprate=getOption('keeprate',timesteps/100);              % keep every \it{keeprate}-th step.
-seconds_per_update = getOption('seconds_per_update',3);
-g=getOption('g',9.81);                  % Set gravity
-alpha=getOption('alpha',.05);               % Set slope
-plotb=getOption('plotb',1);                 % Bool to plot
-dsigma=getOption('dsigma',.01);              % Our change in Sigma from program
-maxsigma=getOption('maxsigma',150);             % The maximum value for sigma that we want.
-xmax=getOption('xmax',5000);               %max for x
+maxl=       getOption('maxl',100);                % maximum for lambda
+timesteps=  getOption('timesteps',20000);         % number of time steps between \lambda=0, and \lambda=maxl, %DJN 4/10/13
+a=          getOption('a',.5);                    % a is the amplutude of our pulse
+s0=         getOption('s0',15);                   % so is the mean of out pulse
+p=          getOption('p',1.5);                   % p is the  varence in pulse
+keeprate=   getOption('keeprate',timesteps/100);  % keep every \it{keeprate}-th step.
+g=          getOption('g',9.81);                  % Set gravity
+alpha=      getOption('alpha',.05);               % Set slope
+plotb=      getOption('plotb',1);                 % Bool to plot
+dsigma=     getOption('dsigma',.01);              % Our change in Sigma from program
+maxsigma=   getOption('maxsigma',150);            % The maximum value for sigma that we want.
+xmax=       getOption('xmax',5000);               % max for x
 
-DJN_beachwidth=getOption('DJN_beachwidth',50);
-DJN_slopes=getOption('DJN_slopes',0.5);
+seconds_per_update = getOption('seconds_per_update',3);
+DJN_beachwidth=      getOption('DJN_beachwidth',50);
+DJN_slopes=          getOption('DJN_slopes',0.5);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %We generate the space-determined variables sigma, F, H, H0, intF, dF, W,
@@ -125,7 +125,7 @@ n = length(sigma);
 % Build starting need information from user inputs and build the matrix A
 % that will be used to solve our system
 
-disp('Building model...')
+println('Building model...')
 dlambda=maxl/timesteps;     % Define dlambda %DJN correction 4/10/13
 
 dsigma2=dsigma*dsigma;   % Find dlambda^2 and dsigma^2
@@ -217,7 +217,7 @@ Phi_n=Phi_nm1+dlambda*(G);                                                   % C
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Solve the model for Psi and Phi
 
-disp('Running model...')
+println('Running model...')
 
 %Pre-allocate for the speed %DJN 4/10/13
 Psiout=zeros(ceil(timesteps/keeprate), n);
@@ -285,7 +285,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Convert back to physical varables
 
-disp('Converting Approx data...')
+println('Converting Approx data...')
 Phiout=Phiout';
 Psiout=Psiout';
 lambda=lambda';
@@ -314,7 +314,7 @@ fprintf('Simulation compeleted in %d seconds\n', ceil(etime(clock(),start_time))
 % Plot the data
 
 % Look for break in time.
-disp('Plotting...')
+println('Plotting...')
 [dummy,I]=sort(t2*alpha,2);
 found=0;
 brokeat=length(t2(1,:))+1;
@@ -339,9 +339,9 @@ if plotb
 %     end
 %     for i=1:length(lambda)
 %         % %         if ((breakc(i)>=1/2*alpha)||(i==brokeat))
-%         % %             disp('BROKE...')
+%         % %             println('BROKE...')
 %         % %             if found
-%         % %                 disp('Numerical')
+%         % %                 println('Numerical')
 %         % %             end
 %         % %             %break
 %         % %         end
@@ -364,9 +364,9 @@ if plotb
     x=-3*max(max(x2)):.1:2*max(max(x2));
     for i=1:length(lambda)
 %         if ((breakc(i)>=1/2*alpha)||(i==brokeat))
-%             disp('BROKE...')
+%             println('BROKE...')
 %             if found
-%                 disp('Numerical')
+%                 println('Numerical')
 %             end
 %             %break
 %         end
