@@ -409,7 +409,7 @@ if plotb
 end
 
 if inoctave()
-    fprintf('Simulation compeleted in %d seconds\n', time() - start_time);
-end
+fprintf('Simulation compeleted in %d seconds\n', time() - start_time);
+edn
 
 %save(['analytical_nw_',results.case,'.mat'], 'results')
