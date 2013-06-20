@@ -1,1 +1,0 @@
-This is the octave code for the Summer 2013 REU with Alexi Rybkin that models Tsunamis. The project reduces a 3D water simulation problem to one dimension which greatly speeds up simulation time.

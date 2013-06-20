@@ -81,7 +81,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 clear all
-%clc
+clc
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Define all needed user inputs
 
@@ -97,10 +97,15 @@ alpha=.05;               % Set slope
 plotb=1;                 % Bool to plot
 dsigma=.01;              % Our change in Sigma from program
 maxsigma=150;             % The maximum value for sigma that we want.
-xmax=5000;               %max for x
+xmax=6934;               %max for x
 
 DJN_beachwidth=50;
-DJN_slopes=0.5; 1/2;
+DJN_slopes=.5; 1/2;
+
+
+
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %We generate the space-determined variables sigma, F, H, H0, intF, dF, W,
@@ -112,7 +117,7 @@ if inoctave()
 end
 
 %[sigma,F,H,H0,intF,dF,W,dW] = trapF(1,1,dsigma,maxsigma,340,g);
-[sigma,F,H,H0,intF,dF,W,dW] = trapF(DJN_slopes,DJN_beachwidth/2,dsigma,maxsigma,DJN_beachwidth+alpha*xmax/DJN_slopes,g);
+[sigma,F,H,H0,intF,dF,W,dW] = trapF(DJN_slopes,DJN_beachwidth/2,dsigma,maxsigma,2*(DJN_beachwidth)+2*alpha*xmax/DJN_slopes,g);
 W(1)=1e100; %W(1) is the infinity, just make it huge, instead of the Inf, DJN 4/10/13
 W = W';
 
@@ -137,7 +142,7 @@ if inoctave()
     A(2:n-1, 1:n-2) = A(2:n-1, 1:n-2) + diag(   -(   dlambda2/dsigma2 - dlambda2/(2*dsigma).*W(2:n-1)));
     A(2:n-1, 2:n-1) = A(2:n-1, 2:n-1) + diag(1  -(-2*dlambda2/dsigma2                                + dlambda2*dW(2:n-1)));
     A(2:n-1, 3:n  ) = A(2:n-1, 3:n  ) + diag(   -(   dlambda2/dsigma2 + dlambda2/(2*dsigma).*W(2:n-1)));
-else 
+else
     for i=2:n-1
         A(i, i-1)=   -(    dlambda2/(dsigma2) - dlambda2/(2*dsigma)*W(i)                    );
         A(i, i)  = 1 -( -2*dlambda2/(dsigma2)                           + dlambda2*dW(i)    );
@@ -149,27 +154,60 @@ A(n,n)=dsigma+dlambda;
 A(n,n-1)=-dlambda;
 
 
+
+
+
 %DJN
-%Define the initial profile
-DJN_x=-[0:1:5000];
-%DJN_eta=-0.0001/0.6065*exp(-2e-5*(1000+DJN_x).^2).*(1000+DJN_x); %alpha=0.01
+%Define the initial profile and find Xmax.
 
-DJN_eta=-9.0315e-4*exp(-1.5e-5*(1000+DJN_x).^2).*(1000+DJN_x); %alpha=0.01
-DJN_eta(abs(DJN_eta)<1e-3)=0;
+while(true)
+    DJN_x=-[0:1:xmax];
+    %DJN_eta=-0.0001/0.6065*exp(-2e-5*(1000+DJN_x).^2).*(1000+DJN_x); %alpha=0.01
+    
+    DJN_eta=eta_0(DJN_x);
+    DJN_u=DJN_eta.*sqrt(g./(-alpha*DJN_x));
+    DJN_u(isnan(DJN_u))=0;
+    
+    %DJN_eta=0.01*(1-tanh((1000+DJN_x)/200 ))/2
+    
+    
+    
+    %We need to convert (x, t, \eta, u) to (\sigma, \lambda, \phi, \psi)
+    DJN_H=DJN_eta-DJN_x*alpha;
+    DJN_Sigma=interp1(H, sigma, DJN_H);
+    if max(DJN_Sigma)>max(sigma)-1
+        break
+    end
+    xmax=xmax+1;
+end
 
-DJN_u=DJN_eta.*sqrt(g./(-alpha*DJN_x));
-DJN_u(isnan(DJN_u))=0;
 
-%DJN_eta=0.01*(1-tanh((1000+DJN_x)/200 ))/2
-plot(DJN_x, DJN_eta)
-
-
-%We need to convert (x, t, \eta, u) to (\sigma, \lambda, \phi, \psi)
-DJN_H=DJN_eta-DJN_x*alpha;
-DJN_Sigma=interp1(H, sigma, DJN_H);
+%check if eta for the boundry if far enough away.
+if(max(abs(eta_bound(0:.1:xmax)))>10^-5)
+    fprintf('eta_bound not far enough!/n Move eta_bound back or reduce maxsigma.')
+end
 
 
-
+% find when we need to switch from eta to linear theory boundry
+wasnon0=false;
+is0=false;
+time=0;
+counter=1;
+while(~(wasnon0&&is0))
+    if(time>40)
+        counter=-1;
+        break
+    end
+    Point=xmax+sqrt(abs(alpha*g*xmax))*time/(abs(alpha*g));
+    if(~wasnon0)
+        wasnon0=eta_bound(Point)~=0;
+    end
+    is0=eta_bound(Point)==0;
+    time=counter*dlambda;
+    if ~(wasnon0&&is0)
+        counter=counter+1;
+    end
+end
 
 
 DJN_Phi=2*g*DJN_eta;
@@ -217,7 +255,6 @@ Phi_n=Phi_nm1+dlambda*(G);                                                   % C
 
 
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Solve the model for Psi and Phi
 
@@ -238,7 +275,7 @@ lambda(l)=0;
 step=1;
 if(mod(step,keeprate)==0) %Check if we need to keep it.
     l=2;                            % Index to keep only parts of our informaion
-    Phiout(l,:)=Phi_n;           
+    Phiout(l,:)=Phi_n;
     Psiout(l,:)=Psi_n;
     lambda(l)=step*dlambda;
 end
@@ -246,20 +283,21 @@ end
 l=l+1;
 
 for step=2:timesteps    %we start from the third step, since the first two are already computed, DJN 4/10/13
-%DJN  b(1)=0;                     % Define b as the right side of our system
-%     for i=2:n-1
-%         b(i)=2*Psi_n(i)-Psi_nm1(i);
-%     end
-%     b(n)=0;
-     
-    b=2*Psi_n-Psi_nm1;          %Convert into the vector operation, DJN 4/10/13  
+    %DJN  b(1)=0;                     % Define b as the right side of our system
+    %     for i=2:n-1
+    %         b(i)=2*Psi_n(i)-Psi_nm1(i);
+    %     end
+    %     b(n)=0;
+    
+    b=2*Psi_n-Psi_nm1;          %Convert into the vector operation, DJN 4/10/13
     b(1)=0;
     
     %implisit method
+    % we have psi_lambda=-psi_sigma
     b(n)=dsigma*Psi_n(n);
-%DJN  Psi=A\b;                    %solve for Psi and set the timesteps up one
-%     Psi_nm1=Psi_n;
-%     Psi_n=Psi;
+    %DJN  Psi=A\b;                    %solve for Psi and set the timesteps up one
+    %     Psi_nm1=Psi_n;
+    %     Psi_n=Psi;
     
     Psi_nm1=Psi_n;              %We don't really need Psi vector, it just got eliminated to save time, DJN 4/10/13
     Psi_n=A\b;
@@ -269,12 +307,12 @@ for step=2:timesteps    %we start from the third step, since the first two are a
     Phi=4/3*Phi_n-1/3*Phi_nm1+2/3*G*dlambda;                             % Define the next Phi
     Phi_nm1=Phi_n;
     Phi_n=Phi;
-      
+    
     if(mod(step,keeprate)==0)              % Keep information at some points
         Psiout(l,:)=Psi_n;              % save the values at the current time step (written into the *_n arrays)
         Phiout(l,:)=Phi_n;
         lambda(l)=step*dlambda;
-       
+        
         plot(sigma(1,:),Phiout(l,:))
         pause(.000000000000001);
         l=l+1;
@@ -322,7 +360,7 @@ t2=abs(t2);
 % [J, UL, US]=Jacobian(F,g,alpha,u2,sigma,lambda,dsigma,dlambda);
 
 if ~inoctave()
-    clearvars -except  'u2'  'eta2' 'x2' 't2' 'm' 'g' 'alpha' 'lambda' 'sigma' 'Exact' 'plotb' 'DJN_beachwidth' 'DJN_slopes' 'DJN_x' 'DJN_eta' 'J' 'UL' 'US' 
+    clearvars -except  'u2'  'eta2' 'x2' 't2' 'm' 'g' 'alpha' 'lambda' 'sigma' 'Exact' 'plotb' 'DJN_beachwidth' 'DJN_slopes' 'DJN_x' 'DJN_eta' 'J' 'UL' 'US'
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -344,49 +382,49 @@ end
 
 if plotb
     
-% % %     % Plot to look for global error and information
-%     slope=zeros(1,length(lambda));
-%     breakc=slope;
-%     for j=1:length(lambda)
-%         for i=1:length(eta2(:,1))-1
-%             slope(i)=(eta2(i+1,j)-eta2(i,j))/(x2(i+1,j)-x2(i,j));
-%         end
-%         breakc(j)=max(slope(:));
-%     end
-%     for i=1:length(lambda)
-%         % %         if ((breakc(i)>=1/2*alpha)||(i==brokeat))
-%         % %             disp('BROKE...')
-%         % %             if found
-%         % %                 disp('Numerical')
-%         % %             end
-%         % %             %break
-%         % %         end
-%         index1=(J(:,i)>=0);
-%         index2=~index1;
-%         plot(sigma(index1), eta2(index1,i), '.r')
-%         hold on
-%         plot(sigma(index2), eta2(index2,i), '.b')
-%         plot(sigma, J(:,i), '-k')
-%         hold off
-%         axis([0 300 min(min(eta2)) max(max(eta2))])
-%         leg=legend('Aprox solution');
-%         % set(leg,'Location','Best');
-%         xlabel('Sigma')
-%         title(num2str(t2(2,i)))
-%         pause(0.01)
-%     end
+    % % %     % Plot to look for global error and information
+    %     slope=zeros(1,length(lambda));
+    %     breakc=slope;
+    %     for j=1:length(lambda)
+    %         for i=1:length(eta2(:,1))-1
+    %             slope(i)=(eta2(i+1,j)-eta2(i,j))/(x2(i+1,j)-x2(i,j));
+    %         end
+    %         breakc(j)=max(slope(:));
+    %     end
+    %     for i=1:length(lambda)
+    %         % %         if ((breakc(i)>=1/2*alpha)||(i==brokeat))
+    %         % %             disp('BROKE...')
+    %         % %             if found
+    %         % %                 disp('Numerical')
+    %         % %             end
+    %         % %             %break
+    %         % %         end
+    %         index1=(J(:,i)>=0);
+    %         index2=~index1;
+    %         plot(sigma(index1), eta2(index1,i), '.r')
+    %         hold on
+    %         plot(sigma(index2), eta2(index2,i), '.b')
+    %         plot(sigma, J(:,i), '-k')
+    %         hold off
+    %         axis([0 300 min(min(eta2)) max(max(eta2))])
+    %         leg=legend('Aprox solution');
+    %         % set(leg,'Location','Best');
+    %         xlabel('Sigma')
+    %         title(num2str(t2(2,i)))
+    %         pause(0.01)
+    %     end
     
     % Plot at the shore
     x=-3*max(max(x2)):.1:2*max(max(x2));
     for i=1:length(lambda)
-%         if ((breakc(i)>=1/2*alpha)||(i==brokeat))
-%             disp('BROKE...')
-%             if found
-%                 disp('Numerical')
-%             end
-%             %break
-%         end
-
+        %         if ((breakc(i)>=1/2*alpha)||(i==brokeat))
+        %             disp('BROKE...')
+        %             if found
+        %                 disp('Numerical')
+        %             end
+        %             %break
+        %         end
+        
         index1=(x2(:,i)<1e10);%(J(:,i)>=0);
         index2=~index1;
         plot(x2(index1,i),eta2(index1,i), '.r')
