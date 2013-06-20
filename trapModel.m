@@ -196,19 +196,27 @@ counter=1;
 while(~(wasnon0&&is0))
     if(time>40)
         counter=-1;
+        disp('normal boundry')
         break
     end
     Point=xmax+sqrt(abs(alpha*g*xmax))*time/(abs(alpha*g));
     if(~wasnon0)
-        wasnon0=eta_bound(Point)~=0;
+        wasnon0=eta_bound(Point)>0;
     end
     is0=eta_bound(Point)==0;
+    %if(wasnon0&&time>20)
+     %   is0=eta_bound(Point)<10^-10;
+    %end
+        
     time=counter*dlambda;
     if ~(wasnon0&&is0)
         counter=counter+1;
     end
 end
-
+if(time<1.75)
+    disp('time to reach shore is too small. move away from shore')
+    break
+end
 
 DJN_Phi=2*g*DJN_eta;
 
@@ -288,13 +296,24 @@ for step=2:timesteps    %we start from the third step, since the first two are a
     %         b(i)=2*Psi_n(i)-Psi_nm1(i);
     %     end
     %     b(n)=0;
-    
     b=2*Psi_n-Psi_nm1;          %Convert into the vector operation, DJN 4/10/13
     b(1)=0;
     
-    %implisit method
-    % we have psi_lambda=-psi_sigma
-    b(n)=dsigma*Psi_n(n);
+    
+    if(counter>step&&counter~=-1)
+        %set phi equal to F U where u=\sqrt(g/h)eta and h=alpha*xmax
+        A(n,n)=1;
+        A(n,n-1)=0;
+        %eta at the x-t point(assuming linear velosity
+        b(n)=F(end)*sqrt(g/(alpha*xmax))*eta_bound(xmax+sqrt(abs(alpha*g*xmax))*step*dlambda/(abs(alpha*g)));
+    else
+        %implisit method
+        % we have psi_lambda=-psi_sigma
+        A(n,n)=dsigma+dlambda;
+        A(n,n-1)=-dlambda;
+        b(n)=dsigma*Psi_n(n);
+    end
+    
     %DJN  Psi=A\b;                    %solve for Psi and set the timesteps up one
     %     Psi_nm1=Psi_n;
     %     Psi_n=Psi;
