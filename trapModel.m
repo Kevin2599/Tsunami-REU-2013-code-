@@ -125,14 +125,12 @@ function trapModel(varargin)
     if( ~getOption('load',false) )
 
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        %We generate the space-determined variables sigma, F, H, H0, intF, dF, W,
-        %and dW.
-
+        %We generate the space-determined variables sigma, F, H, H0, intF, dF, W, and dW.
         %[sigma,F,H,H0,intF,dF,W,dW] = trapF(1,1,dsigma,maxsigma,340,g);
-        [sigma,F,H,H0,intF,dF,W,dW] = trapF(DJN_slopes,DJN_beachwidth/2,dsigma,maxsigma,DJN_beachwidth+alpha*xmax/DJN_slopes,g);
-
+        [sigma,F,H,H0,intF,dF,W,dW] = trapF(DJN_slopes,DJN_beachwidth/2,dsigma,maxsigma,2*(DJN_beachwidth)+2*alpha*xmax/DJN_slopes,g);
         W(1)=1e100; %W(1) is the infinity, just make it huge, instead of the Inf, DJN 4/10/13
         W = W';
+
         start_time = clock();
 
         n = length(sigma);
@@ -160,27 +158,56 @@ function trapModel(varargin)
         A(n,n)=dsigma+dlambda;
         A(n,n-1)=-dlambda;
 
-
         %DJN
-        %Define the initial profile
-        DJN_x=-[0:1:xmax];
-        %DJN_eta=-0.0001/0.6065*exp(-2e-5*(1000+DJN_x).^2).*(1000+DJN_x); %alpha=0.01
+        %Define the initial profile and find Xmax.
 
-        DJN_eta=-9.0315e-4*exp(-1.5e-5*(1000+DJN_x).^2).*(1000+DJN_x); %alpha=0.01
-        DJN_eta(abs(DJN_eta)<1e-3)=0;
+        while(true)
+            DJN_x=-[0:1:xmax];
+            %DJN_eta=-0.0001/0.6065*exp(-2e-5*(1000+DJN_x).^2).*(1000+DJN_x); %alpha=0.01
+            
+            DJN_eta=eta_0(DJN_x);
+            DJN_u=DJN_eta.*sqrt(g./(-alpha*DJN_x));
+            DJN_u(isnan(DJN_u))=0;
+            
+            %DJN_eta=0.01*(1-tanh((1000+DJN_x)/200 ))/2
+            
+            
+            
+            %We need to convert (x, t, \eta, u) to (\sigma, \lambda, \phi, \psi)
+            DJN_H=DJN_eta-DJN_x*alpha;
+            DJN_Sigma=interp1(H, sigma, DJN_H);
+            if max(DJN_Sigma)>max(sigma)-1
+                break
+            end
+            xmax=xmax+1;
+        end
 
-        DJN_u=DJN_eta.*sqrt(g./(-alpha*DJN_x));
-        DJN_u(isnan(DJN_u))=0;
-
-        %DJN_eta=0.01*(1-tanh((1000+DJN_x)/200 ))/2
-        plot(DJN_x, DJN_eta)
-
-
-        %We need to convert (x, t, \eta, u) to (\sigma, \lambda, \phi, \psi)
-        DJN_H=DJN_eta-DJN_x*alpha;
-        DJN_Sigma=interp1(H, sigma, DJN_H);
+        %check if eta for the boundry if far enough away.
+        if(max(abs(eta_bound(0:.1:xmax)))>10^-5)
+            fprintf('eta_bound not far enough!/n Move eta_bound back or reduce maxsigma.')
+        end
 
 
+        % find when we need to switch from eta to linear theory boundry
+        wasnon0=false;
+        is0=false;
+        time=0;
+        counter=1;
+        while(~(wasnon0&&is0))
+            if(time>40)
+                counter=-1;
+                break
+            end
+            Point=xmax+sqrt(abs(alpha*g*xmax))*time/(abs(alpha*g));
+            if(~wasnon0)
+                wasnon0=eta_bound(Point)~=0;
+            end
+            is0=eta_bound(Point)==0;
+            time=counter*dlambda;
+            if ~(wasnon0&&is0)
+                counter=counter+1;
+            end
+        end
 
 
 
@@ -228,8 +255,6 @@ function trapModel(varargin)
         %DJN 4/10/13 %Phi=Phi_n;                                                                   % Define Psi as the nth step
 
 
-
-
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % Solve the model for Psi and Phi
 
@@ -255,23 +280,22 @@ function trapModel(varargin)
             lambda(l)=step*dlambda;
         end
 
-        l=l+1;
-
         for step=2:timesteps    %we start from the third step, since the first two are already computed, DJN 4/10/13
-        %DJN  b(1)=0;                     % Define b as the right side of our system
-        %     for i=2:n-1
-        %         b(i)=2*Psi_n(i)-Psi_nm1(i);
-        %     end
-        %     b(n)=0;
-             
-            b=2*Psi_n-Psi_nm1;          %Convert into the vector operation, DJN 4/10/13  
+            %DJN  b(1)=0;                     % Define b as the right side of our system
+            %     for i=2:n-1
+            %         b(i)=2*Psi_n(i)-Psi_nm1(i);
+            %     end
+            %     b(n)=0;
+            
+            b=2*Psi_n-Psi_nm1;          %Convert into the vector operation, DJN 4/10/13
             b(1)=0;
             
-            %implisit method
+            %implicit method
+            % we have psi_lambda=-psi_sigma
             b(n)=dsigma*Psi_n(n);
-        %DJN  Psi=A\b;                    %solve for Psi and set the timesteps up one
-        %     Psi_nm1=Psi_n;
-        %     Psi_n=Psi;
+            %DJN  Psi=A\b;                    %solve for Psi and set the timesteps up one
+            %     Psi_nm1=Psi_n;
+            %     Psi_n=Psi;
             
             Psi_nm1=Psi_n;              %We don't really need Psi vector, it just got eliminated to save time, DJN 4/10/13
             Psi_n=A\b;
@@ -283,15 +307,15 @@ function trapModel(varargin)
             Phi=4/3*Phi_n-1/3*Phi_nm1+2/3*G*dlambda;                             % Define the next Phi
             Phi_nm1=Phi_n;
             Phi_n=Phi;
-              
+            
             if(mod(step,keeprate)==0)              % Keep information at some points
                 Psiout(l,:)=Psi_n;              % save the values at the current time step (written into the *_n arrays)
                 Phiout(l,:)=Phi_n;
                 lambda(l)=step*dlambda;
-               
+                
                 figure(1);
                 plot(sigma(1,:),Phiout(l,:))
-                title(['Step ',num2str(step),' (',num2str(step/timesteps*100),'%)']);
+                title(['Step ' num2str(step) ' (' num2str(step * timesteps/100) '%)'])
                 pause(.000000000000001);
                 l=l+1;
             end
@@ -386,6 +410,10 @@ function trapModel(varargin)
         %     pause(0.01)
         % end
         
+        figure(2); clf('reset');
+        figure(1); clf('reset');
+
+
         % Plot at the shore
         x=-3*max(max(x2)):.1:2*max(max(x2));
         for i=1:length(lambda)
@@ -407,7 +435,7 @@ function trapModel(varargin)
             plot(0,0,'^b')
             hold off
             %axis([1.5*(-1*(max(max(eta2))-min(min(eta2)))/alpha+max(max(x2))) 1.5*max(max(x2)) 1.5*min(min(eta2)) 1.5*max(max(eta2))])
-            axis([-2350 1.5*max(max(x2)) max(min(min(eta2)), -1) 1.5*max(max(eta2))])
+            axis([-2350, 1.5*max(max(x2)), max(min(min(eta2)), -1), 1.5*max(max(eta2))]);
             %leg=legend('Aprox Solution');
             %set(leg,'Location','Best')
             xlabel(['x(lambda = ' num2str(lambda(i)) ' ' num2str(i)])
@@ -424,6 +452,7 @@ function trapModel(varargin)
                 figure(2);
                 hold on
                 plot3(x2(:,i)', t2(:,i)', eta2(:,i)');
+
             elseif false
                 figure(2);
                 surf( [1 ; 1] * x2(:,i)', [-DJN_beachwidth ; DJN_beachwidth] * ones(size(x2(:,i)')), [1 ; 1 ] * eta2(:,i)',
@@ -442,7 +471,7 @@ function trapModel(varargin)
 
             pause(.03)
         end
-        hold on
+        figure(1); hold on
         plot(DJN_x, DJN_eta,'-b')
         hold off
         
