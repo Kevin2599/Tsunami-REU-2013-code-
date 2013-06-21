@@ -55,12 +55,7 @@ y0index = find(y==y0,1);
 %We pre-allocate f, then use a loop to define the piecewise trapezoidal
 %cross-section.
 f=zeros(1,length(y));
-for i=1:(y0index - 1)
-    f(i) = 0;
-end
-for i=y0index:length(y)
-    f(i)= beta*(y(i) - y0);
-end
+f(y0index:end) = beta*( y(y0index:end) - y0 );
 
 
 %We need to find h0temp.  This is defined as:
@@ -196,9 +191,7 @@ dF=zeros(1,n);
 dF(1)=(-F(3)+4*F(2)-3*F(1))/(2*dsigma);
 
 %Use a second order central difference scheme 
-for i=2:n-1
-    dF(i)=(F(i+1)-F(i-1))/(2*dsigma);
-end
+dF(2:n-1) = (F(3:n)-F(1:n-2)) / (2*dsigma);
 
 %Find the endpoint using a backwards difference scheme
 dF(n)=(-3*F(n)+4*F(n-1)-F(n-2))/(2*dsigma);
