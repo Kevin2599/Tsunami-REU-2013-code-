@@ -113,7 +113,6 @@ function trapModel(varargin)
     keeprate=   getOption('keeprate',timesteps/100);  % keep every \it{keeprate}-th step.
     g=          getOption('g',9.81);                  % Set gravity
     alpha=      getOption('alpha',.05);               % Set slope
-    plotb=      getOption('plotb',1);                 % Bool to plot
     dsigma=     getOption('dsigma',.01);              % Our change in Sigma from program
     maxsigma=   getOption('maxsigma',150);            % The maximum value for sigma that we want.
     xmax=       getOption('xmax',6934);               % max for x
@@ -177,6 +176,7 @@ function trapModel(varargin)
                 break
             end
             xmax=xmax+1;
+            println(['searching for xmax: ' num2str(xmax)])
         end
         DJN_u=DJN_eta.*sqrt(g./(-alpha*DJN_x));
         DJN_u(isnan(DJN_u))=0;
@@ -242,8 +242,8 @@ function trapModel(varargin)
             end
         end
         if(time<1.75)
-            disp('time to reach shore is too small. move away from shore')
-            break
+            println('time to reach shore is too small. move away from shore')
+            return
         end
 
         Phi_nm1=interp1(DJN_Sigma, DJN_Phi, sigma);
@@ -352,8 +352,9 @@ function trapModel(varargin)
                 Phiout(l,:)=Phi_n;
                 lambda(l)=step*dlambda;
                 
-                figure(1);
-                plot(sigma(1,:),Phiout(l,:))
+                figure(1); hold off;
+                plot(sigma(1,:),[Phiout(l,:)]);
+
                 title(['Step ' num2str(step) ' (' num2str(100 *step /timesteps) '%)'])
                 pause(.000000000000001);
                 l=l+1;
@@ -391,7 +392,10 @@ function trapModel(varargin)
         fprintf('Simulation compeleted in %d seconds\n', ceil(etime(clock(),start_time)));
 
         if getOption('save',false)
-            save('.savedTrapModel.mat',  'eta2','t2','x2','u2','DJN_x','DJN_eta','DJN_beachwidth','DJN_slopes', ...
+            eta2 = eta2(1:3:end,:);
+            t2 = t2(1:3:end,:);
+            x2 = x2(1:3:end,:);
+            save('.savedTrapModel.mat',  'eta2','t2','x2','DJN_x','DJN_eta','DJN_beachwidth','DJN_slopes', ...
                 'alpha','lambda');
         end
     else
@@ -411,11 +415,17 @@ function trapModel(varargin)
             found=1;
             brokeat=j;
             println(['Broke at ' num2str(brokeat)])
+            if getOption('trimAtBreak', false)
+                t2 = t2(:,1:j-1);
+                x2 = x2(:,1:j-1);
+                eta2 = eta2(:,1:j-1);
+            end
             break
         end
     end
 
-    if plotb
+    x=-3*max(max(x2)):.1:2*max(max(x2));
+    if getOption('plotLambda',true)
         
     % %     % Plot to look for global error and information
         % slope=zeros(1,length(lambda));
@@ -454,7 +464,6 @@ function trapModel(varargin)
 
 
         % Plot at the shore
-        x=-3*max(max(x2)):.1:2*max(max(x2));
         for i=1:length(lambda)
     %         if ((breakc(i)>=1/2*alpha)||(i==brokeat))
     %             println('BROKE...')
@@ -464,7 +473,6 @@ function trapModel(varargin)
     %             %break
     %         end
 
-            figure(1);
             index1=(x2(:,i)<1e10);%(J(:,i)>=0);
             index2=~index1;
             plot(x2(index1,i),eta2(index1,i), '.r')
@@ -487,12 +495,7 @@ function trapModel(varargin)
             results.max_runup=max(max(eta2));
             results.case=['case_',num2str(DJN_beachwidth),'m_',num2str(1/DJN_slopes),'_',num2str(alpha)];
 
-            if getOption('plotTopView',false)
-                figure(2);
-                hold on
-                plot3(x2(:,i)', t2(:,i)', eta2(:,i)');
-
-            elseif false
+            if getOption('plotTopView', false)
                 figure(2);
                 surf( [1 ; 1] * x2(:,i)', [-DJN_beachwidth ; DJN_beachwidth] * ones(size(x2(:,i)')), [1 ; 1 ] * eta2(:,i)',
                     ones(2,length(x2(:,i))),'EdgeColor','none','LineStyle','none');
@@ -506,14 +509,51 @@ function trapModel(varargin)
                 axis([-100 1.5*max(max(x2))    -DJN_beachwidth DJN_beachwidth    max(min(min(eta2)), -1) 1.5*max(max(eta2))])
                 view(2)
                 hold off
+                figure(1);
             end
 
             pause(.03)
         end
+
         figure(1); hold on
         plot(DJN_x, DJN_eta,'-b')
         hold off
-        
+    end
+    if getOption('plotTime',false)
+
+        x2 = x2(:,10:end/2);
+        t2 = t2(:,10:end/2);
+        eta2 = eta2(:,10:end/2);
+
+        figure(2); clf
+        hold on
+        for i=1:length(x2(1,:))
+            plot3(x2(:,i)', t2(:,i)', eta2(:,i)');
+            pause(0.0000001);
+        end
+
+        figure(1); clf
+
+        delta_t = diff(t2');
+        surf(delta_t,'EdgeColor','none','LineStyle','none');
+        % etaCleared = eta2 * ([ones(size(eta2()))])
+
+        figure(3); clf
+
+        delta_x = diff(x2);
+        surf(delta_x,'EdgeColor','none','LineStyle','none');
+
+        xs = reshape(x2(),1,[]);
+        ys = reshape(t2(),1,[]);
+        zs = reshape(eta2(),1,[]);
+
+        whos
+
+        [X Y] = meshgrid(min(min(xs)):max(max(xs)) , t2(2,:));
+
+
+        Z = griddata(xs, ys, ones(size(zs)), X,Y); 
+        surf(X,Y,Z);
     end
 
 %save(['analytical_nw_',results.case,'.mat'], 'results')
