@@ -243,7 +243,7 @@ function trapModel(varargin)
         end
         if(time<1.75)
             disp('time to reach shore is too small. move away from shore')
-            break
+            return
         end
 
         Phi_nm1=interp1(DJN_Sigma, DJN_Phi, sigma);
@@ -251,35 +251,36 @@ function trapModel(varargin)
         Phi_nm1(1)=0;
 
         Phi_nm1=Phi_nm1';   %Make it the column, DJN 4/10/13
-
+        %Phi_sigma=Psi_lambda
         %Define the initial Psi and then the next time step (wave velocity)
-        G=zeros(n,1);                                                % Pre-allocate for speed
+        PSI_LAMBDA=zeros(n,1);                                                % Pre-allocate for speed
 
-        G(1)     =  (-Phi_nm1(3) + 4*Phi_nm1(2)-3*Phi_nm1(1))/(2*dsigma);     % Second order forwards difference
-        G(2:n-1) = (Phi_nm1(3:n) - Phi_nm1(1:n-2)) / (2*dsigma);
-        G(n)     =(-3*Phi_nm1(n) + 4*Phi_nm1(n-1)-Phi_nm1(n-2))/(2*dsigma); % Second order backwards difference
+        PSI_LAMBDA(1)     =  (-Phi_nm1(3) + 4*Phi_nm1(2)-3*Phi_nm1(1))/(2*dsigma);     % Second order forwards difference
+        PSI_LAMBDA(2:n-1) = (Phi_nm1(3:n) - Phi_nm1(1:n-2)) / (2*dsigma);           %phi(n+1)-Phi(n-1)
+        PSI_LAMBDA(n)     =(-3*Phi_nm1(n) + 4*Phi_nm1(n-1)-Phi_nm1(n-2))/(2*dsigma); % Second order backwards difference
 
 
 
         u_sigma=interp1(DJN_Sigma, DJN_u, sigma);
         u_sigma(isnan(u_sigma))=0;
-
+        
         Psi_nm1=(F.*u_sigma);
         Psi_nm1(isnan(Psi_nm1))=0;  % 1/0 is not good.
         Psi_nm1=Psi_nm1';   %Make it the column, DJN 4/10/13
         %zeros(n,1);                                          % psi=0, %Make it the column, DJN 4/10/13
-
-
-        Psi_n=Psi_nm1+G*dlambda;                                     % Compute psi at the second step
+        
+        
+        Psi_n=Psi_nm1+PSI_LAMBDA*dlambda;                                     % Compute psi at the second step
         %DJN 4/10/13 %Psi=Psi_n;                                                   % Define Psi as the nth step
-
-
+        
+        PHI_LAMBDA=zeros(n,1);
+        % Phi_lambda=psi_sigma+W\psi
         %Find Phi at the next time step using Psi_n
-        G(1)=(-Psi_nm1(3)+4*Psi_nm1(2)-3*Psi_nm1(1))/(2*dsigma)+Psi_nm1(1)*W(1);     % Second order forwards difference
-        G(2:n-1) = (Psi_nm1(3:n)-Psi_nm1(1:n-2)) / (2*dsigma) + Psi_nm1(2:n-1) .* W(2:n-1);
-        G(n)=(-3*Psi_nm1(n)+4*Psi_nm1(n-1)-Psi_nm1(n-2))/(2*dsigma)+Psi_nm1(n)*W(n); % Second order backwards difference
-
-        Phi_n=Phi_nm1+dlambda*(G);                                                   % Compute phi at the nth step
+        PHI_LAMBDA(1)=(-Psi_nm1(3)+4*Psi_nm1(2)-3*Psi_nm1(1))/(2*dsigma)+Psi_nm1(1)*W(1);     % Second order forwards difference
+        PHI_LAMBDA(2:n-1) = (Psi_nm1(3:n)-Psi_nm1(1:n-2)) / (2*dsigma) + Psi_nm1(2:n-1) .* W(2:n-1); %psi(n+1)-psi(n+1)/(2dsigma)+psi(n)*W(n)
+        PHI_LAMBDA(n)=(-3*Psi_nm1(n)+4*Psi_nm1(n-1)-Psi_nm1(n-2))/(2*dsigma)+Psi_nm1(n)*W(n); % Second order backwards difference
+        
+        Phi_n=Phi_nm1+dlambda*(PHI_LAMBDA);                                                   % Compute phi at the nth step
         %DJN 4/10/13 %Phi=Phi_n;                                                                   % Define Psi as the nth step
 
 
@@ -339,11 +340,11 @@ function trapModel(varargin)
             Psi_nm1=Psi_n;              %We don't really need Psi vector, it just got eliminated to save time, DJN 4/10/13
             Psi_n=A\b;
 
-            G(1)=(-Psi_n(3)+4*Psi_n(2)-3*Psi_n(1))/(2*dsigma)+W(1)*Psi_n(1);     % Second order forwards difference
-            G(2:n-1) = ((Psi_n(3:n) - Psi_n(1:n-2)) ./ (2*dsigma)) + W(2:n-1).*Psi_n(2:n-1);
-            G(n)=(-3*Psi_n(n)+4*Psi_n(n-1)-Psi_n(n-2))/(2*dsigma)+W(n)*Psi_n(n); % Second order backwards difference
+            PHI_LAMBDA(1)=(-Psi_n(3)+4*Psi_n(2)-3*Psi_n(1))/(2*dsigma)+W(1)*Psi_n(1);     % Second order forwards difference
+            PHI_LAMBDA(2:n-1) = ((Psi_n(3:n) - Psi_n(1:n-2)) ./ (2*dsigma)) + W(2:n-1).*Psi_n(2:n-1);  %psi(n+1)-psi(n+1)/(2dsigma)+psi(n)*W(n)
+            PHI_LAMBDA(n)=(-3*Psi_n(n)+4*Psi_n(n-1)-Psi_n(n-2))/(2*dsigma)+W(n)*Psi_n(n); % Second order backwards difference
 
-            Phi=4/3*Phi_n-1/3*Phi_nm1+2/3*G*dlambda;                             % Define the next Phi
+            Phi=4/3*Phi_n-1/3*Phi_nm1+2/3*PHI_LAMBDA*dlambda;                             % Define the next Phi
             Phi_nm1=Phi_n;
             Phi_n=Phi;
             
@@ -352,7 +353,7 @@ function trapModel(varargin)
                 Phiout(l,:)=Phi_n;
                 lambda(l)=step*dlambda;
                 
-                figure(1);
+                %figure(1);
                 plot(sigma(1,:),Phiout(l,:))
                 title(['Step ' num2str(step) ' (' num2str(100 *step /timesteps) '%)'])
                 pause(.000000000000001);
@@ -494,7 +495,7 @@ function trapModel(varargin)
 
             elseif false
                 figure(2);
-                surf( [1 ; 1] * x2(:,i)', [-DJN_beachwidth ; DJN_beachwidth] * ones(size(x2(:,i)')), [1 ; 1 ] * eta2(:,i)',
+                surf( [1 ; 1] * x2(:,i)', [-DJN_beachwidth ; DJN_beachwidth] * ones(size(x2(:,i)')), [1 ; 1 ] * eta2(:,i)', ...
                     ones(2,length(x2(:,i))),'EdgeColor','none','LineStyle','none');
                 hold on
 
