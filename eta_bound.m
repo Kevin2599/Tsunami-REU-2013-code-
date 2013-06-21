@@ -3,4 +3,7 @@ function y=eta_bound(x)
 	x_l=7000;
 	l=5;
 	y=a*exp(-((x-x_l)/l).^2);% gause wave
+
+	% take out function
+	y(:,:) = 0;
 end

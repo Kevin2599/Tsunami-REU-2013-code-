@@ -116,7 +116,7 @@ function trapModel(varargin)
     plotb=      getOption('plotb',1);                 % Bool to plot
     dsigma=     getOption('dsigma',.01);              % Our change in Sigma from program
     maxsigma=   getOption('maxsigma',150);            % The maximum value for sigma that we want.
-    xmax=       getOption('xmax',5000);               % max for x
+    xmax=       getOption('xmax',6934);               % max for x
 
     seconds_per_update = getOption('seconds_per_update',3);
     DJN_beachwidth=      getOption('DJN_beachwidth',50);
@@ -161,6 +161,7 @@ function trapModel(varargin)
         %DJN
         %Define the initial profile and find Xmax.
 
+        %FIXME, O(n) => O(log(n))
         while(true)
             DJN_x=-[0:1:xmax];
             %DJN_eta=-0.0001/0.6065*exp(-2e-5*(1000+DJN_x).^2).*(1000+DJN_x); %alpha=0.01
@@ -290,9 +291,20 @@ function trapModel(varargin)
             b=2*Psi_n-Psi_nm1;          %Convert into the vector operation, DJN 4/10/13
             b(1)=0;
             
-            %implicit method
-            % we have psi_lambda=-psi_sigma
-            b(n)=dsigma*Psi_n(n);
+            if(counter>step&&counter~=-1)
+                %set phi equal to F U where u=\sqrt(g/h)eta and h=alpha*xmax
+                A(n,n)=1;
+                A(n,n-1)=0;
+                %eta at the x-t point(assuming linear velosity
+                b(n)=F(end)*sqrt(g/(alpha*xmax))*eta_bound(xmax+sqrt(abs(alpha*g*xmax))*step*dlambda/(abs(alpha*g)));
+            else
+                %implisit method
+                % we have psi_lambda=-psi_sigma
+                A(n,n)=dsigma+dlambda;
+                A(n,n-1)=-dlambda;
+                b(n)=dsigma*Psi_n(n);
+            end
+
             %DJN  Psi=A\b;                    %solve for Psi and set the timesteps up one
             %     Psi_nm1=Psi_n;
             %     Psi_n=Psi;
@@ -315,7 +327,7 @@ function trapModel(varargin)
                 
                 figure(1);
                 plot(sigma(1,:),Phiout(l,:))
-                title(['Step ' num2str(step) ' (' num2str(step * timesteps/100) '%)'])
+                title(['Step ' num2str(step) ' (' num2str(100 *step /timesteps) '%)'])
                 pause(.000000000000001);
                 l=l+1;
             end
