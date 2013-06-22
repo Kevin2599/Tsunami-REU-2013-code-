@@ -464,7 +464,7 @@ function trapModel(varargin)
 
 
         % Plot at the shore
-        for i=1:length(lambda)
+        for i=1:length(x2(1,:))
     %         if ((breakc(i)>=1/2*alpha)||(i==brokeat))
     %             println('BROKE...')
     %             if found
@@ -521,39 +521,69 @@ function trapModel(varargin)
     end
     if getOption('plotTime',false)
 
-        x2 = x2(:,10:end/2);
-        t2 = t2(:,10:end/2);
-        eta2 = eta2(:,10:end/2);
+        % get rid of lambda=[1,end] b/c they fuck griddata up
+        x2 = x2(2:5:end/10,:);
+        t2 = t2(2:5:end/10,:);
+        eta2 = eta2(2:5:end/10,:);
 
+        % line plot of x,t,eta
         figure(2); clf
         hold on
         for i=1:length(x2(1,:))
-            plot3(x2(:,i)', t2(:,i)', eta2(:,i)');
+            plot3(t2(:,i)', x2(:,i)', eta2(:,i)');
             pause(0.0000001);
         end
+        view(2);
 
-        figure(1); clf
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        % Correct the t values 
+        %
+        % build a mesh for sampling at constant t intervals
+        % there are more x-samples near the shoreline, this captures that
+        x_sample = mean(x2,2);
+        x_sample = x_sample - x_sample(end);
+        x_sample = x_sample ./ x_sample(1);
+        % x_sample = x_sample(1:stride:end)
 
-        delta_t = diff(t2');
-        surf(delta_t,'EdgeColor','none','LineStyle','none');
-        % etaCleared = eta2 * ([ones(size(eta2()))])
+        % each t sample is the average of t(lambda = i)
+        t_lin = mean(t2);
 
-        figure(3); clf
+        % moving shoreline for x
+        x_max = interp1(t2(  1,:), x2(  1,:), t_lin);
+        x_min = interp1(t2(end,:), x2(end,:), t_lin);
 
-        delta_x = diff(x2);
-        surf(delta_x,'EdgeColor','none','LineStyle','none');
+        % create the mesh
+        t_lin = ones(size(x_sample)) * t_lin;
+        x_lin = x_sample * x_max + (1-x_sample) * x_min;
+        mesh(t_lin, x_lin, ones(size(x_lin)));
 
-        xs = reshape(x2(),1,[]);
-        ys = reshape(t2(),1,[]);
-        zs = reshape(eta2(),1,[]);
+        % vectorize a matrix
+        v = @(mat) reshape(mat(),1,[]);
 
-        whos
+        % sample the wave height (eta) at the correct t-values
+        eta_lin = griddata(v(x2), v(t2), v(eta2), x_lin,t_lin); % 'cubic'
+        % surf(x_lin,t_lin,eta_lin,'EdgeColor','none','LineStyle','none');
 
-        [X Y] = meshgrid(min(min(xs)):max(max(xs)) , t2(2,:));
+        figure(1);
 
+        for i=1:length(x2(1,:))
+            hold off
+            plot(x2(:,i),eta2(:,i)', 'b')
+            hold on
+            plot(x_lin(:,i),eta_lin(:,i), 'r')
 
-        Z = griddata(xs, ys, ones(size(zs)), X,Y); 
-        surf(X,Y,Z);
+            x_axis = [min(x_min), max(x_max)+10];
+            plot(x_axis , alpha*x_axis);
+            plot(0,0,'^b');
+
+            axis([x_axis   min(min(eta_lin)), max(max(eta_lin))]);
+            leg=legend('lambda','real t');
+            set(leg,'Location','southeast')
+            xlabel(['x'])
+            ylabel(['z'])
+            title(['t = ', num2str(t_lin(1,i))]);
+            pause(.3);
+        end
     end
 
 %save(['analytical_nw_',results.case,'.mat'], 'results')
