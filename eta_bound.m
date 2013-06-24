@@ -6,4 +6,5 @@ function y=eta_bound(x)
     y(y<10^-5)=0;
 	%y(y~=0)=0;
    % y=.2/14.11;
+   y=0;
 end

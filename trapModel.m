@@ -113,7 +113,6 @@ function trapModel(varargin)
     keeprate=   getOption('keeprate',timesteps/100);  % keep every \it{keeprate}-th step.
     g=          getOption('g',9.81);                  % Set gravity
     alpha=      getOption('alpha',.05);               % Set slope
-    plotb=      getOption('plotb',1);                 % Bool to plot
     dsigma=     getOption('dsigma',.01);              % Our change in Sigma from program
     maxsigma=   getOption('maxsigma',150);            % The maximum value for sigma that we want.
     xmax=       getOption('xmax',5000);               % max for x
@@ -163,9 +162,6 @@ function trapModel(varargin)
 
         %DJN
         %Define the initial profile and find Xmax.
-
-        %FIXME, O(n) => O(log(n))
-        
         
         %Find the real Xmax.
         Max_H=interp1(sigma,H,maxsigma);
@@ -181,7 +177,7 @@ function trapModel(varargin)
         %We need to convert (x, t, \eta, u) to (\sigma, \lambda, \phi, \psi)
         DJN_H=DJN_eta-DJN_x*alpha;
         DJN_Sigma=interp1(H, sigma, DJN_H);
-        
+
         DJN_u=DJN_eta.*sqrt(g./(-alpha*DJN_x));
         DJN_u(isnan(DJN_u))=0;
 
@@ -228,7 +224,7 @@ function trapModel(varargin)
             end
         end
         if(time<1.75)
-            disp('time to reach shore is too small. move away from shore')
+            println('time to reach shore is too small. move away from shore')
             return
         end
 
@@ -312,9 +308,6 @@ function trapModel(varargin)
                 %eta at the x-t point(assuming linear velosity
                 b(n)=interp1(sigma,F,maxsigma)*sqrt(g/(alpha*xmax))*eta_bound(xmax+sqrt(abs(alpha*g*xmax))*step*dlambda/(abs(alpha*g)));
             else
-                if counter==step
-                    090909
-                end
                 %implicit method
                 % we have psi_lambda=-psi_sigma
                 A(n,n)=dsigma+dlambda;
@@ -388,7 +381,10 @@ function trapModel(varargin)
         fprintf('Simulation compeleted in %d seconds\n', ceil(etime(clock(),start_time)));
 
         if getOption('save',false)
-            save('.savedTrapModel.mat',  'eta2','t2','x2','u2','DJN_x','DJN_eta','DJN_beachwidth','DJN_slopes', ...
+            eta2 = eta2(1:3:end,:);
+            t2 = t2(1:3:end,:);
+            x2 = x2(1:3:end,:);
+            save('.savedTrapModel.mat',  'eta2','t2','x2','DJN_x','DJN_eta','DJN_beachwidth','DJN_slopes', ...
                 'alpha','lambda');
         end
     else
@@ -408,11 +404,17 @@ function trapModel(varargin)
             found=1;
             brokeat=j;
             println(['Broke at ' num2str(brokeat)])
+            if getOption('trimAtBreak', false)
+                t2 = t2(:,1:j-1);
+                x2 = x2(:,1:j-1);
+                eta2 = eta2(:,1:j-1);
+            end
             break
         end
     end
 
-    if plotb
+    x=-3*max(max(x2)):.1:2*max(max(x2));
+    if getOption('plotLambda',true)
         
     % %     % Plot to look for global error and information
         % slope=zeros(1,length(lambda));
@@ -451,8 +453,7 @@ function trapModel(varargin)
 
 
         % Plot at the shore
-        x=-3*max(max(x2)):.1:2*max(max(x2));
-        for i=1:length(lambda)
+        for i=1:length(x2(1,:))
     %         if ((breakc(i)>=1/2*alpha)||(i==brokeat))
     %             println('BROKE...')
     %             if found
@@ -461,7 +462,6 @@ function trapModel(varargin)
     %             %break
     %         end
 
-            figure(1);
             index1=(x2(:,i)<1e10);%(J(:,i)>=0);
             index2=~index1;
             plot(x2(index1,i),eta2(index1,i), '.r')
@@ -503,14 +503,72 @@ function trapModel(varargin)
                 axis([-100 1.5*max(max(x2))    -DJN_beachwidth DJN_beachwidth    max(min(min(eta2)), -1) 1.5*max(max(eta2))])
                 view(2)
                 hold off
+                figure(1);
             end
 
-            pause(.03)
+            pause(.1)
         end
+
         figure(1); hold on
         plot(DJN_x, DJN_eta,'-b')
         hold off
-        
+    end
+    if getOption('plotTime',false)
+        % get rid of lambda=[1,end] b/c they fuck griddata up
+        x2 = x2(2:end-1,:);
+        t2 = t2(2:end-1,:);
+        eta2 = eta2(2:end-1,:);
+
+        % doing the entire matrix is very slow
+        sample = @(mat) mat(floor(getOption('timeFixStart',0.0)*end)+1 : getOption('timeFixStride',10) : floor(getOption('timeFixEnd',0.1)*end),:);
+        x2 = sample(x2);
+        t2 = sample(t2);
+        eta2 = sample(eta2);
+
+        % line plot of x,t,eta
+        figure(2); clf
+        hold on
+        for i=1:length(x2(1,:))
+            plot3(t2(:,i)', x2(:,i)', eta2(:,i)');
+            pause(0.0000001);
+        end
+        view(2);
+
+        [x_lin t_lin eta_lin] = toConstantTime(x2,t2,eta2);
+        % surf(x_lin,t_lin,eta_lin,'EdgeColor','none','LineStyle','none');
+
+        x_axis = [min(min(x_lin)), max(max(x_lin))+10];
+        eta_axis = [min(min(eta_lin)), max(max(eta_lin))];
+
+        max_height = eta_axis(2) - x_axis(1)*alpha;
+        max_y = max_height/DJN_slopes + DJN_beachwidth/2;
+        trap_bathymetry = [-max_y max_y max_height; -DJN_beachwidth/2 DJN_beachwidth/2 0];
+        waterOutlineInitial = topViewOfWater(trap_bathymetry,alpha,x_lin(:,1),eta_lin(:,1));
+
+        for i=1:length(x2(1,:))
+            figure(1); hold off
+            plot(x2(:,i),eta2(:,i)', 'b')
+            hold on
+            plot(x_lin(:,i),eta_lin(:,i), 'r')
+
+            plot(x_axis , alpha*x_axis);
+            plot(0,0,'^b');
+
+            axis([x_axis eta_axis]);
+            leg=legend('lambda','real t');
+            set(leg,'Location','southeast')
+            xlabel(['x'])
+            ylabel(['z'])
+            title(['t = ', num2str(t_lin(1,i))]);
+
+            figure(3); hold off
+            waterOutline = topViewOfWater(trap_bathymetry,alpha,x_lin(:,i),eta_lin(:,i));
+            plot(waterOutlineInitial(:,1),waterOutlineInitial(:,2),'k'); hold on
+            plot(waterOutline(:,1),waterOutline(:,2),'r');
+            axis(x_axis);
+
+            pause(.3);
+        end
     end
 
 %save(['analytical_nw_',results.case,'.mat'], 'results')
