@@ -522,9 +522,15 @@ function trapModel(varargin)
     if getOption('plotTime',false)
 
         % get rid of lambda=[1,end] b/c they fuck griddata up
-        x2 = x2(2:5:end/10,:);
-        t2 = t2(2:5:end/10,:);
-        eta2 = eta2(2:5:end/10,:);
+        x2 = x2(2:end-1,:);
+        t2 = t2(2:end-1,:);
+        eta2 = eta2(2:end-1,:);
+
+        % doing the entire matrix is very slow
+        sample = @(mat) mat(floor(getOption('timeFixStart',0.0)*end)+1 : getOption('timeFixStride',10) : floor(getOption('timeFixEnd',0.1)*end),:);
+        x2 = sample(x2);
+        t2 = sample(t2);
+        eta2 = sample(eta2);
 
         % line plot of x,t,eta
         figure(2); clf
@@ -543,7 +549,6 @@ function trapModel(varargin)
         x_sample = mean(x2,2);
         x_sample = x_sample - x_sample(end);
         x_sample = x_sample ./ x_sample(1);
-        % x_sample = x_sample(1:stride:end)
 
         % each t sample is the average of t(lambda = i)
         t_lin = mean(t2);
