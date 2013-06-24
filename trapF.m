@@ -202,8 +202,24 @@ sigStitchIndex = find(sigma==preciseSigma(stitchIndex),1);
 %Now let's smooth our dF
 smoothdF = (fixit(smooth(dF,15),sigStitchIndex-40,sigStitchIndex+40,30))';
 
+%corect last few points
+for temp=2:length(smoothdF)
+   if abs(smoothdF(temp-1)-smoothdF(temp))>.03
+       smoothdF(temp)=smoothdF(temp-1);
+   end
+end
+
 %Now find W using F and dF.
 W=(2-smoothdF)./F;
+
+
+
+%plot(smoothdF(1:length(smoothdF)-1)-smoothdF(2:length(smoothdF)),'.k')
+
+
+
+
+
 %Now let's define our asmyptotic W.
 asympW = 1./sigma + sigma./(3*g*beta*y0);
 
@@ -211,6 +227,5 @@ asympW = 1./sigma + sigma./(3*g*beta*y0);
 dW=-(1./F).^2.*(2*ones(1,length(dF))-smoothdF);
 %Let's also do the asmyptotics of dW.
 asympdW = -(1./(sigma.^2)) + 1/(3*g*beta*y0);
-
 dF = smoothdF;
 end
