@@ -312,6 +312,9 @@ function trapModel(varargin)
                 %eta at the x-t point(assuming linear velosity
                 b(n)=interp1(sigma,F,maxsigma)*sqrt(g/(alpha*xmax))*eta_bound(xmax+sqrt(abs(alpha*g*xmax))*step*dlambda/(abs(alpha*g)));
             else
+                if counter==step
+                    090909
+                end
                 %implicit method
                 % we have psi_lambda=-psi_sigma
                 A(n,n)=dsigma+dlambda;
@@ -502,7 +505,7 @@ function trapModel(varargin)
                 hold off
             end
 
-            pause(.1)
+            pause(.03)
         end
         figure(1); hold on
         plot(DJN_x, DJN_eta,'-b')
