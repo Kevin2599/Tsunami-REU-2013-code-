@@ -520,7 +520,6 @@ function trapModel(varargin)
         hold off
     end
     if getOption('plotTime',false)
-
         % get rid of lambda=[1,end] b/c they fuck griddata up
         x2 = x2(2:end-1,:);
         t2 = t2(2:end-1,:);
@@ -541,52 +540,38 @@ function trapModel(varargin)
         end
         view(2);
 
-        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        % Correct the t values 
-        %
-        % build a mesh for sampling at constant t intervals
-        % there are more x-samples near the shoreline, this captures that
-        x_sample = mean(x2,2);
-        x_sample = x_sample - x_sample(end);
-        x_sample = x_sample ./ x_sample(1);
-
-        % each t sample is the average of t(lambda = i)
-        t_lin = mean(t2);
-
-        % moving shoreline for x
-        x_max = interp1(t2(  1,:), x2(  1,:), t_lin);
-        x_min = interp1(t2(end,:), x2(end,:), t_lin);
-
-        % create the mesh
-        t_lin = ones(size(x_sample)) * t_lin;
-        x_lin = x_sample * x_max + (1-x_sample) * x_min;
-        mesh(t_lin, x_lin, ones(size(x_lin)));
-
-        % vectorize a matrix
-        v = @(mat) reshape(mat(),1,[]);
-
-        % sample the wave height (eta) at the correct t-values
-        eta_lin = griddata(v(x2), v(t2), v(eta2), x_lin,t_lin); % 'cubic'
+        [x_lin t_lin eta_lin] = toConstantTime(x2,t2,eta2);
         % surf(x_lin,t_lin,eta_lin,'EdgeColor','none','LineStyle','none');
 
-        figure(1);
+        x_axis = [min(min(x_lin)), max(max(x_lin))+10];
+        eta_axis = [min(min(eta_lin)), max(max(eta_lin))];
+
+        max_height = eta_axis(2) - x_axis(1)*alpha;
+        max_y = max_height/DJN_slopes + DJN_beachwidth/2;
+        trap_bathymetry = [-max_y max_y max_height; -DJN_beachwidth/2 DJN_beachwidth/2 0];
 
         for i=1:length(x2(1,:))
-            hold off
+            figure(1); hold off
             plot(x2(:,i),eta2(:,i)', 'b')
             hold on
             plot(x_lin(:,i),eta_lin(:,i), 'r')
 
-            x_axis = [min(x_min), max(x_max)+10];
             plot(x_axis , alpha*x_axis);
             plot(0,0,'^b');
 
-            axis([x_axis   min(min(eta_lin)), max(max(eta_lin))]);
+            axis([x_axis eta_axis]);
             leg=legend('lambda','real t');
             set(leg,'Location','southeast')
             xlabel(['x'])
             ylabel(['z'])
             title(['t = ', num2str(t_lin(1,i))]);
+
+            figure(3); hold off
+            waterOutline = topViewOfWater(trap_bathymetry,alpha,x_lin(:,i),eta_lin(:,i));
+            fflush(stdout);
+            plot(waterOutline(:,1),waterOutline(:,2));
+            axis(x_axis);
+
             pause(.3);
         end
     end
