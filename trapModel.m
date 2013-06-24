@@ -549,6 +549,7 @@ function trapModel(varargin)
         max_height = eta_axis(2) - x_axis(1)*alpha;
         max_y = max_height/DJN_slopes + DJN_beachwidth/2;
         trap_bathymetry = [-max_y max_y max_height; -DJN_beachwidth/2 DJN_beachwidth/2 0];
+        waterOutlineInitial = topViewOfWater(trap_bathymetry,alpha,x_lin(:,1),eta_lin(:,1));
 
         for i=1:length(x2(1,:))
             figure(1); hold off
@@ -568,8 +569,8 @@ function trapModel(varargin)
 
             figure(3); hold off
             waterOutline = topViewOfWater(trap_bathymetry,alpha,x_lin(:,i),eta_lin(:,i));
-            fflush(stdout);
-            plot(waterOutline(:,1),waterOutline(:,2));
+            plot(waterOutlineInitial(:,1),waterOutlineInitial(:,2),'k'); hold on
+            plot(waterOutline(:,1),waterOutline(:,2),'r');
             axis(x_axis);
 
             pause(.3);
