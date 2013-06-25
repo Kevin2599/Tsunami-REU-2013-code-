@@ -564,7 +564,7 @@ function trapModel(varargin)
             figure(3); hold off
             waterOutline = topViewOfWater(trap_bathymetry,alpha,x_lin(:,i),eta_lin(:,i));
             plot(waterOutlineInitial(:,1),waterOutlineInitial(:,2),'k'); hold on
-            plot(waterOutline(:,1),1*(waterOutline(:,2)-waterOutlineInitial(:,2))+waterOutlineInitial(:,2),'r');
+            plot(waterOutline(:,1),(waterOutline(:,2)),'r');
             xlim(x_axis);
             title(['t = ', num2str(t_lin(1,i))]);
             end
