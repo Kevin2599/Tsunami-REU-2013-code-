@@ -404,7 +404,7 @@ function trapModel(varargin)
         eta2 = eta2(2:end-1,:);
         t2   =   t2(2:end-1,:);
         x2   =   x2(2:end-1,:);
-        u2   =   u2(2:3:end-1,:);
+        u2   =   u2(2:end-1,:);
         %J    =    J(2:3:end-1,:);
 
         % doing the entire matrix is very slow
