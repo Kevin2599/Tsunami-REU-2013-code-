@@ -105,11 +105,11 @@ function trapModel(varargin)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Define all needed user inputs
 
-    maxl=       getOption('maxl',200);                % maximum for lambda
+    maxl=       getOption('maxl',150);                % maximum for lambda
     timesteps=  getOption('timesteps',20000);         % number of time steps between \lambda=0, and \lambda=maxl, %DJN 4/10/13
     a=          getOption('a',.05);                    % a is the amplutude of our pulse
     s0=         getOption('s0',15);                   % so is the mean of out pulse
-    p=          getOption('p',15);                   % p is the  varence in pulse
+    p=          getOption('p',1.5);                   % p is the  varence in pulse
     keeprate=   getOption('keeprate',timesteps/100);  % keep every \it{keeprate}-th step.
     g=          getOption('g',9.81);                  % Set gravity
     alpha=      getOption('alpha',.05);               % Set slope
@@ -250,11 +250,11 @@ function trapModel(varargin)
         Psi_nm1(isnan(Psi_nm1))=0;  % 1/0 is not good.
         Psi_nm1=Psi_nm1';   %Make it the column, DJN 4/10/13
         %zeros(n,1);                                          % psi=0, %Make it the column, DJN 4/10/13
-        
+
         
         Psi_n=Psi_nm1+PSI_LAMBDA*dlambda;                                     % Compute psi at the second step
         %DJN 4/10/13 %Psi=Psi_n;                                                   % Define Psi as the nth step
-        
+
         PHI_LAMBDA=zeros(n,1);
         % Phi_lambda=psi_sigma+W\psi
         %Find Phi at the next time step using Psi_n
@@ -318,10 +318,8 @@ function trapModel(varargin)
             %DJN  Psi=A\b;                    %solve for Psi and set the timesteps up one
             %     Psi_nm1=Psi_n;
             %     Psi_n=Psi;
-            
             Psi_nm1=Psi_n;              %We don't really need Psi vector, it just got eliminated to save time, DJN 4/10/13
             Psi_n=A\b;
-            
             
             if(counter>step&&counter~=-1)% if we have a moving boundry
                 Psi_n(end)=2*g*eta_bound(xmax+sqrt(abs(alpha*g*xmax))*step*dlambda/(abs(alpha*g)));
@@ -375,7 +373,7 @@ function trapModel(varargin)
         x2 = (Phiout-u2.^(2)-intgrid)/(2*alpha*g);
         t2=abs(t2);
 
-        % [J, UL, US]=Jacobian(F,g,alpha,u2,sigma,lambda,dsigma,dlambda);
+        [J, UL, US]=Jacobian(F,g,alpha,u2,sigma,lambda,dsigma,dlambda);
 
 
         fprintf('Simulation compeleted in %d seconds\n', ceil(etime(clock(),start_time)));
@@ -385,7 +383,7 @@ function trapModel(varargin)
             t2 = t2(1:3:end,:);
             x2 = x2(1:3:end,:);
             save('.savedTrapModel.mat',  'eta2','t2','x2','DJN_x','DJN_eta','DJN_beachwidth','DJN_slopes', ...
-                'alpha','lambda');
+                'alpha','lambda','J');
         end
     else
         load('.savedTrapModel.mat');
@@ -546,6 +544,7 @@ function trapModel(varargin)
         waterOutlineInitial = topViewOfWater(trap_bathymetry,alpha,x_lin(:,1),eta_lin(:,1));
 
         for i=1:length(x2(1,:))
+            if(0)
             figure(1); hold off
             plot(x2(:,i),eta2(:,i)', 'b')
             hold on
@@ -560,13 +559,19 @@ function trapModel(varargin)
             xlabel(['x'])
             ylabel(['z'])
             title(['t = ', num2str(t_lin(1,i))]);
-
+            end
+            if(1)
             figure(3); hold off
             waterOutline = topViewOfWater(trap_bathymetry,alpha,x_lin(:,i),eta_lin(:,i));
             plot(waterOutlineInitial(:,1),waterOutlineInitial(:,2),'k'); hold on
-            plot(waterOutline(:,1),waterOutline(:,2),'r');
-            axis(x_axis);
-
+            plot(waterOutline(:,1),1*(waterOutline(:,2)-waterOutlineInitial(:,2))+waterOutlineInitial(:,2),'r');
+            xlim(x_axis);
+            title(['t = ', num2str(t_lin(1,i))]);
+            end
+            xlabel(['Jacobian=',num2str(min(J(:,i)))]);
+            if min(J(:,i))<0
+                pause(.1)
+            end
             pause(.3);
         end
     end
