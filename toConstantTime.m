@@ -1,19 +1,24 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% function [x_lin, t_lin, varargout] = toConstantTime(x2, t2, timeSampleType, varargin)
+%
 % Correct the t values 
 %
+% timeSampleType = {'mean','linear'}
 % build a mesh for sampling at constant t intervals
 % there are more x-samples near the shoreline, this captures that
 
-function [x_lin, eta_lin, t_lin, u_lin] = toConstantTime(x2, t2, eta2, timeSamples, u2)
+function [x_lin, t_lin, varargout] = toConstantTime(x2, t2, timeSampleType, varargin)
     x_sample = mean(x2,2);
     x_sample = x_sample - x_sample(end);
     x_sample = x_sample ./ x_sample(1);
 
     % each t sample is the average of t(lambda = i)
-    if exist('timeSamples')
-        t_lin = timeSamples;
-    else
+    if strcmp(timeSampleType,'mean')
         t_lin = mean(t2);
+    elseif strcmp(timeSampleType,'linear')
+        t_lin = linspace( max(min(t2')), min(max(t2')), length(t2(1,:)) );
+    else
+        error(['option ''' timeSampleType ''' is not supported']);
     end
 
     % moving shoreline for x
@@ -27,10 +32,10 @@ function [x_lin, eta_lin, t_lin, u_lin] = toConstantTime(x2, t2, eta2, timeSampl
 
     % vectorize a matrix
     v = @(mat) reshape(mat(),1,[]);
+    x2 = v(x2); t2 = v(t2);
 
-    % sample the wave height (eta) at the correct t-values
-    eta_lin = griddata(v(x2), v(t2), v(eta2), x_lin, t_lin); % 'cubic'
-    if exist('u2')
-        u_lin = griddata(v(x2), v(t2), v(u2), x_lin, t_lin); 
+    % sample the vars at the correct t-values
+    for i = 1:(nargout-2)
+        varargout{i} = griddata(x2, t2, v(varargin{i}), x_lin, t_lin); % 'cubic'
     end
 end

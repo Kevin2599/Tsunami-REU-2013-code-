@@ -416,8 +416,7 @@ function trapModel(varargin)
         u2    = sample(u2);
         %J     = sample(J);
 
-        len = length(t2(1,:));
-        [x_lin eta_lin t_lin u_lin] = toConstantTime(x2,t2,eta2, linspace(max(min(t2')), min(max(t2')), len) , u2);
+        [x_lin t_lin eta_lin u_lin] = toConstantTime(x2,t2, 'linear' ,eta2, u2);
 
         fprintf('Simulation compeleted in %d seconds\n', ceil(etime(clock(),start_time)));
 
