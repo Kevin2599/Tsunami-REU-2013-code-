@@ -105,7 +105,7 @@ function trapModel(varargin)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Define all needed user inputs
 
-    maxl=       getOption('maxl',150);                % maximum for lambda
+    maxl=       getOption('maxl',100);                % maximum for lambda
     timesteps=  getOption('timesteps',20000);         % number of time steps between \lambda=0, and \lambda=maxl, %DJN 4/10/13
     a=          getOption('a',.05);                    % a is the amplutude of our pulse
     s0=         getOption('s0',15);                   % so is the mean of out pulse
