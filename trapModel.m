@@ -401,9 +401,9 @@ function trapModel(varargin)
 
         % trim the data
         % get rid of lambda=[1,end] b/c they fuck griddata up
-        eta2 = eta2(2:3:end-1,:);
-        t2   =   t2(2:3:end-1,:);
-        x2   =   x2(2:3:end-1,:);
+        eta2 = eta2(2:end-1,:);
+        t2   =   t2(2:end-1,:);
+        x2   =   x2(2:end-1,:);
         u2   =   u2(2:3:end-1,:);
         %J    =    J(2:3:end-1,:);
 
@@ -417,7 +417,7 @@ function trapModel(varargin)
         %J     = sample(J);
 
         len = length(t2(1,:));
-        [x_lin eta_lin u_lin t_lin] = toConstantTime(x2,t2,eta2,u2, linspace(max(min(t2')), min(max(t2')), len) );
+        [x_lin eta_lin t_lin u_lin] = toConstantTime(x2,t2,eta2, linspace(max(min(t2')), min(max(t2')), len) , u2);
 
         fprintf('Simulation compeleted in %d seconds\n', ceil(etime(clock(),start_time)));
 

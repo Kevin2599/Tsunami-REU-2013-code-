@@ -4,7 +4,7 @@
 % build a mesh for sampling at constant t intervals
 % there are more x-samples near the shoreline, this captures that
 
-function [x_lin, eta_lin, u_lin, t_lin] = toConstantTime(x2, t2, eta2, u2, timeSamples)
+function [x_lin, eta_lin, t_lin, u_lin] = toConstantTime(x2, t2, eta2, timeSamples, u2)
     x_sample = mean(x2,2);
     x_sample = x_sample - x_sample(end);
     x_sample = x_sample ./ x_sample(1);
