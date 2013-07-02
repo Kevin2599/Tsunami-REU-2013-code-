@@ -105,11 +105,11 @@ function trapModel(varargin)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Define all needed user inputs
 
-    maxl=       getOption('maxl',200);                % maximum for lambda
+    maxl=       getOption('maxl',100);                % maximum for lambda
     timesteps=  getOption('timesteps',20000);         % number of time steps between \lambda=0, and \lambda=maxl, %DJN 4/10/13
     a=          getOption('a',.05);                    % a is the amplutude of our pulse
     s0=         getOption('s0',15);                   % so is the mean of out pulse
-    p=          getOption('p',15);                   % p is the  varence in pulse
+    p=          getOption('p',1.5);                   % p is the  varence in pulse
     keeprate=   getOption('keeprate',timesteps/100);  % keep every \it{keeprate}-th step.
     g=          getOption('g',9.81);                  % Set gravity
     alpha=      getOption('alpha',.05);               % Set slope
@@ -251,11 +251,11 @@ function trapModel(varargin)
         Psi_nm1(isnan(Psi_nm1))=0;  % 1/0 is not good.
         Psi_nm1=Psi_nm1';   %Make it the column, DJN 4/10/13
         %zeros(n,1);                                          % psi=0, %Make it the column, DJN 4/10/13
-        
+
         
         Psi_n=Psi_nm1+PSI_LAMBDA*dlambda;                                     % Compute psi at the second step
         %DJN 4/10/13 %Psi=Psi_n;                                                   % Define Psi as the nth step
-        
+
         PHI_LAMBDA=zeros(n,1);
         % Phi_lambda=psi_sigma+W\psi
         %Find Phi at the next time step using Psi_n
@@ -320,10 +320,8 @@ function trapModel(varargin)
             %DJN  Psi=A\b;                    %solve for Psi and set the timesteps up one
             %     Psi_nm1=Psi_n;
             %     Psi_n=Psi;
-            
             Psi_nm1=Psi_n;              %We don't really need Psi vector, it just got eliminated to save time, DJN 4/10/13
             Psi_n=A\b;
-            
             
             if(counter>step&&counter~=-1)% if we have a moving boundry
                 Psi_n(end)=2*g*eta_bound(xmax+sqrt(abs(alpha*g*xmax))*step*dlambda/(abs(alpha*g)));
@@ -556,7 +554,7 @@ function trapModel(varargin)
 
         figure(3); hold off
         m = startMovieCapture('octaveMovies');
-        for i=1:200%length(x_lin(1,:))
+        for i=1:length(x_lin(1,:))
             % figure(1); hold off
             % % plot(x2(:,i),eta2(:,i)', 'b')
             % plot(x_lin(:,i),eta_lin(:,i), 'r')
@@ -583,6 +581,12 @@ function trapModel(varargin)
             % semilogy(x_lin(:,i),J(:,i));
             % axis([x_axis  min(min(J)) max(max(J))]);
             % title('Jacobian');
+
+            % xlabel(['Jacobian=',num2str(min(J(:,i)))]);
+            % if min(J(:,i))<0
+            %     pause(.1)
+            % end
+            % pause(framerate);
 
             drawnow();
         end
