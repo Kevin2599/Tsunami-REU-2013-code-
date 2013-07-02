@@ -5,7 +5,8 @@
 %  waveX      (M x 1)
 %  waveHeight (M x 1)
 % ========
-%  wateroutline (2M x 2)
+%  wateroutline (2M x 2) [x y]
+% just do plot(wateroutline(:,1), wateroutline(:,2));
 
 function waterOutline = topViewOfWater(bayShape, slope, waveX, waveHeight)
 	waveHeight = waveHeight - slope*waveX;
