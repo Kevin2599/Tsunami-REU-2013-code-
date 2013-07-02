@@ -1,3 +1,0 @@
-function r = newtonSolve()
-
-end
