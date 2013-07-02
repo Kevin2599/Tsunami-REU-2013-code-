@@ -1,24 +1,26 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% function [x_lin, t_lin, varargout] = toConstantTime(x2, t2, timeSampleType, varargin)
+% function [x_lin, t_lin, varargout] = toConstantTime(x2, t2, timeSamples, varargin)
 %
 % Correct the t values 
 %
-% timeSampleType = {'mean','linear'}
+% timeSamples = {'mean','linear', [your values]}
 % build a mesh for sampling at constant t intervals
 % there are more x-samples near the shoreline, this captures that
 
-function [x_lin, t_lin, varargout] = toConstantTime(x2, t2, timeSampleType, varargin)
+function [x_lin, t_lin, varargout] = toConstantTime(x2, t2, timeSamples, varargin)
     x_sample = mean(x2,2);
     x_sample = x_sample - x_sample(end);
     x_sample = x_sample ./ x_sample(1);
 
     % each t sample is the average of t(lambda = i)
-    if strcmp(timeSampleType,'mean')
+    if ~ischar(timeSamples)
+        t_lin = timeSamples;
+    elseif strcmp(timeSamples,'mean')
         t_lin = mean(t2);
-    elseif strcmp(timeSampleType,'linear')
+    elseif strcmp(timeSamples,'linear')
         t_lin = linspace( max(min(t2')), min(max(t2')), length(t2(1,:)) );
     else
-        error(['option ''' timeSampleType ''' is not supported']);
+        error(['option ''' timeSamples ''' is not supported']);
     end
 
     % moving shoreline for x

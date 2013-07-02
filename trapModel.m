@@ -364,20 +364,19 @@ function trapModel(varargin)
 
         % Data Needed to convert both exact and aprox data
         [LAM, Fgrid] = meshgrid(-lambda, F);
-        [dummy, intgrid] = meshgrid(-lambda, intF);
-        clear dummy
+        [~, intgrid] = meshgrid(-lambda, intF);
 
         % Convert Aprox.
-        u2 = Psiout./Fgrid;
-        eta2=(Phiout-u2.^(2))/(2*g);
-        t2=((LAM-u2)/(alpha*g));
-        x2 = (Phiout-u2.^(2)-intgrid)/(2*alpha*g);
-        t2=abs(t2);
+        u2   = Psiout./Fgrid;
+        eta2 = (Phiout-u2.^(2))/(2*g);
+        t2   = ((LAM-u2)/(alpha*g));
+        x2   = (Phiout-u2.^(2)-intgrid)/(2*alpha*g);
+        t2   = abs(t2);
 
         %[J, UL, US]=Jacobian(F,g,alpha,u2,sigma,lambda,dsigma,dlambda);
 
         % Test the data to see if it breaks
-        [dummy,I]=sort(t2*alpha,2);
+        [~,I]=sort(t2*alpha,2);
         brokeat=0;
         for j=1:length(t2(1,:))
             if I(2,j)~=j
@@ -414,7 +413,7 @@ function trapModel(varargin)
         u2    = sample(u2);
         %J     = sample(J);
 
-        [x_lin t_lin eta_lin u_lin] = toConstantTime(x2,t2, 'linear' ,eta2, u2);
+        [x_lin t_lin eta_lin u_lin] = toConstantTime(x2,t2, 1:max(max(t2)) ,eta2, u2);
 
         fprintf('Simulation compeleted in %d seconds\n', ceil(etime(clock(),start_time)));
 
@@ -550,37 +549,48 @@ function trapModel(varargin)
         max_height = eta_axis(2) - x_axis(1)*alpha;
         max_y = max_height/DJN_slopes + DJN_beachwidth/2;
         trap_bathymetry = [-max_y max_y max_height; -DJN_beachwidth/2 DJN_beachwidth/2 0];
-        waterOutlineInitial = topViewOfWater(trap_bathymetry,alpha,x_lin(:,1),eta_lin(:,1));
 
-        for i=1:length(x2(1,:))
-            figure(1); hold off
-            plot(x2(:,i),eta2(:,i)', 'b')
-            hold on
-            plot(x_lin(:,i),eta_lin(:,i), 'r')
+        waterOutlineInitial = topViewOfWater(trap_bathymetry,alpha,x_lin(:,round(end/2)),zeros(size(eta_lin(:,1))));
 
-            plot(x_axis , alpha*x_axis);
-            plot(0,0,'^b');
+        figure(3); hold off
+        m = startMovieCapture('octaveMovies');
+        for i=1:length(x_lin(1,:))
+            % figure(1); hold off
+            % % plot(x2(:,i),eta2(:,i)', 'b')
+            % plot(x_lin(:,i),eta_lin(:,i), 'r')
+            % hold on
 
-            axis([x_axis eta_axis]);
-            leg=legend('lambda','real t');
-            set(leg,'Location','southeast')
-            xlabel(['x'])
-            ylabel(['z'])
-            title(['t = ', num2str(t_lin(1,i))]);
-            if(1)
-                figure(3); hold off
-                waterOutline = topViewOfWater(trap_bathymetry,alpha,x_lin(:,i),eta_lin(:,i));
-                plot(waterOutlineInitial(:,1),waterOutlineInitial(:,2),'k'); hold on
-                plot(waterOutline(:,1),waterOutline(:,2),'r');
-                xlim(x_axis);
-                title(['t = ', num2str(t_lin(1,i))]);
-            end
-            xlabel(['Jacobian=',num2str(min(J(:,i)))]);
-            if min(J(:,i))<0
-                pause(.1)
-            end
-            pause(framerate);
+            % plot(x_axis , alpha*x_axis);
+            % plot(0,0,'^b');
+
+            % axis([x_axis eta_axis]);
+            % leg=legend('lambda','real t');
+            % set(leg,'Location','southeast')
+            % xlabel(['x'])
+            % ylabel(['z'])
+            % title(['t = ', num2str(t_lin(1,i))]);
+            waterOutline = topViewOfWater(trap_bathymetry,alpha,x_lin(:,i),eta_lin(:,i));
+            plot(waterOutlineInitial(:,1),waterOutlineInitial(:,2),'k'); hold on
+            plot(waterOutline(:,1),waterOutline(:,2),'r');
+            xlim(x_axis);
+            xlabel('x'); ylabel('y');
+            title('top view')
+            m = captureFrame(m);
+
+            % figure(4); hold off
+            % semilogy(x_lin(:,i),J(:,i));
+            % axis([x_axis  min(min(J)) max(max(J))]);
+            % title('Jacobian');
+
+            % xlabel(['Jacobian=',num2str(min(J(:,i)))]);
+            % if min(J(:,i))<0
+            %     pause(.1)
+            % end
+            % pause(framerate);
+
+            drawnow();
         end
+        endMovieCapture(m,'waterOutline.avi');
     end
 
 %save(['analytical_nw_',results.case,'.mat'], 'results')
