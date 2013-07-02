@@ -116,6 +116,7 @@ function trapModel(varargin)
     dsigma=     getOption('dsigma',.01);              % Our change in Sigma from program
     maxsigma=   getOption('maxsigma',150);            % The maximum value for sigma that we want.
     xmax=       getOption('xmax',5000);               % max for x
+    framerate=  1/getOption('framerate',100);
 
     seconds_per_update = getOption('seconds_per_update',3);
     DJN_beachwidth=      getOption('DJN_beachwidth',50);
@@ -291,6 +292,7 @@ function trapModel(varargin)
             lambda(l)=step*dlambda;
         end
 
+        figure(1); clf;
         for step=2:timesteps    %we start from the third step, since the first two are already computed, DJN 4/10/13
             %DJN  b(1)=0;                     % Define b as the right side of our system
             %     for i=2:n-1
@@ -306,7 +308,7 @@ function trapModel(varargin)
                 A(n,n)=1;
                 A(n,n-1)=0;
                 %eta at the x-t point(assuming linear velosity
-                b(n)=interp1(sigma,F,maxsigma)*sqrt(g/(alpha*xmax))*eta_bound(xmax+sqrt(abs(alpha*g*xmax))*step*dlambda/(abs(alpha*g)));
+                b(n)=interp1(sigma,F,maxsigma) * sqrt(g/(alpha*xmax)) * eta_bound(xmax+sqrt(abs(alpha*g*xmax))*step*dlambda/(abs(alpha*g)));
             else
                 %implicit method
                 % we have psi_lambda=-psi_sigma
@@ -340,10 +342,9 @@ function trapModel(varargin)
                 Phiout(l,:)=Phi_n;
                 lambda(l)=step*dlambda;
                 
-                %figure(1);
                 plot(sigma(1,1:n-2),Phiout(l,1:n-2),'.b')
                 title(['Step ' num2str(step) ' (' num2str(100 *step /timesteps) '%)'])
-                pause(.000000000000001);
+                drawnow();
                 l=l+1;
             end
         end
@@ -363,27 +364,62 @@ function trapModel(varargin)
 
         % Data Needed to convert both exact and aprox data
         [LAM, Fgrid] = meshgrid(-lambda, F);
-        [dummy, intgrid] = meshgrid(-lambda, intF);
-        clear dummy
+        [~, intgrid] = meshgrid(-lambda, intF);
 
         % Convert Aprox.
-        u2 = Psiout./Fgrid;
-        eta2=(Phiout-u2.^(2))/(2*g);
-        t2=((LAM-u2)/(alpha*g));
-        x2 = (Phiout-u2.^(2)-intgrid)/(2*alpha*g);
-        t2=abs(t2);
+        u2   = Psiout./Fgrid;
+        eta2 = (Phiout-u2.^(2))/(2*g);
+        t2   = ((LAM-u2)/(alpha*g));
+        x2   = (Phiout-u2.^(2)-intgrid)/(2*alpha*g);
+        t2   = abs(t2);
 
-        [J, UL, US]=Jacobian(F,g,alpha,u2,sigma,lambda,dsigma,dlambda);
+        %[J, UL, US]=Jacobian(F,g,alpha,u2,sigma,lambda,dsigma,dlambda);
 
+        % Test the data to see if it breaks
+        [~,I]=sort(t2*alpha,2);
+        brokeat=0;
+        for j=1:length(t2(1,:))
+            if I(2,j)~=j
+                brokeat=j;
+                println(['Broke at ' num2str(brokeat)])
+                if getOption('trimAtBreak', false)
+                    t2 = t2(:,1:j-1);
+                    x2 = x2(:,1:j-1);
+                    eta2 = eta2(:,1:j-1);
+                    J = J(:,1:j-1);
+                end
+                break
+            end
+        end
+
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        % Align data with respect to time (currently with respect to lambda)
+        println('Aligning with respect to time...')
+
+        % trim the data
+        % get rid of lambda=[1,end] b/c they fuck griddata up
+        eta2 = eta2(2:end-1,:);
+        t2   =   t2(2:end-1,:);
+        x2   =   x2(2:end-1,:);
+        u2   =   u2(2:end-1,:);
+        %J    =    J(2:3:end-1,:);
+
+        % doing the entire matrix is very slow
+        sample = @(mat) mat(floor(getOption('timeFixStart',0.0)*end)+1 : getOption('timeFixStride',10) : floor(getOption('timeFixEnd',0.1)*end),:);
+
+        x2    = sample(x2);
+        t2    = sample(t2);
+        eta2  = sample(eta2);
+        u2    = sample(u2);
+        %J     = sample(J);
+
+        [x_lin t_lin eta_lin u_lin] = toConstantTime(x2,t2, 1:max(max(t2)) ,eta2, u2);
 
         fprintf('Simulation compeleted in %d seconds\n', ceil(etime(clock(),start_time)));
 
         if getOption('save',false)
-            eta2 = eta2(1:3:end,:);
-            t2 = t2(1:3:end,:);
-            x2 = x2(1:3:end,:);
             save('.savedTrapModel.mat',  'eta2','t2','x2','DJN_x','DJN_eta','DJN_beachwidth','DJN_slopes', ...
-                'alpha','lambda','J');
+                'alpha','lambda','x_lin','t_lin','eta_lin','u_lin');
         end
     else
         load('.savedTrapModel.mat');
@@ -394,22 +430,6 @@ function trapModel(varargin)
 
     % Look for break in time.
     println('Plotting...')
-    [dummy,I]=sort(t2*alpha,2);
-    found=0;
-    brokeat=length(t2(1,:))+1;
-    for j=1:length(t2(1,:))
-        if I(2,j)~=j
-            found=1;
-            brokeat=j;
-            println(['Broke at ' num2str(brokeat)])
-            if getOption('trimAtBreak', false)
-                t2 = t2(:,1:j-1);
-                x2 = x2(:,1:j-1);
-                eta2 = eta2(:,1:j-1);
-            end
-            break
-        end
-    end
 
     x=-3*max(max(x2)):.1:2*max(max(x2));
     if getOption('plotLambda',true)
@@ -504,7 +524,7 @@ function trapModel(varargin)
                 figure(1);
             end
 
-            pause(.1)
+            pause(framerate)
         end
 
         figure(1); hold on
@@ -512,27 +532,15 @@ function trapModel(varargin)
         hold off
     end
     if getOption('plotTime',false)
-        % get rid of lambda=[1,end] b/c they fuck griddata up
-        x2 = x2(2:end-1,:);
-        t2 = t2(2:end-1,:);
-        eta2 = eta2(2:end-1,:);
-
-        % doing the entire matrix is very slow
-        sample = @(mat) mat(floor(getOption('timeFixStart',0.0)*end)+1 : getOption('timeFixStride',10) : floor(getOption('timeFixEnd',0.1)*end),:);
-        x2 = sample(x2);
-        t2 = sample(t2);
-        eta2 = sample(eta2);
 
         % line plot of x,t,eta
         figure(2); clf
         hold on
         for i=1:length(x2(1,:))
             plot3(t2(:,i)', x2(:,i)', eta2(:,i)');
-            pause(0.0000001);
+            drawnow();
         end
-        view(2);
 
-        [x_lin t_lin eta_lin] = toConstantTime(x2,t2,eta2);
         % surf(x_lin,t_lin,eta_lin,'EdgeColor','none','LineStyle','none');
 
         x_axis = [min(min(x_lin)), max(max(x_lin))+10];
@@ -541,39 +549,48 @@ function trapModel(varargin)
         max_height = eta_axis(2) - x_axis(1)*alpha;
         max_y = max_height/DJN_slopes + DJN_beachwidth/2;
         trap_bathymetry = [-max_y max_y max_height; -DJN_beachwidth/2 DJN_beachwidth/2 0];
-        waterOutlineInitial = topViewOfWater(trap_bathymetry,alpha,x_lin(:,1),eta_lin(:,1));
 
-        for i=1:length(x2(1,:))
-            if(0)
-            figure(1); hold off
-            plot(x2(:,i),eta2(:,i)', 'b')
-            hold on
-            plot(x_lin(:,i),eta_lin(:,i), 'r')
+        waterOutlineInitial = topViewOfWater(trap_bathymetry,alpha,x_lin(:,round(end/2)),zeros(size(eta_lin(:,1))));
 
-            plot(x_axis , alpha*x_axis);
-            plot(0,0,'^b');
+        figure(3); hold off
+        m = startMovieCapture('octaveMovies');
+        for i=1:length(x_lin(1,:))
+            % figure(1); hold off
+            % % plot(x2(:,i),eta2(:,i)', 'b')
+            % plot(x_lin(:,i),eta_lin(:,i), 'r')
+            % hold on
 
-            axis([x_axis eta_axis]);
-            leg=legend('lambda','real t');
-            set(leg,'Location','southeast')
-            xlabel(['x'])
-            ylabel(['z'])
-            title(['t = ', num2str(t_lin(1,i))]);
-            end
-            if(1)
-            figure(3); hold off
+            % plot(x_axis , alpha*x_axis);
+            % plot(0,0,'^b');
+
+            % axis([x_axis eta_axis]);
+            % leg=legend('lambda','real t');
+            % set(leg,'Location','southeast')
+            % xlabel(['x'])
+            % ylabel(['z'])
+            % title(['t = ', num2str(t_lin(1,i))]);
             waterOutline = topViewOfWater(trap_bathymetry,alpha,x_lin(:,i),eta_lin(:,i));
             plot(waterOutlineInitial(:,1),waterOutlineInitial(:,2),'k'); hold on
-            plot(waterOutline(:,1),(waterOutline(:,2)),'r');
+            plot(waterOutline(:,1),waterOutline(:,2),'r');
             xlim(x_axis);
-            title(['t = ', num2str(t_lin(1,i))]);
-            end
-            xlabel(['Jacobian=',num2str(min(J(:,i)))]);
-            if min(J(:,i))<0
-                pause(.1)
-            end
-            pause(.3);
+            xlabel('x'); ylabel('y');
+            title('top view')
+            m = captureFrame(m);
+
+            % figure(4); hold off
+            % semilogy(x_lin(:,i),J(:,i));
+            % axis([x_axis  min(min(J)) max(max(J))]);
+            % title('Jacobian');
+
+            % xlabel(['Jacobian=',num2str(min(J(:,i)))]);
+            % if min(J(:,i))<0
+            %     pause(.1)
+            % end
+            % pause(framerate);
+
+            drawnow();
         end
+        endMovieCapture(m,'waterOutline.avi');
     end
 
 %save(['analytical_nw_',results.case,'.mat'], 'results')
