@@ -87,20 +87,9 @@ function trapModel(varargin)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % passing a dictionary of options lets us modify the conditions without changing the program
 
-    options.dummyVar = 0; %create the structure
+    options = readOptions(varargin);
 
-    if length(varargin) ~= 0
-        startPos = 1;
-        if isstruct(varargin{1})
-            options = varargin{1};
-            startPos = 2;
-        end
-        for i=startPos:2:length(varargin)
-            options = setfield(options,varargin{i},varargin{i+1});
-        end
-    end
-
-    getOption = @(name,defaultValue) getOption_(options,name,defaultValue);
+    getOption = @(name,defaultValue) readOption(options,name,defaultValue);
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Define all needed user inputs
@@ -534,12 +523,12 @@ function trapModel(varargin)
     if getOption('plotTime',false)
 
         % line plot of x,t,eta
-        figure(2); clf
-        hold on
-        for i=1:length(x2(1,:))
-            plot3(t2(:,i)', x2(:,i)', eta2(:,i)');
-            drawnow();
-        end
+        % figure(2); clf
+        % hold on
+        % for i=1:length(x2(1,:))
+        %     plot3(t2(:,i)', x2(:,i)', eta2(:,i)');
+        %     drawnow();
+        % end
 
         % surf(x_lin,t_lin,eta_lin,'EdgeColor','none','LineStyle','none');
 
@@ -550,11 +539,10 @@ function trapModel(varargin)
         max_y = max_height/DJN_slopes + DJN_beachwidth/2;
         trap_bathymetry = [-max_y max_y max_height; -DJN_beachwidth/2 DJN_beachwidth/2 0];
 
-        waterOutlineInitial = topViewOfWater(trap_bathymetry,alpha,x_lin(:,round(end/2)),zeros(size(eta_lin(:,1))));
+        waterOutlineInitial = topViewOfWater(trap_bathymetry,alpha,[0; min(min(x_lin))],[0; 0]);
 
-        figure(3); hold off
-        m = startMovieCapture('octaveMovies');
-        for i=1:length(x_lin(1,:))
+        outlinePlot = makePlot('saveMovie',true,'movieName','waterOutline.avi', 'movieLocation','octaveMovies');
+        for i=1:150 %length(x_lin(1,:))
             % figure(1); hold off
             % % plot(x2(:,i),eta2(:,i)', 'b')
             % plot(x_lin(:,i),eta_lin(:,i), 'r')
@@ -569,13 +557,18 @@ function trapModel(varargin)
             % xlabel(['x'])
             % ylabel(['z'])
             % title(['t = ', num2str(t_lin(1,i))]);
+
+            switchToPlot(outlinePlot); clf; hold on;
+
             waterOutline = topViewOfWater(trap_bathymetry,alpha,x_lin(:,i),eta_lin(:,i));
-            plot(waterOutlineInitial(:,1),waterOutlineInitial(:,2),'k'); hold on
+
+            plot(waterOutlineInitial(:,1),waterOutlineInitial(:,2),'k');
             plot(waterOutline(:,1),waterOutline(:,2),'r');
             xlim(x_axis);
             xlabel('x'); ylabel('y');
             title('top view')
-            m = captureFrame(m);
+            
+            outlinePlot = drawPlot(outlinePlot);
 
             % figure(4); hold off
             % semilogy(x_lin(:,i),J(:,i));
@@ -587,22 +580,13 @@ function trapModel(varargin)
             %     pause(.1)
             % end
             % pause(framerate);
-
-            drawnow();
+            % figure(3,'visible','on')
         end
-        endMovieCapture(m,'waterOutline.avi');
+        finishPlot(outlinePlot);
     end
 
 %save(['analytical_nw_',results.case,'.mat'], 'results')
 end %function
-
-function value = getOption_(options,name,defaultValue)
-    if isfield(options,name)
-        value = getfield(options,name);
-    else
-        value = defaultValue;
-    end
-end
 
 
 
