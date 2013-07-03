@@ -1,5 +1,8 @@
-function switchToPlot(m)
+function switchToPlot(m,subplotIndex)
 	if gcf() ~= m.plotHandle
 		figure(m.plotHandle)
+	end
+	if isfield(m,'subplotDim')
+		subplot(m.subplotDim(1),m.subplotDim(2),subplotIndex);
 	end
 end

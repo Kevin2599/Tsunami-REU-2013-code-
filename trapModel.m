@@ -491,13 +491,12 @@ function trapModel(varargin)
             results.max_runup=max(max(eta2));
             results.case=['case_',num2str(DJN_beachwidth),'m_',num2str(1/DJN_slopes),'_',num2str(alpha)];
 
-            if getOption('plotTopView',false)
+            if getOption('plotTopView',false) %
                % figure(2);
                 hold on
                 plot3(x2(:,i)', t2(:,i)', eta2(:,i)');
 
-            elseif false
-               % figure(2);
+            elseif false % 3-D plot of the wave breaking on the shore, x(lambda) eta(lambda)
                 surf( [1 ; 1] * x2(:,i)', [-DJN_beachwidth ; DJN_beachwidth] * ones(size(x2(:,i)')), [1 ; 1 ] * eta2(:,i)', ...
                     ones(2,length(x2(:,i))),'EdgeColor','none','LineStyle','none');
                 hold on
@@ -539,34 +538,40 @@ function trapModel(varargin)
         max_y = max_height/DJN_slopes + DJN_beachwidth/2;
         trap_bathymetry = [-max_y max_y max_height; -DJN_beachwidth/2 DJN_beachwidth/2 0];
 
-        waterOutlineInitial = topViewOfWater(trap_bathymetry,alpha,[0; min(min(x_lin))],[0; 0]);
+        [outlineInitial_x outlineInitial_y] = topViewOfWater(trap_bathymetry,alpha,[0; min(min(x_lin))],[0; 0]);
 
-        outlinePlot = makePlot('saveMovie',true,'movieName','waterOutline.avi', 'movieLocation','octaveMovies');
-        for i=1:150 %length(x_lin(1,:))
-            % figure(1); hold off
-            % % plot(x2(:,i),eta2(:,i)', 'b')
-            % plot(x_lin(:,i),eta_lin(:,i), 'r')
-            % hold on
+        outlinePlot = makePlot('saveMovie',false,'movieName','waterOutline.avi', 'movieLocation','octaveMovies', ...
+                                'subplot',[2 1],'hold','off');
+        for i=1:150 %length(t_lin)
 
-            % plot(x_axis , alpha*x_axis);
-            % plot(0,0,'^b');
+            %% top view
+            switchToPlot(outlinePlot,1);
 
-            % axis([x_axis eta_axis]);
-            % leg=legend('lambda','real t');
-            % set(leg,'Location','southeast')
-            % xlabel(['x'])
-            % ylabel(['z'])
-            % title(['t = ', num2str(t_lin(1,i))]);
+            [outline_x outline_y] = topViewOfWater(trap_bathymetry,alpha,x_lin(:,i),eta_lin(:,i));
 
-            switchToPlot(outlinePlot); clf; hold on;
+            hold off;
+            plot(outlineInitial_x,outlineInitial_y,'k');
+            hold on;
+            plot(outline_x,outline_y,'r');
 
-            waterOutline = topViewOfWater(trap_bathymetry,alpha,x_lin(:,i),eta_lin(:,i));
-
-            plot(waterOutlineInitial(:,1),waterOutlineInitial(:,2),'k');
-            plot(waterOutline(:,1),waterOutline(:,2),'r');
             xlim(x_axis);
             xlabel('x'); ylabel('y');
-            title('top view')
+            title(['top view, t=', num2str(t_lin(i))]);
+
+            %% side view
+            switchToPlot(outlinePlot,2); hold off
+            plot(x_lin(:,i),eta_lin(:,i), 'r'); hold on
+            % plot(x2(:,i),eta2(:,i)', 'b')
+
+            plot(x_axis , alpha*x_axis);
+            plot(0,0,'^b');
+
+            axis([x_axis eta_axis]);
+            leg=legend('real t','lambda');
+            set(leg,'Location','southeast')
+            xlabel(['x'])
+            ylabel(['z'])
+            title(['side view, t = ', num2str(t_lin(i))]);
             
             outlinePlot = drawPlot(outlinePlot);
 

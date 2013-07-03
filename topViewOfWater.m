@@ -8,7 +8,7 @@
 %  wateroutline (2M x 2) [x y]
 % just do plot(wateroutline(:,1), wateroutline(:,2));
 
-function waterOutline = topViewOfWater(bayShape, slope, waveX, waveHeight)
+function [xs ys] = topViewOfWater(bayShape, slope, waveX, waveHeight)
 	waveHeight = waveHeight - slope*waveX;
 
 	bayLeft   = bayShape(:,1);
@@ -18,5 +18,6 @@ function waterOutline = topViewOfWater(bayShape, slope, waveX, waveHeight)
 	outlineLeft  = interp1(bayHeight,bayLeft ,waveHeight);
 	outlineRight = interp1(bayHeight,bayRight,waveHeight);
 
-	waterOutline = [waveX(end:-1:1) outlineLeft(end:-1:1); waveX outlineRight];
+	xs = [waveX(end:-1:1); waveX];
+	ys = [outlineLeft(end:-1:1); outlineRight];
 end

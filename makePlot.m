@@ -19,12 +19,16 @@ function m = makePlot(varargin)
 
 	figure('visible',readOption(options,'visible','on'));
 	m.plotHandle = gcf();
+	if isfield(options,'subplot')
+		m.subplotDim = options.subplot;
+		subplot(options.subplot(1), options.subplot(2), 1)
+	end
 
 	if m.saveMovie
 		m.frameLoc = [m.loc '/frames-', num2str(m.plotHandle)];
 		if inoctave()
-			system(['rm -rfp ' m.frameLoc]); 
-			system(['mkdir ' m.frameLoc]);
+			system(['rm -rf ' m.frameLoc]); 
+			system(['mkdir -p ' m.frameLoc]);
 		else
 			% set(gcf,'Renderer','zbuffer');
 		end
