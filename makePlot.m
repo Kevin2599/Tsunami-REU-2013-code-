@@ -11,6 +11,9 @@ function m = makePlot(varargin)
 		m.frame = 0;
 		if inoctave()
 			graphics_toolkit gnuplot;
+		else
+			m.writer = VideoWriter(m.movieName);
+			open(m.writer);
 		end
 	end
 
@@ -22,6 +25,8 @@ function m = makePlot(varargin)
 		if inoctave()
 			system(['rm -rfp ' m.frameLoc]); 
 			system(['mkdir ' m.frameLoc]);
+		else
+			% set(gcf,'Renderer','zbuffer');
 		end
 	end
 end

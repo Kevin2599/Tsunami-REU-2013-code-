@@ -5,6 +5,9 @@ function m = drawPlot(m)
 			print(fileName);
 			m.frame = m.frame + 1;
 			fprintf('\rSaving frame: %d',m.frame); fflush(stdout);
+		else
+			frame = getframe();
+			writeVideo(m.writer,frame);
 		end
 	else
 		drawnow();

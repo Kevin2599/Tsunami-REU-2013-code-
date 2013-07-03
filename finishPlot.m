@@ -5,6 +5,8 @@ function finishPlot(m)
 			system(['rm -rf ' m.frameLoc]);
 			fprintf('\rFinished saving movie\n');
 			graphics_toolkit fltk
+		else
+			close(m.writer);
 		end
 	end
 	if readOption(m,'closeOnFinish',false)
