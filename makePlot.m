@@ -1,12 +1,12 @@
 function m = makePlot(varargin)
-	options = readOptions(varargin);
+	m = readOptions(varargin);
 
-	m.saveMovie = readOption(options,'saveMovie',false);
+	m.saveMovie = readOption(m,'saveMovie',false);
 
 	if m.saveMovie
-		m.movieName = readOption(options,'movieName','octave.avi');
-		m.loc = readOption(options,'movieLocation','octaveMovies');
-		m.visible = readOption(options,'visible','off')
+		m.movieName = readOption(m,'movieName','octave.avi');
+		m.loc = readOption(m,'movieLocation','octaveMovies');
+		m.visible = readOption(m,'visible','off')
 		m.closeOnFinish = true;
 		m.frame = 0;
 		if inoctave()
@@ -17,11 +17,11 @@ function m = makePlot(varargin)
 		end
 	end
 
-	figure('visible',readOption(options,'visible','on'));
+	figure('visible',readOption(m,'visible','on'));
 	m.plotHandle = gcf();
-	if isfield(options,'subplot')
-		m.subplotDim = options.subplot;
-		subplot(options.subplot(1), options.subplot(2), 1)
+	if isfield(m,'subplot')
+		m.subplotDim = m.subplot;
+		subplot(m.subplot(1), m.subplot(2), 1)
 	end
 
 	if m.saveMovie

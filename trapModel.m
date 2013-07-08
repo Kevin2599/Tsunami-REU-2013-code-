@@ -540,27 +540,25 @@ function trapModel(varargin)
 
         [outlineInitial_x outlineInitial_y] = topViewOfWater(trap_bathymetry,alpha,[0; min(min(x_lin))],[0; 0]);
 
-        outlinePlot = makePlot('saveMovie',false,'movieName','waterOutline.avi', 'movieLocation','octaveMovies', ...
+        timePlot = makePlot('saveMovie',false,'movieName','waterOutline.avi', 'movieLocation','octaveMovies', ...
                                 'subplot',[2 1],'hold','off');
         for i=1:150 %length(t_lin)
 
-            %% top view
-            switchToPlot(outlinePlot,1);
+        %% top view
+            switchToPlot(timePlot,1);
 
             [outline_x outline_y] = topViewOfWater(trap_bathymetry,alpha,x_lin(:,i),eta_lin(:,i));
 
-            hold off;
             plot(outlineInitial_x,outlineInitial_y,'k');
-            hold on;
             plot(outline_x,outline_y,'r');
 
             xlim(x_axis);
             xlabel('x'); ylabel('y');
             title(['top view, t=', num2str(t_lin(i))]);
 
-            %% side view
-            switchToPlot(outlinePlot,2); hold off
-            plot(x_lin(:,i),eta_lin(:,i), 'r'); hold on
+        %% side view
+            switchToPlot(timePlot,2);
+            plot(x_lin(:,i),eta_lin(:,i), 'r');
             % plot(x2(:,i),eta2(:,i)', 'b')
 
             plot(x_axis , alpha*x_axis);
@@ -569,11 +567,9 @@ function trapModel(varargin)
             axis([x_axis eta_axis]);
             leg=legend('real t','lambda');
             set(leg,'Location','southeast')
-            xlabel(['x'])
-            ylabel(['z'])
+            xlabel(['x']); ylabel(['z']);
             title(['side view, t = ', num2str(t_lin(i))]);
             
-            outlinePlot = drawPlot(outlinePlot);
 
             % figure(4); hold off
             % semilogy(x_lin(:,i),J(:,i));
@@ -586,8 +582,9 @@ function trapModel(varargin)
             % end
             % pause(framerate);
             % figure(3,'visible','on')
+            timePlot = drawPlot(timePlot);
         end
-        finishPlot(outlinePlot);
+        finishPlot(timePlot);
     end
 
 %save(['analytical_nw_',results.case,'.mat'], 'results')
