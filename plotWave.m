@@ -5,9 +5,9 @@ function plotWave(x,z,t,bath,varargin)
     getOption = @(name,defaultValue) readOption(options,name,defaultValue);
 
     if getOption('plotTime',false)
-        timePlot = makePlot('saveMovie',getOption('saveTimePlot',false),'movieName','waterOutline.avi', 'movieLocation','octaveMovies', ...
+        timePlot = makePlot('timePlot','saveMovie',getOption('saveTimePlot',false),'movieName','waterOutline.avi', 'movieLocation','octaveMovies', ...
                                 'subplot',[4 1],'hold','off');
-        % time3DPlot = makePlot('hold', 'on');
+        time3DPlot = makePlot('time3DPlot','hold', 'on');
 
     %% line plot of x,t,eta
     %% warning, this requires a matrix for t
@@ -22,20 +22,18 @@ function plotWave(x,z,t,bath,varargin)
         end
 
     %% Bathymetry
-        x_axis   = [min(min(x))  , max(max(x))+10];
-        eta_axis = [min(min(z)), max(max(z)) ];
+        x_axis    = [min(min(x))  , max(max(x))+10];
+        eta_axis  = [min(min(z)), max(max(z)) ];
+
+        max_slope = max(diff(bath.right - bath.left) ./ diff(bath.height));
+        disp_axis = eta_axis * max_slope;
 
         [outlineInitial_x outlineInitial_y] = topViewOfWater(bath,[0; min(min(x))],[0; 0]);
 
-    %% top view
-        % switchToPlot(time3DPlot);
-        % [bath_x bath_y] = meshgrid(x_axis,[bath.left; bath.right(end:-1:1)]);
-        % surf(bath_x,bath_y,[bath.height bath.height ; bath.height(end:-1:1) bath.height(end:-1:1)] + ones(4,1) * (x_axis*bath.slope),'EdgeColor','none','LineStyle','none');
-
-        for i=1:150 %length(t)
+        for i=100:110 %length(t)
 
         %% top view
-            switchToPlot(timePlot,1:2);
+            timePlot = switchToPlot(timePlot,1:2);
 
             [outline_x outline_y outline_dy] = topViewOfWater(bath,x(:,i),z(:,i), getOption('waveOutlineMagnification',1));
 
@@ -47,16 +45,16 @@ function plotWave(x,z,t,bath,varargin)
             title(['top view, t=', num2str(t(i))]);
 
         %% displacement
-            switchToPlot(timePlot,3);
+            timePlot = switchToPlot(timePlot,3);
 
             plot(outline_x(1:end/2),outline_dy);
             xlim(x_axis);
-%            ylim(2.2 * eta_axis / DJN_slopes);
+            ylim(disp_axis);
             ylabel('edge runup');
             grid on
 
         %% side view
-            switchToPlot(timePlot,4);
+            timePlot = switchToPlot(timePlot,4);
             % plot(x2(:,i),eta2(:,i)', 'b')
             plot(x(:,i),z(:,i), 'r');
 
@@ -67,6 +65,13 @@ function plotWave(x,z,t,bath,varargin)
             leg=legend('lambda','real t');
             set(leg,'Location','northwest')
             xlabel(['X']); ylabel(['Z']);
+
+
+	        time3DPlot = switchToPlot(time3DPlot);
+	        [bath_x bath_y] = meshgrid(x_axis,[bath.left; bath.right(end:-1:1)]);
+	        surf(bath_x,bath_y, ...
+	        		[bath.height bath.height ; bath.height(end:-1:1) bath.height(end:-1:1)] + ones(4,1) * (x_axis*bath.slope), ...
+	        	ones(size(bath_x)),'EdgeColor','none','LineStyle','none');
             
 
             % figure(4); hold off
@@ -81,7 +86,6 @@ function plotWave(x,z,t,bath,varargin)
             % pause(framerate);
             % figure(3,'visible','on')
             timePlot = drawPlot(timePlot);
-
         end
         finishPlot(timePlot);
     end

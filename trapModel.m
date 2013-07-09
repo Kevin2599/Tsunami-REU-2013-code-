@@ -394,7 +394,7 @@ function trapModel(varargin)
         %J    =    J(2:3:end-1,:);
 
         % doing the entire matrix is very slow
-        sample = @(mat) mat(floor(getOption('timeFixStart',0.0)*end)+1 : getOption('timeFixStride',10) : floor(getOption('timeFixEnd',0.1)*end),:);
+        sample = @(mat) mat(floor(getOption('timeFixStart',0.0)*end)+1 : getOption('timeFixStride',10) : floor(getOption('timeFixEnd',0.1)*end) ,:);
 
         x2    = sample(x2);
         t2    = sample(t2);
@@ -537,7 +537,6 @@ function trapModel(varargin)
         plotWave(x_lin,eta_lin,t_lin,bath,options);
     end
 
-%save(['analytical_nw_',results.case,'.mat'], 'results')
 end %function
 
 
