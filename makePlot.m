@@ -6,7 +6,7 @@ function m = makePlot(varargin)
 	if m.saveMovie
 		m.movieName = readOption(m,'movieName','octave.avi');
 		m.loc = readOption(m,'movieLocation','octaveMovies');
-		m.visible = readOption(m,'visible','off')
+		m.visible = readOption(m,'visible','off');
 		m.closeOnFinish = true;
 		m.frame = 0;
 		if inoctave()

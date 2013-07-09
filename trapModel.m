@@ -88,7 +88,6 @@ function trapModel(varargin)
     % passing a dictionary of options lets us modify the conditions without changing the program
 
     options = readOptions(varargin);
-
     getOption = @(name,defaultValue) readOption(options,name,defaultValue);
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -116,7 +115,7 @@ function trapModel(varargin)
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %We generate the space-determined variables sigma, F, H, H0, intF, dF, W, and dW.
         %[sigma,F,H,H0,intF,dF,W,dW] = trapF(1,1,dsigma,maxsigma,340,g);
-        [sigma,F,H,H0,intF,dF,W,dW] = trapF(DJN_slopes,DJN_beachwidth/2,dsigma,maxsigma,2*(DJN_beachwidth)+2*alpha*xmax/DJN_slopes,g);
+        [sigma,F,H,H0,intF,dF,W,dW] = trapF(DJN_slopes, DJN_beachwidth/2, dsigma, maxsigma, 2*(DJN_beachwidth)+2*alpha*xmax/DJN_slopes, g);
         W(1)=1e100; %W(1) is the infinity, just make it huge, instead of the Inf, DJN 4/10/13
         W = W';
         
@@ -381,8 +380,9 @@ function trapModel(varargin)
             end
         end
 
-        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        % Align data with respect to time (currently with respect to lambda)
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % Align data with respect to time (currently with respect to lambda)
+    %%%%%
         println('Aligning with respect to time...')
 
         % trim the data
@@ -414,8 +414,9 @@ function trapModel(varargin)
         load('.savedTrapModel.mat');
     end
 
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    % Plot the data
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Plot the data
+%%%%%
 
     % Look for break in time.
     println('Plotting...')
@@ -496,7 +497,7 @@ function trapModel(varargin)
                 hold on
                 plot3(x2(:,i)', t2(:,i)', eta2(:,i)');
 
-            elseif false % 3-D plot of the wave breaking on the shore, x(lambda) eta(lambda)
+            elseif true % 3-D plot of the wave breaking on the shore, x(lambda) eta(lambda)
                 surf( [1 ; 1] * x2(:,i)', [-DJN_beachwidth ; DJN_beachwidth] * ones(size(x2(:,i)')), [1 ; 1 ] * eta2(:,i)', ...
                     ones(2,length(x2(:,i))),'EdgeColor','none','LineStyle','none');
                 hold on
@@ -519,72 +520,21 @@ function trapModel(varargin)
         plot(DJN_x, DJN_eta,'-b')
         hold off
     end
+
+
     if getOption('plotTime',false)
-
-        % line plot of x,t,eta
-        % figure(2); clf
-        % hold on
-        % for i=1:length(x2(1,:))
-        %     plot3(t2(:,i)', x2(:,i)', eta2(:,i)');
-        %     drawnow();
-        % end
-
-        % surf(x_lin,t_lin,eta_lin,'EdgeColor','none','LineStyle','none');
-
-        x_axis = [min(min(x_lin)), max(max(x_lin))+10];
-        eta_axis = [min(min(eta_lin)), max(max(eta_lin))];
+        x_axis   = [min(min(x_lin))  , max(max(x_lin))+10];
+        eta_axis = [min(min(eta_lin)), max(max(eta_lin)) ];
 
         max_height = eta_axis(2) - x_axis(1)*alpha;
-        max_y = max_height/DJN_slopes + DJN_beachwidth/2;
-        trap_bathymetry = [-max_y max_y max_height; -DJN_beachwidth/2 DJN_beachwidth/2 0];
+        max_y      = max_height/DJN_slopes + DJN_beachwidth/2;
 
-        [outlineInitial_x outlineInitial_y] = topViewOfWater(trap_bathymetry,alpha,[0; min(min(x_lin))],[0; 0]);
+        bath.height = [max_height; 0];
+        bath.left   = [-max_y; -DJN_beachwidth/2];
+        bath.right  = [ max_y;  DJN_beachwidth/2];
+        bath.slope  = alpha;
 
-        timePlot = makePlot('saveMovie',false,'movieName','waterOutline.avi', 'movieLocation','octaveMovies', ...
-                                'subplot',[2 1],'hold','off');
-        for i=1:150 %length(t_lin)
-
-        %% top view
-            switchToPlot(timePlot,1);
-
-            [outline_x outline_y] = topViewOfWater(trap_bathymetry,alpha,x_lin(:,i),eta_lin(:,i));
-
-            plot(outlineInitial_x,outlineInitial_y,'k');
-            plot(outline_x,outline_y,'r');
-
-            xlim(x_axis);
-            xlabel('x'); ylabel('y');
-            title(['top view, t=', num2str(t_lin(i))]);
-
-        %% side view
-            switchToPlot(timePlot,2);
-            plot(x_lin(:,i),eta_lin(:,i), 'r');
-            % plot(x2(:,i),eta2(:,i)', 'b')
-
-            plot(x_axis , alpha*x_axis);
-            plot(0,0,'^b');
-
-            axis([x_axis eta_axis]);
-            leg=legend('real t','lambda');
-            set(leg,'Location','southeast')
-            xlabel(['x']); ylabel(['z']);
-            title(['side view, t = ', num2str(t_lin(i))]);
-            
-
-            % figure(4); hold off
-            % semilogy(x_lin(:,i),J(:,i));
-            % axis([x_axis  min(min(J)) max(max(J))]);
-            % title('Jacobian');
-
-            % xlabel(['Jacobian=',num2str(min(J(:,i)))]);
-            % if min(J(:,i))<0
-            %     pause(.1)
-            % end
-            % pause(framerate);
-            % figure(3,'visible','on')
-            timePlot = drawPlot(timePlot);
-        end
-        finishPlot(timePlot);
+        plotWave(x_lin,eta_lin,t_lin,bath,options);
     end
 
 %save(['analytical_nw_',results.case,'.mat'], 'results')
