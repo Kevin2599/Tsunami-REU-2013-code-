@@ -6,9 +6,9 @@ function m=switchToPlot(m,subplotIndex)
 		end
 
 		if isfield(plotIDs,m.plotID)
-			figure(getfield(plotIDs,m.plotID),'visible',readOption(m,'visible','on'));
+			figure(getfield(plotIDs,m.plotID),'visible',readOption(m,'visible','on')); clf('reset');
 		else
-			figure('visible',readOption(m,'visible','on'));
+			figure('visible',readOption(m,'visible','on')); clf('reset');
 			plotIDs = setfield(plotIDs,m.plotID,gcf());
 		end
 		m.plotHandle = gcf();
