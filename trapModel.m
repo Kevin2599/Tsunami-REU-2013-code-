@@ -88,7 +88,6 @@ function trapModel(varargin)
     % passing a dictionary of options lets us modify the conditions without changing the program
 
     options = readOptions(varargin);
-
     getOption = @(name,defaultValue) readOption(options,name,defaultValue);
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -116,7 +115,7 @@ function trapModel(varargin)
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %We generate the space-determined variables sigma, F, H, H0, intF, dF, W, and dW.
         %[sigma,F,H,H0,intF,dF,W,dW] = trapF(1,1,dsigma,maxsigma,340,g);
-        [sigma,F,H,H0,intF,dF,W,dW] = trapF(DJN_slopes,DJN_beachwidth/2,dsigma,maxsigma,2*(DJN_beachwidth)+2*alpha*xmax/DJN_slopes,g);
+        [sigma,F,H,H0,intF,dF,W,dW] = trapF(DJN_slopes, DJN_beachwidth/2, dsigma, maxsigma, 2*(DJN_beachwidth)+2*alpha*xmax/DJN_slopes, g);
         W(1)=1e100; %W(1) is the infinity, just make it huge, instead of the Inf, DJN 4/10/13
         W = W';
         
@@ -127,9 +126,9 @@ function trapModel(varargin)
         
         n = length(sigma);
         
-        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        % Build starting need information from user inputs and build the matrix A
-        % that will be used to solve our system
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % Build starting need information from user inputs and build the matrix A
+    % that will be used to solve our system
 
         println('Building model...')
         dlambda=maxl/timesteps;     % Define dlambda %DJN correction 4/10/13
@@ -256,8 +255,8 @@ function trapModel(varargin)
         %DJN 4/10/13 %Phi=Phi_n;                                                                   % Define Psi as the nth step
 
 
-        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        % Solve the model for Psi and Phi
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % Solve the model for Psi and Phi
 
         println('Running model...')
 
@@ -340,10 +339,11 @@ function trapModel(varargin)
 
 
 
-        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        % Convert back to physical varables
-
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % Convert back to physical varables
+    %%%%%
         println('Converting Approx data...')
+
         Phiout=Phiout';
         Psiout=Psiout';
         lambda=lambda';
@@ -365,7 +365,7 @@ function trapModel(varargin)
         %[J, UL, US]=Jacobian(F,g,alpha,u2,sigma,lambda,dsigma,dlambda);
 
         % Test the data to see if it breaks
-        [~,I]=sort(t2*alpha,2);
+        [~,I]=sort(t2,2);
         brokeat=0;
         for j=1:length(t2(1,:))
             if I(2,j)~=j
@@ -381,8 +381,9 @@ function trapModel(varargin)
             end
         end
 
-        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        % Align data with respect to time (currently with respect to lambda)
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % Align data with respect to time (currently with respect to lambda)
+    %%%%%
         println('Aligning with respect to time...')
 
         % trim the data
@@ -394,7 +395,7 @@ function trapModel(varargin)
         %J    =    J(2:3:end-1,:);
 
         % doing the entire matrix is very slow
-        sample = @(mat) mat(floor(getOption('timeFixStart',0.0)*end)+1 : getOption('timeFixStride',10) : floor(getOption('timeFixEnd',0.1)*end),:);
+        sample = @(mat) mat(floor(getOption('timeFixStart',0.0)*end)+1 : getOption('timeFixStride',10) : floor(getOption('timeFixEnd',0.1)*end) ,:);
 
         x2    = sample(x2);
         t2    = sample(t2);
@@ -414,178 +415,33 @@ function trapModel(varargin)
         load('.savedTrapModel.mat');
     end
 
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    % Plot the data
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Plot the data
+%%%%%
 
-    % Look for break in time.
     println('Plotting...')
 
-    x=-3*max(max(x2)):.1:2*max(max(x2));
+    x_axis   = [min(min(x_lin))  , max(max(x_lin))+10];
+    eta_axis = [min(min(eta_lin)), max(max(eta_lin)) ];
+
+    max_height = eta_axis(2) - x_axis(1)*alpha;
+    max_y      = max_height/DJN_slopes + DJN_beachwidth/2;
+
+    bath.height = [max_height; 0];
+    bath.left   = [-max_y; -DJN_beachwidth/2];
+    bath.right  = [ max_y;  DJN_beachwidth/2];
+    bath.slope  = alpha;
+
+    % x=-3*max(max(x2)):.1:2*max(max(x2));
     if getOption('plotLambda',true)
-        
-    % %     % Plot to look for global error and information
-        % slope=zeros(1,length(lambda));
-        % breakc=slope;
-        % for j=1:length(lambda)
-        %     for i=1:length(eta2(:,1))-1
-        %         slope(i)=(eta2(i+1,j)-eta2(i,j))/(x2(i+1,j)-x2(i,j));
-        %     end
-        %     breakc(j)=max(slope(:));
-        % end
-        % for i=1:length(lambda)
-        %     % %         if ((breakc(i)>=1/2*alpha)||(i==brokeat))
-        %     % %             println('BROKE...')
-        %     % %             if found
-        %     % %                 println('Numerical')
-        %     % %             end
-        %     % %             %break
-        %     % %         end
-        %     index1=(J(:,i)>=0);
-        %     index2=~index1;
-        %     plot(sigma(index1), eta2(index1,i), '.r')
-        %     hold on
-        %     plot(sigma(index2), eta2(index2,i), '.b')
-        %     plot(sigma, J(:,i), '-k')
-        %     hold off
-        %     axis([0 300 min(min(eta2)) max(max(eta2))])
-        %     leg=legend('Aprox solution');
-        %     % set(leg,'Location','Best');
-        %     xlabel('Sigma')
-        %     title(num2str(t2(2,i)))
-        %     pause(0.01)
-        % end
-        
-        %figure(2); clf('reset');
-        figure(1); clf('reset');
-
-
-        % Plot at the shore
-        for i=1:length(x2(1,:))
-    %         if ((breakc(i)>=1/2*alpha)||(i==brokeat))
-    %             println('BROKE...')
-    %             if found
-    %                 println('Numerical')
-    %             end
-    %             %break
-    %         end
-
-            index1=(x2(:,i)<1e10);%(J(:,i)>=0);
-            index2=~index1;
-            plot(x2(index1,i),eta2(index1,i), '.r')
-            hold on
-    %        plot(x2(index2,i),eta2(index2,i), '.b')
-            plot(x,alpha*x)
-            plot(0,0,'^b')
-            hold off
-            %axis([1.5*(-1*(max(max(eta2))-min(min(eta2)))/alpha+max(max(x2))) 1.5*max(max(x2)) 1.5*min(min(eta2)) 1.5*max(max(eta2))])
-            axis([-5, 1.5*max(max(x2)), max(min(min(eta2)), -1), 1.5*max(max(eta2))]);
-            %leg=legend('Aprox Solution');
-            %set(leg,'Location','Best')
-            xlabel(['x(lambda = ' num2str(lambda(i)) ' ' num2str(i)])
-            ylabel(['eta(lambda = ' num2str(lambda(i))])
-            title(num2str(t2(2,i)))
-            
-            results.snapshot{i}.x=x2(:,i);
-            results.snapshot{i}.eta=eta2(:,i);
-            results.snapshot{i}.time=t2(2,i);
-            results.max_runup=max(max(eta2));
-            results.case=['case_',num2str(DJN_beachwidth),'m_',num2str(1/DJN_slopes),'_',num2str(alpha)];
-
-            if getOption('plotTopView',false)
-               % figure(2);
-                hold on
-                plot3(x2(:,i)', t2(:,i)', eta2(:,i)');
-
-            elseif false
-               % figure(2);
-                surf( [1 ; 1] * x2(:,i)', [-DJN_beachwidth ; DJN_beachwidth] * ones(size(x2(:,i)')), [1 ; 1 ] * eta2(:,i)', ...
-                    ones(2,length(x2(:,i))),'EdgeColor','none','LineStyle','none');
-                hold on
-
-                xs = ones(4,1) * [-2350 1.5*max(max(x2))];
-                ys = (DJN_beachwidth/2) * [-2; -1; 1; 2] * ones(1,2);
-                zs = alpha*xs + (abs(ys) - (DJN_beachwidth/2))*DJN_slopes;
-
-                surf(xs,ys,zs, 2* ones(size(zs)));
-                axis([-100 1.5*max(max(x2))    -DJN_beachwidth DJN_beachwidth    max(min(min(eta2)), -1) 1.5*max(max(eta2))])
-                view(2)
-                hold off
-                figure(1);
-            end
-
-            pause(framerate)
-        end
-
-        figure(1); hold on
-        plot(DJN_x, DJN_eta,'-b')
-        hold off
+        plotWave(x2, eta2, t2,  bath, options);
+        plot(DJN_x, DJN_eta,'-b');
     end
+
     if getOption('plotTime',false)
-
-        % line plot of x,t,eta
-        % figure(2); clf
-        % hold on
-        % for i=1:length(x2(1,:))
-        %     plot3(t2(:,i)', x2(:,i)', eta2(:,i)');
-        %     drawnow();
-        % end
-
-        % surf(x_lin,t_lin,eta_lin,'EdgeColor','none','LineStyle','none');
-
-        x_axis = [min(min(x_lin)), max(max(x_lin))+10];
-        eta_axis = [min(min(eta_lin)), max(max(eta_lin))];
-
-        max_height = eta_axis(2) - x_axis(1)*alpha;
-        max_y = max_height/DJN_slopes + DJN_beachwidth/2;
-        trap_bathymetry = [-max_y max_y max_height; -DJN_beachwidth/2 DJN_beachwidth/2 0];
-
-        waterOutlineInitial = topViewOfWater(trap_bathymetry,alpha,[0; min(min(x_lin))],[0; 0]);
-
-        outlinePlot = makePlot('saveMovie',true,'movieName','waterOutline.avi', 'movieLocation','octaveMovies');
-        for i=1:150 %length(x_lin(1,:))
-            % figure(1); hold off
-            % % plot(x2(:,i),eta2(:,i)', 'b')
-            % plot(x_lin(:,i),eta_lin(:,i), 'r')
-            % hold on
-
-            % plot(x_axis , alpha*x_axis);
-            % plot(0,0,'^b');
-
-            % axis([x_axis eta_axis]);
-            % leg=legend('lambda','real t');
-            % set(leg,'Location','southeast')
-            % xlabel(['x'])
-            % ylabel(['z'])
-            % title(['t = ', num2str(t_lin(1,i))]);
-
-            switchToPlot(outlinePlot); clf; hold on;
-
-            waterOutline = topViewOfWater(trap_bathymetry,alpha,x_lin(:,i),eta_lin(:,i));
-
-            plot(waterOutlineInitial(:,1),waterOutlineInitial(:,2),'k');
-            plot(waterOutline(:,1),waterOutline(:,2),'r');
-            xlim(x_axis);
-            xlabel('x'); ylabel('y');
-            title('top view')
-            
-            outlinePlot = drawPlot(outlinePlot);
-
-            % figure(4); hold off
-            % semilogy(x_lin(:,i),J(:,i));
-            % axis([x_axis  min(min(J)) max(max(J))]);
-            % title('Jacobian');
-
-            % xlabel(['Jacobian=',num2str(min(J(:,i)))]);
-            % if min(J(:,i))<0
-            %     pause(.1)
-            % end
-            % pause(framerate);
-            % figure(3,'visible','on')
-        end
-        finishPlot(outlinePlot);
+        plotWave(x_lin, eta_lin, t_lin,  bath, options);
     end
 
-%save(['analytical_nw_',results.case,'.mat'], 'results')
 end %function
 
 
