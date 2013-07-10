@@ -87,7 +87,9 @@ function trapModel(varargin)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % passing a dictionary of options lets us modify the conditions without changing the program
 
-    options = readOptions(varargin);
+    defaultOptions = readOptions('maxl',100,'timesteps',20000,'a',.05,'s0',15,'p',1.5,'g',9.81, 'alpha',.05, ...
+                                 'dsigma',.01,'maxsigma',150,'xmax',5000,'DJN_beachwidth',50,'DJN_slopes',.5);
+    options = readOptions(defaultOptions,varargin);
     getOption = @(name,defaultValue) readOption(options,name,defaultValue);
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -104,9 +106,7 @@ function trapModel(varargin)
     dsigma=     getOption('dsigma',.01);              % Our change in Sigma from program
     maxsigma=   getOption('maxsigma',150);            % The maximum value for sigma that we want.
     xmax=       getOption('xmax',5000);               % max for x
-    framerate=  1/getOption('framerate',100);
 
-    seconds_per_update = getOption('seconds_per_update',3);
     DJN_beachwidth=      getOption('DJN_beachwidth',50);
     DJN_slopes=          getOption('DJN_slopes',0.5);
 
@@ -214,7 +214,7 @@ function trapModel(varargin)
             end
         end
         if(time<1.75)
-            println('time to reach shore is too small. move away from shore')
+            println('  - time to reach shore is too small. move away from shore')
             return
         end
 
@@ -327,7 +327,7 @@ function trapModel(varargin)
 
         [x_lin t_lin eta_lin u_lin] = toConstantTime(x2,t2, 1:max(max(t2)) ,eta2, u2);
 
-        fprintf(' >Simulation compeleted in %d seconds<\n', ceil(etime(clock(),start_time)));
+        fprintf('  - Simulation compeleted in %d seconds\n', ceil(etime(clock(),start_time)));
 
         if getOption('quickSave',false)
             save('.savedTrapModel.mat',  'eta2','t2','x2','DJN_x','DJN_eta','DJN_beachwidth','DJN_slopes', ...
