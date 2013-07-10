@@ -12,7 +12,7 @@ function [x_mesh, t_samples, varargout] = toConstantTime(x2, t2, timeSamples, va
     x_sample = x_sample - x_sample(end);
     x_sample = x_sample ./ x_sample(1);
 
-    % each t sample is the average of t(lambda = i)
+  % each t sample is the average of t(lambda = i)
     if ~ischar(timeSamples)
         t_samples = timeSamples;
     elseif strcmp(timeSamples,'mean')
@@ -23,20 +23,22 @@ function [x_mesh, t_samples, varargout] = toConstantTime(x2, t2, timeSamples, va
         error(['option ''' timeSamples ''' is not supported']);
     end
 
-    % moving shoreline for x
+  % moving shoreline for x
     x_max = interp1(t2(  1,:), x2(  1,:), t_samples);
     x_min = interp1(t2(end,:), x2(end,:), t_samples);
 
-    % create the mesh
+  % create the mesh
     t_mesh = ones(size(x_sample)) * t_samples;
     x_mesh = x_sample * x_max + (1-x_sample) * x_min;
-    mesh(t_mesh, x_mesh, ones(size(x_mesh)));
 
-    % vectorize a matrix
+  % plot the mesh
+    % mesh(t_mesh, x_mesh, ones(size(x_mesh)));
+
+  % vectorize a matrix
     v = @(mat) reshape(mat(),1,[]);
     x2 = v(x2); t2 = v(t2);
 
-    % sample the vars at the correct t-values
+  % sample the vars at the correct t-values
     for i = 1:(nargout-2)
         varargout{i} = griddata(x2, t2, v(varargin{i}), x_mesh, t_mesh); % 'cubic'
     end

@@ -111,6 +111,8 @@ function trapModel(varargin)
     DJN_slopes=          getOption('DJN_slopes',0.5);
 
     if( ~getOption('load',false) )
+        start_time = clock();
+        println('Building bathymetry...')
 
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %We generate the space-determined variables sigma, F, H, H0, intF, dF, W, and dW.
@@ -119,10 +121,9 @@ function trapModel(varargin)
         W(1)=1e100; %W(1) is the infinity, just make it huge, instead of the Inf, DJN 4/10/13
         W = W';
         
-        %For no potintial.
+        %For no potential.
         %W=0*W;
         %dW=0*dW;
-        start_time = clock();
         
         n = length(sigma);
         
@@ -405,7 +406,7 @@ function trapModel(varargin)
 
         [x_lin t_lin eta_lin u_lin] = toConstantTime(x2,t2, 1:max(max(t2)) ,eta2, u2);
 
-        fprintf('Simulation compeleted in %d seconds\n', ceil(etime(clock(),start_time)));
+        fprintf('----Simulation compeleted in %d seconds----\n', ceil(etime(clock(),start_time)));
 
         if getOption('save',false)
             save('.savedTrapModel.mat',  'eta2','t2','x2','DJN_x','DJN_eta','DJN_beachwidth','DJN_slopes', ...

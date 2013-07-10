@@ -34,7 +34,7 @@ function plotWave(x,z,t,bath,varargin)
         bath_z = [bath.height bath.height ; bath.height(end:-1:1) bath.height(end:-1:1)] + ones(4,1) * (x_axis*bath.slope);
         y_axis = [min(min(bath_y)) max(max(bath_y))];
 
-        for i=100:110 %length(t)
+        for i=1:length(t)
 
         %% top view
             timePlot = switchToPlot(timePlot,1:2);
@@ -67,7 +67,7 @@ function plotWave(x,z,t,bath,varargin)
             plot(0,0,'^b');
 
             axis([x_axis eta_axis]);
-            leg=legend('lambda','real t');
+            leg=legend('real t');
             set(leg,'Location','northwest')
             xlabel(['X']); ylabel(['Z']);
 
@@ -75,13 +75,15 @@ function plotWave(x,z,t,bath,varargin)
             timePlot = drawPlot(timePlot);
 
         %% 3D plot
-	        time3DPlot = switchToPlot(time3DPlot);
+            if getOption('timePlot3D',false)
+                time3DPlot = switchToPlot(time3DPlot);
 
-	        surf(bath_x,bath_y, bath_z,   2*ones(size(bath_x)),'EdgeColor','none','LineStyle','none');
-	        surf([1 ; 1] * x(:,i)', y_axis' * ones(size(x(:,i)')), [1 ; 1 ] * z(:,i)', ...
-                    ones(2,length(x(:,i))),'EdgeColor','none','LineStyle','none')
+                surf(bath_x,bath_y, bath_z,   2*ones(size(bath_x)),'EdgeColor','none','LineStyle','none');
+                surf([1 ; 1] * x(:,i)', y_axis' * ones(size(x(:,i)')), [1 ; 1 ] * z(:,i)', ...
+                        ones(2,length(x(:,i))),'EdgeColor','none','LineStyle','none')
 
-            time3DPlot = drawPlot(time3DPlot);
+                time3DPlot = drawPlot(time3DPlot);
+            end
             
 
             % figure(4); hold off
