@@ -12,13 +12,13 @@ function [x_mesh, t_samples, varargout] = toConstantTime(x2, t2, timeSamples, va
     x_sample = x_sample - x_sample(end);
     x_sample = x_sample ./ x_sample(1);
 
-  % each t sample is the average of t(lambda = i)
+  % specify the time samples
     if ~ischar(timeSamples)
         t_samples = timeSamples;
-    elseif strcmp(timeSamples,'mean')
+    elseif strcmp(timeSamples,'mean') % each t sample is the average of t(lambda = i)
         t_samples = mean(t2);
     elseif strcmp(timeSamples,'linear')
-        t_samples = linspace( max(min(t2')), min(max(t2')), length(t2(1,:)) );
+        t_samples = linspace( max(min(t2')), min(max(t2')), size(t2,2) );
     else
         error(['option ''' timeSamples ''' is not supported']);
     end
@@ -40,6 +40,6 @@ function [x_mesh, t_samples, varargout] = toConstantTime(x2, t2, timeSamples, va
 
   % sample the vars at the correct t-values
     for i = 1:(nargout-2)
-        varargout{i} = griddata(x2, t2, v(varargin{i}), x_mesh, t_mesh); % 'cubic'
+        varargout{i} = griddata(x2, t2, v(varargin{i}), x_mesh, t_mesh); % other option, 'cubic'
     end
 end

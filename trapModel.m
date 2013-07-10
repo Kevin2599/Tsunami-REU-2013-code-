@@ -110,7 +110,7 @@ function trapModel(varargin)
     DJN_beachwidth=      getOption('DJN_beachwidth',50);
     DJN_slopes=          getOption('DJN_slopes',0.5);
 
-    if( ~getOption('load',false) )
+    if( ~getOption('quickLoad',false) || ~isfield(options,'load'))
         start_time = clock();
         println('Building bathymetry...')
 
@@ -195,7 +195,7 @@ function trapModel(varargin)
                     break
                 else
                 counter=-1;
-                disp('normal boundry')
+                println('  -normal boundry')
                 break
                 end
             end
@@ -318,9 +318,9 @@ function trapModel(varargin)
             
             
             
-            PHI_LAMBDA(1)=(-Psi_n(3)+4*Psi_n(2)-3*Psi_n(1))/(2*dsigma)+W(1)*Psi_n(1);     % Second order forwards difference
-            PHI_LAMBDA(2:n-1) = ((Psi_n(3:n) - Psi_n(1:n-2)) ./ (2*dsigma)) + W(2:n-1).*Psi_n(2:n-1);  %psi(n+1)-psi(n+1)/(2dsigma)+psi(n)*W(n)
-            PHI_LAMBDA(n)=(-3*Psi_n(n)+4*Psi_n(n-1)-Psi_n(n-2))/(2*dsigma)+W(n)*Psi_n(n); % Second order backwards difference
+            PHI_LAMBDA(1)     = (  -Psi_n(3) + 4*Psi_n(2)-3*Psi_n(1))/(2*dsigma)+W(1)*Psi_n(1);     % Second order forwards difference
+            PHI_LAMBDA(2:n-1) = ( Psi_n(3:n) - Psi_n(1:n-2)) ./ (2*dsigma) + W(2:n-1).*Psi_n(2:n-1);  %psi(n+1)-psi(n+1)/(2dsigma)+psi(n)*W(n)
+            PHI_LAMBDA(n)     = (-3*Psi_n(n) + 4*Psi_n(n-1)-Psi_n(n-2))/(2*dsigma)+W(n)*Psi_n(n); % Second order backwards difference
 
             Phi=4/3*Phi_n-1/3*Phi_nm1+2/3*PHI_LAMBDA*dlambda;                             % Define the next Phi
             Phi_nm1=Phi_n;
@@ -348,9 +348,6 @@ function trapModel(varargin)
         Phiout=Phiout';
         Psiout=Psiout';
         lambda=lambda';
-
-
-
 
         % Data Needed to convert both exact and aprox data
         [LAM, Fgrid] = meshgrid(-lambda, F);
@@ -406,14 +403,27 @@ function trapModel(varargin)
 
         [x_lin t_lin eta_lin u_lin] = toConstantTime(x2,t2, 1:max(max(t2)) ,eta2, u2);
 
-        fprintf('----Simulation compeleted in %d seconds----\n', ceil(etime(clock(),start_time)));
+        fprintf(' >Simulation compeleted in %d seconds<\n', ceil(etime(clock(),start_time)));
 
-        if getOption('save',false)
+        if getOption('quickSave',false)
             save('.savedTrapModel.mat',  'eta2','t2','x2','DJN_x','DJN_eta','DJN_beachwidth','DJN_slopes', ...
                 'alpha','lambda','x_lin','t_lin','eta_lin','u_lin');
         end
-    else
+        if getOption('save', false)
+            for i=1:size(x2,2)
+                results.snapshot{i}.x=x2(:,i);
+                results.snapshot{i}.eta=eta2(:,i);
+                results.snapshot{i}.time=t2(2,i);
+            end
+            results.max_runup=max(max(eta2));
+            results.case=['case_',num2str(DJN_beachwidth),'m_',num2str(1/DJN_slopes),'_',num2str(alpha)];
+            save(results.case,'results');
+        end
+    elseif getOption('quickLoad',false)
         load('.savedTrapModel.mat');
+    else
+        load(getOption('load'));
+
     end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
