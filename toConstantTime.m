@@ -8,7 +8,19 @@
 % there are more x-samples near the shoreline, this captures that
 
 function [x_mesh, t_samples, varargout] = toConstantTime(x2, t2, timeSamples, varargin)
-    x_sample = mean(x2,2);
+    options.dummyVar = [];
+    if isstruct(varargin{1})
+        options = varargin{1};
+        varargin = varargin(2:end);
+    end
+
+    xSamples = readOption(options,'toConstantTime_xSamples','default');
+    if strcmp(xSamples,'default')
+        x_sample = mean(x2,2);
+    elseif ~ischar(xSamples)
+        x_sample = xSamples
+    end
+
     x_sample = x_sample - x_sample(end);
     x_sample = x_sample ./ x_sample(1);
 
