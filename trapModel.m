@@ -152,7 +152,7 @@ function trapModel(varargin)
         DJN_x=-[0:1:xmax];
         %DJN_eta=-0.0001/0.6065*exp(-2e-5*(1000+DJN_x).^2).*(1000+DJN_x); %alpha=0.01
         
-        DJN_eta=eta_0(DJN_x);
+        [DJN_eta DJN_flag]=eta_0(DJN_x);
         
         %DJN_eta=0.01*(1-tanh((1000+DJN_x)/200 ))/2
         
@@ -160,7 +160,7 @@ function trapModel(varargin)
         DJN_H=DJN_eta-DJN_x*alpha;
         DJN_Sigma=interp1(H, sigma, DJN_H);
 
-        DJN_u=DJN_eta.*sqrt(g./(-alpha*DJN_x));
+        DJN_u=DJN_flag * DJN_eta.*sqrt(g./(-alpha*DJN_x));
         DJN_u(isnan(DJN_u))=0;
 
   

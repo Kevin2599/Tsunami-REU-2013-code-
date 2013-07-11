@@ -72,6 +72,7 @@ function [Phiout Psiout lambda] = runModel(sigma,Phi_nm1,Phi_n, Psi_nm1,Psi_n, c
             lambda(l)=step*dlambda;
             
             plot(sigma(1,1:n-2),Phiout(l,1:n-2),'.b')
+            set(gca,'xdir','reverse')
             title(['Step ' num2str(step) ' (' num2str(100 *step /options.timesteps) '%)'])
             drawnow();
             l=l+1;
