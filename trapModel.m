@@ -13,8 +13,8 @@
 % W        - Vector that is used to find A.
 % A        - n by n matrix that is used to solve the wave equation.
 % I        - Matrix to look for breaks in time.
-% a        - The amplitud of our gauss pulse.
-% alpha    - The slope of th beach.
+% a        - The amplitude of our gauss pulse.
+% alpha    - The slope of the beach.
 % b        - Length n vector that holds the right side of our system.
 % breakc   - Checks to see if we have broken at that time.
 % brokeat  - Keeps the index if there was a break.
@@ -74,7 +74,7 @@
 % step     - Counter that keeps track of lambda when solving our system
 % t1       - Our time output for the exact solution. NOTE MATRIX
 % t2       - Our time output for the aprox solution. NOTE MATRIX
-% timestpes- Sets the change in lambda.
+% timesteps- number of time steps between \lambda=0, and \lambda=maxl %DJN 4/10/13
 % u1       - n by length(lambda) matrix for our velocity output fot the
 %            exact solution.
 % u2       - n by length(lambda) matrix for our velocity output fot the
@@ -84,45 +84,38 @@
 
 function trapModel(varargin)
 
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    % passing a dictionary of options lets us modify the conditions without changing the program
+    options = modelOptions(varargin{:});
 
-    options = readOptions(varargin);
     getOption = @(name,defaultValue) readOption(options,name,defaultValue);
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Define all needed user inputs
 
-    maxl=       getOption('maxl',100);                % maximum for lambda
-    timesteps=  getOption('timesteps',20000);         % number of time steps between \lambda=0, and \lambda=maxl, %DJN 4/10/13
-    a=          getOption('a',.05);                    % a is the amplutude of our pulse
-    s0=         getOption('s0',15);                   % so is the mean of out pulse
-    p=          getOption('p',1.5);                   % p is the  varence in pulse
-    keeprate=   getOption('keeprate',timesteps/100);  % keep every \it{keeprate}-th step.
-    g=          getOption('g',9.81);                  % Set gravity
-    alpha=      getOption('alpha',.05);               % Set slope
-    dsigma=     getOption('dsigma',.01);              % Our change in Sigma from program
-    maxsigma=   getOption('maxsigma',150);            % The maximum value for sigma that we want.
-    xmax=       getOption('xmax',5000);               % max for x
-    framerate=  1/getOption('framerate',100);
+    maxl=    options.maxl;                % maximum for lambda
+    g=       options.g;                  % Set gravity
+    alpha=   options.bath.slope;               % Set slope
+    dsigma=  options.dsigma;              % Our change in Sigma from program
+    xmax=    options.xmax;               % max for x
 
-    seconds_per_update = getOption('seconds_per_update',3);
-    DJN_beachwidth=      getOption('DJN_beachwidth',50);
-    DJN_slopes=          getOption('DJN_slopes',0.5);
+    DJN_beachwidth=      options.DJN_beachwidth;
+    DJN_slopes=          options.DJN_slopes;
 
-    if( ~getOption('load',false) )
+    if options.quickLoad
+        load('.savedTrapModel.mat');
+    else %% run the model
+        start_time = clock();
+        println('Building bathymetry...')
 
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %We generate the space-determined variables sigma, F, H, H0, intF, dF, W, and dW.
         %[sigma,F,H,H0,intF,dF,W,dW] = trapF(1,1,dsigma,maxsigma,340,g);
-        [sigma,F,H,H0,intF,dF,W,dW] = trapF(DJN_slopes, DJN_beachwidth/2, dsigma, maxsigma, 2*(DJN_beachwidth)+2*alpha*xmax/DJN_slopes, g);
+        [sigma,F,H,H0,intF,dF,W,dW] = trapF(DJN_slopes, DJN_beachwidth/2, dsigma, options.maxsigma, 2*(DJN_beachwidth)+2*alpha*xmax/DJN_slopes, g);
         W(1)=1e100; %W(1) is the infinity, just make it huge, instead of the Inf, DJN 4/10/13
         W = W';
         
-        %For no potintial.
+        %For no potential.
         %W=0*W;
         %dW=0*dW;
-        start_time = clock();
         
         n = length(sigma);
         
@@ -131,7 +124,7 @@ function trapModel(varargin)
     % that will be used to solve our system
 
         println('Building model...')
-        dlambda=maxl/timesteps;     % Define dlambda %DJN correction 4/10/13
+        dlambda=maxl/options.timesteps;     % Define dlambda %DJN correction 4/10/13
 
         dsigma2=dsigma*dsigma;   % Find dlambda^2 and dsigma^2
         dlambda2=dlambda*dlambda;
@@ -153,13 +146,13 @@ function trapModel(varargin)
         %Define the initial profile and find Xmax.
         
         %Find the real Xmax.
-        Max_H=interp1(sigma,H,maxsigma);
+        Max_H=interp1(sigma,H,options.maxsigma);
         xmax=Max_H/alpha;
  
         DJN_x=-[0:1:xmax];
         %DJN_eta=-0.0001/0.6065*exp(-2e-5*(1000+DJN_x).^2).*(1000+DJN_x); %alpha=0.01
         
-        DJN_eta=eta_0(DJN_x);
+        [DJN_eta DJN_flag]=eta_0(DJN_x);
         
         %DJN_eta=0.01*(1-tanh((1000+DJN_x)/200 ))/2
         
@@ -167,7 +160,7 @@ function trapModel(varargin)
         DJN_H=DJN_eta-DJN_x*alpha;
         DJN_Sigma=interp1(H, sigma, DJN_H);
 
-        DJN_u=DJN_eta.*sqrt(g./(-alpha*DJN_x));
+        DJN_u=DJN_flag * DJN_eta.*sqrt(g./(-alpha*DJN_x));
         DJN_u(isnan(DJN_u))=0;
 
   
@@ -194,7 +187,7 @@ function trapModel(varargin)
                     break
                 else
                 counter=-1;
-                disp('normal boundry')
+                println('  - normal boundry')
                 break
                 end
             end
@@ -213,7 +206,7 @@ function trapModel(varargin)
             end
         end
         if(time<1.75)
-            println('time to reach shore is too small. move away from shore')
+            println('  - time to reach shore is too small. move away from shore')
             return
         end
 
@@ -259,83 +252,7 @@ function trapModel(varargin)
     % Solve the model for Psi and Phi
 
         println('Running model...')
-
-        %Pre-allocate for the speed %DJN 4/10/13
-        Psiout=zeros(ceil(timesteps/keeprate), n);
-        Phiout=zeros(ceil(timesteps/keeprate), n);
-        lambda=zeros(ceil(timesteps/keeprate), 1);
-
-        step=0;
-        l=1;                            % Index to keep only parts of our informaion
-        Phiout(l,:)=Phi_nm1;         % Keep the initial conditions
-        Psiout(l,:)=Psi_nm1;
-        lambda(l)=0;
-
-        %DJN 4/10/13, we need to keep the second step too.
-        step=1;
-        if(mod(step,keeprate)==0) %Check if we need to keep it.
-            l=2;                            % Index to keep only parts of our informaion
-            Phiout(l,:)=Phi_n;           
-            Psiout(l,:)=Psi_n;
-            lambda(l)=step*dlambda;
-        end
-
-        figure(1); clf;
-        for step=2:timesteps    %we start from the third step, since the first two are already computed, DJN 4/10/13
-            %DJN  b(1)=0;                     % Define b as the right side of our system
-            %     for i=2:n-1
-            %         b(i)=2*Psi_n(i)-Psi_nm1(i);
-            %     end
-            %     b(n)=0;
-            
-            b=2*Psi_n-Psi_nm1;          %Convert into the vector operation, DJN 4/10/13
-            b(1)=0;
-            
-            if(counter>step&&counter~=-1)% if we have a moving boundry
-                %set phi equal to F U where u=\sqrt(g/h)eta and h=alpha*xmax
-                A(n,n)=1;
-                A(n,n-1)=0;
-                %eta at the x-t point(assuming linear velosity
-                b(n)=interp1(sigma,F,maxsigma) * sqrt(g/(alpha*xmax)) * eta_bound(xmax+sqrt(abs(alpha*g*xmax))*step*dlambda/(abs(alpha*g)));
-            else
-                %implicit method
-                % we have psi_lambda=-psi_sigma
-                A(n,n)=dsigma+dlambda;
-                A(n,n-1)=-dlambda;
-                b(n)=dsigma*Psi_n(n);
-            end
-
-            %DJN  Psi=A\b;                    %solve for Psi and set the timesteps up one
-            %     Psi_nm1=Psi_n;
-            %     Psi_n=Psi;
-            Psi_nm1=Psi_n;              %We don't really need Psi vector, it just got eliminated to save time, DJN 4/10/13
-            Psi_n=A\b;
-            
-            if(counter>step&&counter~=-1)% if we have a moving boundry
-                Psi_n(end)=2*g*eta_bound(xmax+sqrt(abs(alpha*g*xmax))*step*dlambda/(abs(alpha*g)));
-            end
-            
-            
-            
-            PHI_LAMBDA(1)=(-Psi_n(3)+4*Psi_n(2)-3*Psi_n(1))/(2*dsigma)+W(1)*Psi_n(1);     % Second order forwards difference
-            PHI_LAMBDA(2:n-1) = ((Psi_n(3:n) - Psi_n(1:n-2)) ./ (2*dsigma)) + W(2:n-1).*Psi_n(2:n-1);  %psi(n+1)-psi(n+1)/(2dsigma)+psi(n)*W(n)
-            PHI_LAMBDA(n)=(-3*Psi_n(n)+4*Psi_n(n-1)-Psi_n(n-2))/(2*dsigma)+W(n)*Psi_n(n); % Second order backwards difference
-
-            Phi=4/3*Phi_n-1/3*Phi_nm1+2/3*PHI_LAMBDA*dlambda;                             % Define the next Phi
-            Phi_nm1=Phi_n;
-            Phi_n=Phi;
-            
-            if(mod(step,keeprate)==0)              % Keep information at some points
-                Psiout(l,:)=Psi_n;              % save the values at the current time step (written into the *_n arrays)
-                Phiout(l,:)=Phi_n;
-                lambda(l)=step*dlambda;
-                
-                plot(sigma(1,1:n-2),Phiout(l,1:n-2),'.b')
-                title(['Step ' num2str(step) ' (' num2str(100 *step /timesteps) '%)'])
-                drawnow();
-                l=l+1;
-            end
-        end
+        [Phiout Psiout lambda] = runModel(sigma,Phi_nm1,Phi_n,Psi_nm1,Psi_n,counter,A,dlambda,dsigma,W,PHI_LAMBDA,F,options);
 
 
 
@@ -347,9 +264,6 @@ function trapModel(varargin)
         Phiout=Phiout';
         Psiout=Psiout';
         lambda=lambda';
-
-
-
 
         % Data Needed to convert both exact and aprox data
         [LAM, Fgrid] = meshgrid(-lambda, F);
@@ -371,7 +285,7 @@ function trapModel(varargin)
             if I(2,j)~=j
                 brokeat=j;
                 println(['Broke at ' num2str(brokeat)])
-                if getOption('trimAtBreak', false)
+                if options.trimAtBreak
                     t2 = t2(:,1:j-1);
                     x2 = x2(:,1:j-1);
                     eta2 = eta2(:,1:j-1);
@@ -395,7 +309,7 @@ function trapModel(varargin)
         %J    =    J(2:3:end-1,:);
 
         % doing the entire matrix is very slow
-        sample = @(mat) mat(floor(getOption('timeFixStart',0.0)*end)+1 : getOption('timeFixStride',10) : floor(getOption('timeFixEnd',0.1)*end) ,:);
+        sample = @(mat) mat(floor(options.timeFixStart*end)+1 : options.timeFixStride : floor(options.timeFixEnd*end) ,:);
 
         x2    = sample(x2);
         t2    = sample(t2);
@@ -405,14 +319,22 @@ function trapModel(varargin)
 
         [x_lin t_lin eta_lin u_lin] = toConstantTime(x2,t2, 1:max(max(t2)) ,eta2, u2);
 
-        fprintf('Simulation compeleted in %d seconds\n', ceil(etime(clock(),start_time)));
+        fprintf('  - Simulation compeleted in %d seconds\n', ceil(etime(clock(),start_time)));
 
-        if getOption('save',false)
+        if options.quickSave
             save('.savedTrapModel.mat',  'eta2','t2','x2','DJN_x','DJN_eta','DJN_beachwidth','DJN_slopes', ...
                 'alpha','lambda','x_lin','t_lin','eta_lin','u_lin');
         end
-    else
-        load('.savedTrapModel.mat');
+        if options.save
+            for i=1:size(x2,2)
+                results.snapshot{i}.x=x2(:,i);
+                results.snapshot{i}.eta=eta2(:,i);
+                results.snapshot{i}.time=t2(2,i);
+            end
+            results.max_runup=max(max(eta2));
+            results.case=['case_',num2str(DJN_beachwidth),'m_',num2str(1/DJN_slopes),'_',num2str(alpha)];
+            save(results.case,'results');
+        end
     end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -433,16 +355,13 @@ function trapModel(varargin)
     bath.slope  = alpha;
 
     % x=-3*max(max(x2)):.1:2*max(max(x2));
-    if getOption('plotLambda',true)
+    if options.plotLambda
         plotWave(x2, eta2, t2,  bath, options);
         plot(DJN_x, DJN_eta,'-b');
     end
 
-    if getOption('plotTime',false)
+    if options.plotTime
         plotWave(x_lin, eta_lin, t_lin,  bath, options);
     end
 
 end %function
-
-
-
