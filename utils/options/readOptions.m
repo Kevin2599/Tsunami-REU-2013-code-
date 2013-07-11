@@ -16,10 +16,3 @@ function options = readOptions(varargin)
         end
     end
 end
-
-function a = combineStructs(a,b)
-    names = fieldnames(b);
-    for i = 1:length(names)
-        a = setfield(a,names{i}, getfield(b,names{i}));
-    end
-end

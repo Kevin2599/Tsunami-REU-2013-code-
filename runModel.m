@@ -1,10 +1,10 @@
-function [Phiout Psiout lambda] = runModel(timesteps,keeprate,sigma,Phi_nm1,Phi_n,Psi_nm1,Psi_n,counter,A,dlambda,dsigma,W,PHI_LAMBDA,F)
+function [Phiout Psiout lambda] = runModel(sigma,Phi_nm1,Phi_n, Psi_nm1,Psi_n, counter,A,dlambda,dsigma,W,PHI_LAMBDA,F,options)
     %Pre-allocate for the speed %DJN 4/10/13
     n=length(sigma);
 
-    Psiout=zeros(ceil(timesteps/keeprate), n);
-    Phiout=zeros(ceil(timesteps/keeprate), n);
-    lambda=zeros(ceil(timesteps/keeprate), 1);
+    Psiout=zeros(ceil(options.timesteps/options.keeprate), n);
+    Phiout=zeros(ceil(options.timesteps/options.keeprate), n);
+    lambda=zeros(ceil(options.timesteps/options.keeprate), 1);
 
     step=0;
     l=1;                            % Index to keep only parts of our informaion
@@ -14,7 +14,7 @@ function [Phiout Psiout lambda] = runModel(timesteps,keeprate,sigma,Phi_nm1,Phi_
 
     %DJN 4/10/13, we need to keep the second step too.
     step=1;
-    if(mod(step,keeprate)==0) %Check if we need to keep it.
+    if(mod(step,options.keeprate)==0) %Check if we need to keep it.
         l=2;                            % Index to keep only parts of our informaion
         Phiout(l,:)=Phi_n;           
         Psiout(l,:)=Psi_n;
@@ -22,7 +22,7 @@ function [Phiout Psiout lambda] = runModel(timesteps,keeprate,sigma,Phi_nm1,Phi_
     end
 
     figure(1); clf;
-    for step=2:timesteps    %we start from the third step, since the first two are already computed, DJN 4/10/13
+    for step=2:options.timesteps    %we start from the third step, since the first two are already computed, DJN 4/10/13
         %DJN  b(1)=0;                     % Define b as the right side of our system
         %     for i=2:n-1
         %         b(i)=2*Psi_n(i)-Psi_nm1(i);
@@ -66,13 +66,13 @@ function [Phiout Psiout lambda] = runModel(timesteps,keeprate,sigma,Phi_nm1,Phi_
         Phi_nm1=Phi_n;
         Phi_n=Phi;
         
-        if(mod(step,keeprate)==0)              % Keep information at some points
+        if(mod(step,options.keeprate)==0)              % Keep information at some points
             Psiout(l,:)=Psi_n;              % save the values at the current time step (written into the *_n arrays)
             Phiout(l,:)=Phi_n;
             lambda(l)=step*dlambda;
             
             plot(sigma(1,1:n-2),Phiout(l,1:n-2),'.b')
-            title(['Step ' num2str(step) ' (' num2str(100 *step /timesteps) '%)'])
+            title(['Step ' num2str(step) ' (' num2str(100 *step /options.timesteps) '%)'])
             drawnow();
             l=l+1;
         end

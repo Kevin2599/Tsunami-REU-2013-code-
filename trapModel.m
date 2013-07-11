@@ -13,8 +13,8 @@
 % W        - Vector that is used to find A.
 % A        - n by n matrix that is used to solve the wave equation.
 % I        - Matrix to look for breaks in time.
-% a        - The amplitud of our gauss pulse.
-% alpha    - The slope of th beach.
+% a        - The amplitude of our gauss pulse.
+% alpha    - The slope of the beach.
 % b        - Length n vector that holds the right side of our system.
 % breakc   - Checks to see if we have broken at that time.
 % brokeat  - Keeps the index if there was a break.
@@ -74,7 +74,7 @@
 % step     - Counter that keeps track of lambda when solving our system
 % t1       - Our time output for the exact solution. NOTE MATRIX
 % t2       - Our time output for the aprox solution. NOTE MATRIX
-% timestpes- Sets the change in lambda.
+% timestpes- number of time steps between \lambda=0, and \lambda=maxl %DJN 4/10/13
 % u1       - n by length(lambda) matrix for our velocity output fot the
 %            exact solution.
 % u2       - n by length(lambda) matrix for our velocity output fot the
@@ -84,40 +84,32 @@
 
 function trapModel(varargin)
 
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    % passing a dictionary of options lets us modify the conditions without changing the program
+    options = modelOptions(varargin{:});
 
-    defaultOptions = readOptions('maxl',100,'timesteps',20000,'a',.05,'s0',15,'p',1.5,'g',9.81, 'alpha',.05, ...
-                                 'dsigma',.01,'maxsigma',150,'xmax',5000,'DJN_beachwidth',50,'DJN_slopes',.5);
-    options = readOptions(defaultOptions,varargin);
     getOption = @(name,defaultValue) readOption(options,name,defaultValue);
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Define all needed user inputs
 
-    maxl=       getOption('maxl',100);                % maximum for lambda
-    timesteps=  getOption('timesteps',20000);         % number of time steps between \lambda=0, and \lambda=maxl, %DJN 4/10/13
-    a=          getOption('a',.05);                    % a is the amplutude of our pulse
-    s0=         getOption('s0',15);                   % so is the mean of out pulse
-    p=          getOption('p',1.5);                   % p is the  varence in pulse
-    keeprate=   getOption('keeprate',timesteps/100);  % keep every \it{keeprate}-th step.
-    g=          getOption('g',9.81);                  % Set gravity
-    alpha=      getOption('alpha',.05);               % Set slope
-    dsigma=     getOption('dsigma',.01);              % Our change in Sigma from program
-    maxsigma=   getOption('maxsigma',150);            % The maximum value for sigma that we want.
-    xmax=       getOption('xmax',5000);               % max for x
+    maxl=    options.maxl;                % maximum for lambda
+    g=       options.g;                  % Set gravity
+    alpha=   options.bath.slope;               % Set slope
+    dsigma=  options.dsigma;              % Our change in Sigma from program
+    xmax=    options.xmax;               % max for x
 
-    DJN_beachwidth=      getOption('DJN_beachwidth',50);
-    DJN_slopes=          getOption('DJN_slopes',0.5);
+    DJN_beachwidth=      options.DJN_beachwidth;
+    DJN_slopes=          options.DJN_slopes;
 
-    if( ~getOption('quickLoad',false) || ~isfield(options,'load'))
+    if options.quickLoad
+        load('.savedTrapModel.mat');
+    else %% run the model
         start_time = clock();
         println('Building bathymetry...')
 
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %We generate the space-determined variables sigma, F, H, H0, intF, dF, W, and dW.
         %[sigma,F,H,H0,intF,dF,W,dW] = trapF(1,1,dsigma,maxsigma,340,g);
-        [sigma,F,H,H0,intF,dF,W,dW] = trapF(DJN_slopes, DJN_beachwidth/2, dsigma, maxsigma, 2*(DJN_beachwidth)+2*alpha*xmax/DJN_slopes, g);
+        [sigma,F,H,H0,intF,dF,W,dW] = trapF(DJN_slopes, DJN_beachwidth/2, dsigma, options.maxsigma, 2*(DJN_beachwidth)+2*alpha*xmax/DJN_slopes, g);
         W(1)=1e100; %W(1) is the infinity, just make it huge, instead of the Inf, DJN 4/10/13
         W = W';
         
@@ -132,7 +124,7 @@ function trapModel(varargin)
     % that will be used to solve our system
 
         println('Building model...')
-        dlambda=maxl/timesteps;     % Define dlambda %DJN correction 4/10/13
+        dlambda=maxl/options.timesteps;     % Define dlambda %DJN correction 4/10/13
 
         dsigma2=dsigma*dsigma;   % Find dlambda^2 and dsigma^2
         dlambda2=dlambda*dlambda;
@@ -154,7 +146,7 @@ function trapModel(varargin)
         %Define the initial profile and find Xmax.
         
         %Find the real Xmax.
-        Max_H=interp1(sigma,H,maxsigma);
+        Max_H=interp1(sigma,H,options.maxsigma);
         xmax=Max_H/alpha;
  
         DJN_x=-[0:1:xmax];
@@ -260,7 +252,7 @@ function trapModel(varargin)
     % Solve the model for Psi and Phi
 
         println('Running model...')
-        [Phiout Psiout lambda] = runModel(timesteps,keeprate,sigma,Phi_nm1,Phi_n,Psi_nm1,Psi_n,counter,A,dlambda,dsigma,W,PHI_LAMBDA,F);
+        [Phiout Psiout lambda] = runModel(sigma,Phi_nm1,Phi_n,Psi_nm1,Psi_n,counter,A,dlambda,dsigma,W,PHI_LAMBDA,F,options);
 
 
 
@@ -293,7 +285,7 @@ function trapModel(varargin)
             if I(2,j)~=j
                 brokeat=j;
                 println(['Broke at ' num2str(brokeat)])
-                if getOption('trimAtBreak', false)
+                if options.trimAtBreak
                     t2 = t2(:,1:j-1);
                     x2 = x2(:,1:j-1);
                     eta2 = eta2(:,1:j-1);
@@ -317,7 +309,7 @@ function trapModel(varargin)
         %J    =    J(2:3:end-1,:);
 
         % doing the entire matrix is very slow
-        sample = @(mat) mat(floor(getOption('timeFixStart',0.0)*end)+1 : getOption('timeFixStride',10) : floor(getOption('timeFixEnd',0.1)*end) ,:);
+        sample = @(mat) mat(floor(options.timeFixStart*end)+1 : options.timeFixStride : floor(options.timeFixEnd*end) ,:);
 
         x2    = sample(x2);
         t2    = sample(t2);
@@ -329,11 +321,11 @@ function trapModel(varargin)
 
         fprintf('  - Simulation compeleted in %d seconds\n', ceil(etime(clock(),start_time)));
 
-        if getOption('quickSave',false)
+        if options.quickSave
             save('.savedTrapModel.mat',  'eta2','t2','x2','DJN_x','DJN_eta','DJN_beachwidth','DJN_slopes', ...
                 'alpha','lambda','x_lin','t_lin','eta_lin','u_lin');
         end
-        if getOption('save', false)
+        if options.save
             for i=1:size(x2,2)
                 results.snapshot{i}.x=x2(:,i);
                 results.snapshot{i}.eta=eta2(:,i);
@@ -343,11 +335,6 @@ function trapModel(varargin)
             results.case=['case_',num2str(DJN_beachwidth),'m_',num2str(1/DJN_slopes),'_',num2str(alpha)];
             save(results.case,'results');
         end
-    elseif getOption('quickLoad',false)
-        load('.savedTrapModel.mat');
-    else
-        load(getOption('load'));
-
     end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -368,12 +355,12 @@ function trapModel(varargin)
     bath.slope  = alpha;
 
     % x=-3*max(max(x2)):.1:2*max(max(x2));
-    if getOption('plotLambda',true)
+    if options.plotLambda
         plotWave(x2, eta2, t2,  bath, options);
         plot(DJN_x, DJN_eta,'-b');
     end
 
-    if getOption('plotTime',false)
+    if options.plotTime
         plotWave(x_lin, eta_lin, t_lin,  bath, options);
     end
 
