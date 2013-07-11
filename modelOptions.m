@@ -1,3 +1,31 @@
+%{
+options = modelOptions(varargin)
+	This loads options for the model to run.
+	The passed options are read using 'readOptions'.
+	Option precedence: console (typed in by user), saved options, defaults.
+
+Model Options
+
+Run Options
+ Data Retention
+ Save/Load
+ Plotting
+
+Options Options
+ -saveOptions
+	saves the current saved/console options to file to be loaded automatically later
+
+ -dontLoadOptions
+ 	prevents the saved options from being loaded
+	combine with 'saveOptions' to clear the current saved options
+
+ -printAllOptions
+	shows the value of all options currently defined
+
+SEE ALSO
+trapModel, readOptions
+%}
+
 function options = modelOptions(varargin)
 
 
@@ -5,7 +33,7 @@ function options = modelOptions(varargin)
                                  'dsigma',.01,'maxsigma',150,'xmax',5000,'DJN_beachwidth',50,'DJN_slopes',.5, ...
                             'trimAtBreak',false, ...
                             'timeFixStart',0.0, 'timeFixStride',10, 'timeFixEnd',0.1, ...
-                            'quickLoad',false,'quickSave',false,'load',false,'save',false, ...
+                            'quickLoad',false,'quickSave',false,'save',false, ...
                             'plotLambda',true,'plotTime',false);
 	savedOptions = struct();
 	savedOptionsFile = '.REU_model_options';

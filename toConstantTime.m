@@ -1,5 +1,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% function [x_mesh, t_samples, varargout] = toConstantTime(x2, t2, timeSamples, varargin)
+% function [x_mesh, t_samples, varargout] = toConstantTime(x2, t2, timeSamples, [options,] varargin)
+% function sout = toConstantTime(dataStruct, options)
 %
 % Correct the t values 
 %

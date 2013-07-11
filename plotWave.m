@@ -1,8 +1,10 @@
 % function plotWave(x,height,bathymetry)
 
-function plotWave(x,z,t,bath,varargin)
+function plotWave(data,bath,varargin)
 	options = readOptions(varargin);
     getOption = @(name,defaultValue) readOption(options,name,defaultValue);
+
+    x = data.x; t = data.t; z = data.eta;
 
     if isvector(t) %% x(t), z(t)
         timePlot = makePlot('timePlot','saveMovie',getOption('saveTimePlot',false),'movieName','waterOutline.avi', 'movieLocation','octaveMovies', ...
@@ -34,7 +36,7 @@ function plotWave(x,z,t,bath,varargin)
         bath_z = [bath.height bath.height ; bath.height(end:-1:1) bath.height(end:-1:1)] + ones(4,1) * (x_axis*bath.slope);
         y_axis = [min(min(bath_y)) max(max(bath_y))];
 
-        for i=1:length(t)
+        for i=100:140%1:length(t)
 
         %% top view
             timePlot = switchToPlot(timePlot,1:2);

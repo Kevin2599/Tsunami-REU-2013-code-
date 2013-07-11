@@ -1,6 +1,7 @@
-function [Phiout Psiout lambda] = runModel(sigma,Phi_nm1,Phi_n, Psi_nm1,Psi_n, counter,A,dlambda,dsigma,W,PHI_LAMBDA,F,options)
+function [Phiout Psiout lambda] = runModel(sigma,Phi_nm1,Phi_n, Psi_nm1,Psi_n, counter,A,dlambda,W,PHI_LAMBDA,F,options)
     %Pre-allocate for the speed %DJN 4/10/13
     n=length(sigma);
+    dsigma = options.dsigma;
 
     Psiout=zeros(ceil(options.timesteps/options.keeprate), n);
     Phiout=zeros(ceil(options.timesteps/options.keeprate), n);
