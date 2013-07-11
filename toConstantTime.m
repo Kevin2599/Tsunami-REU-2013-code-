@@ -53,5 +53,41 @@ function [x_mesh, t_samples, varargout] = toConstantTime(x2, t2, timeSamples, va
   % sample the vars at the correct t-values
     for i = 1:(nargout-2)
         varargout{i} = griddata(x2, t2, v(varargin{i}), x_mesh, t_mesh); % other option, 'cubic'
+
+        if ~inoctave()
+            [e x t] = DJN_bluh(x2,t2,varargin{i});
+            figure(1);
+            mesh(x,t,e);
+            figure(2);
+            mesh(x_mesh,t_mesh,varargout{i});
+        end
     end
+end
+
+function [e x t] = DJN_bluh(x2,t2,eta2)
+    x21=x2(2:end,:);
+    t21=t2(2:end,:);
+    eta21=eta2(2:end,:);
+    F=TriScatteredInterp(x21(:), t21(:), eta21(:));
+
+    min_x=-500;         max_t=500;
+    dx=0.1;
+    dt=0.1;
+
+    [x,t]=meshgrid(min_x:dx:max(x21(:))*1.1, 0:dt:max_t);
+    e=F(x,t);
+
+    index=(x>-50);
+    for i=find(index==1)
+        z=interp1(t21(1,:), x21(1,:), t(i));
+        if(x(i)>z)
+            e(i)=NaN;
+        end
+    end
+
+    line_x=[x21(1,:) min_x min_x  x21(1,1)];
+    line_y=[t21(1,:) max_t     0  t21(1,1)];
+
+    index=inpolygon(x, t, line_x, line_y);
+    e(~index)=NaN;
 end
