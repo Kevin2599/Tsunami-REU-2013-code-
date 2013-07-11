@@ -1,8 +1,12 @@
 function m = makePlot(plotID,varargin)
 	m = readOptions(varargin);
 
-	global numPlots = 0;
-	numPlots = numPlots+1;
+	persistent numPlots
+	if isempty(numPlots)
+		numPlots = 0
+	else
+		numPlots = numPlots+1;
+	end
 
 	m.plotID = plotID;
 	m.plotHandle = -1;
