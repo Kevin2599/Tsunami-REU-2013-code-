@@ -570,7 +570,9 @@ function trapModel(varargin)
             % ylabel(['z'])
             % title(['t = ', num2str(t_lin(1,i))]);
             waterOutline = topViewOfWater(trap_bathymetry,alpha,x_lin(:,i),eta_lin(:,i));
+            hold off;
             plot(waterOutlineInitial(:,1),waterOutlineInitial(:,2),'k'); hold on
+            plot([0,0],[-25,25],'k');
             plot(waterOutline(:,1),waterOutline(:,2),'r');
             xlim(x_axis);
             xlabel('x'); ylabel('y');

@@ -1,0 +1,20 @@
+p2(:,:)=Phi(120,:,:);
+
+aviobj = VideoWriter('example2a_0u.avi');
+open(aviobj);
+for i=1:51
+fig=figure(1);
+    plot(p2(:,i))
+hold on
+plot(ones(1,30000)*max(p2(:,2)),'r')
+plot(ones(1,30000)*min(p2(:,2)),'r')
+hold off
+axis([0 30000 min(min(p2)) max(max(p2))])
+xlabel('sigma')
+ylabel('Phi')
+    pause(.1)
+ F = getframe(fig);
+    writeVideo(aviobj,F);
+end
+close(fig);
+ close(aviobj);

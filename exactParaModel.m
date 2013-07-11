@@ -84,12 +84,12 @@ clear all
 clc
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Define all needed user inputs
+tic
 
 
-
-timesteps=1000;          % change to change dlambda
+dlambda=.01;          % change to change dlambda
 dsigma=.01;              % Defint the change in sigma
-maxl=30;                 % maximum for lambda
+maxl=20;                 % maximum for lambda
 m=2;                     % m difines the bay shape |y|^m
 a=.5;                    % a is the amplutude of our paulse
 s0=15;                   % so is the mean of out paulse
@@ -121,7 +121,11 @@ plotb=1;                  % Bool to plot
 % that will be used to solve our system
 
 disp('Building model...')
-dlambda=1/timesteps;     % Define dlambda and dsigma
+%dlambda=1/timesteps;     % Define dlambda and dsigma
+
+timesteps=1/dlambda;
+
+
 
 dsigma2=dsigma*dsigma;   % Find dlambda^2 and dsigma^2
 dlambda2=dlambda*dlambda;
@@ -149,7 +153,8 @@ A(n,n)=1;
 
 % define the initial Phi (wave height)
 Phi_nm1=-4*a*sigma.^(-1).*((sigma-s0)/p^2.*exp(-1*((sigma-s0)/p).^2)+(sigma+s0)/p^2.*exp(-((sigma+s0)/p).^2)); % at \lambda=0
-%Phi_nm1=4*a*sigma.^(-1).*(exp(-1*((sigma-s0)/p).^2));
+%Phi_nm1=a*(exp(-1*((sigma-s0)/p).^2));
+
 Phi_nm1(1)=0;
 
 
@@ -283,8 +288,9 @@ if Exact
     % Find exact phi and psi.
     phi = a./ SIG .* ( -2.*(SIG+LAM-s0)/(p^2).* exp(-(((SIG+LAM-s0)/p).^2)) -2.*(SIG-LAM-s0)/(p^2).* exp(-(((SIG-LAM-s0)/p).^2)) -2.*(SIG+LAM+s0)/(p^2).* exp(-(((SIG+LAM+s0)/p).^2))-2.*(SIG-LAM+s0)/(p^2).* exp(-(((SIG-LAM+s0)/p).^2)));
     psi = -a./ SIG .* ( -(1./SIG + 2*(SIG + LAM - s0)/(p^2)).* exp(-(((SIG + LAM - s0)/p).^2)) + (1./SIG + 2*(SIG - LAM - s0)/(p^2)).* exp(-(((SIG - LAM - s0)/p).^2)) - (1./SIG + 2*(SIG + LAM + s0)/(p^2)).* exp(-(((SIG + LAM + s0)/p).^2)) + (1./SIG + 2*(SIG - LAM + s0)/(p^2)).* exp(-(((SIG - LAM + s0)/p).^2)));
-    
-    
+  
+
+
 end
 if ~Exact
     disp('No Explicit Data...')
@@ -384,16 +390,38 @@ end
 
 
 
+%{
+format long
+ [maxi,W1]=max(eta1(2,:))
+  [mini,W2]=min(eta1(2,:))
+  [maxi,W11]=max(eta2(2,:));
+  [mini,W21]=min(eta2(2,:));
+x=[-100,100];
+
+plot(x1(:,W1),eta1(:,W1), 'r')
+hold on
+plot(x1(:,W11),eta2(:,W11),'c')
+plot(x,alpha*x)
+plot(0,0,'^b')
 
 
 
 
-
+plot(x1(:,W2),eta1(:,W2), 'r')
+plot(x1(:,W21),eta2(:,W21),'c')
+plot(x,alpha*x)
+plot(0,0,'^b')
+axis((1+floor(max(max(abs(eta2)))))*[-10*max(max(x2)) 1.5*max(max(x2)) alpha*-10*max(max(x2)) 4*alpha*max(max(x2))])
+leg=legend('Exact solution', 'modeled solution','Bay','Initial water level','Exact solution', 'modeled solution','Location','Best');
+xlabel('x')
+return;
+%}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Plot the data
 
 % Look for break in time.
 disp('Plotting...')
+toc
 [dummy,I]=sort(t2*alpha,2);
 found=0;
 brokeat=length(t2(1,:))+1;
