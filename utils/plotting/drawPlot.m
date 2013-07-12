@@ -10,6 +10,6 @@ function m = drawPlot(m)
 			writeVideo(m.writer,frame);
 		end
 	else
-		refresh();
+		drawnow();
 	end
 end

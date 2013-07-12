@@ -1,15 +1,13 @@
-function y=eta_0(x)
+function [y oneorzeroU oneorzeroEta] =eta_0(x)
 	%y=-9.0315e-4*exp(-1.5e-5*(1000+x).^2).*(1000+x);% gause wave
 	%y(abs(y)<1e-3)=0;
 	%y(y~=0)=0;
 
-	%y=.001*exp(-.001*(100+x).^2).*(100+x); 
 
-	%y=.001*exp(-((50+x)/15).^2);
-	y=.5*exp(-((15+x)/1.5).^2);
-
-
-	%y=-exp( (131.6067351280179/2-x).^2);
-	y(y<1e-7)=0;
-	y(abs(y)<1e-7)=0;
+	y=-0.0001/0.6065*exp(-2e-5*(1000+x).^2).*(1000+x); 
+	%y=.1*exp(-((x+1000)/50).^2);
+	y(abs(y)<1e-5)=0;
+	% y=y*0;
+	oneorzeroU = 0;
+    oneorzeroEta=1;
 end
