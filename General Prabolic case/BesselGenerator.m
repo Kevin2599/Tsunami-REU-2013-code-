@@ -60,7 +60,7 @@ x=1/(2*g*alpha)*(phi-(ones(length(u(1,:)),1)*sigma.^2)'*2*g*m./(4*g*(m+1))-u.^2)
 %x=eta-(ones(length(u(1,:)),1)*sigma.^2)'*2*g*m./(4*g*(m+1));
 
 toc
-
+plot(x(:,2),eta(:,2))
 
 
 
