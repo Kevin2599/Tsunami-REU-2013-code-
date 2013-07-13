@@ -1,0 +1,11 @@
+> hold on; p4=plot(mx2(1:20:end), meta2(1:20:end),'xm');
+ >> hold on; p4=plot(mx2(1:20:end), meta2(1:20:end),'xm','MarkerSize',10);
+ >> hold on; p4=plot(mx2(1:20:end), 
+meta2(1:20:end),'xm','MarkerSize',20,'LineWidth',10);
+ >> p5=plot([ -100 -100], [ -1 1],'-xm');
+ >> legend
+ >> legend([p1 p2 p5],{'Bathymetry','FUNWAVE','Semi-analytic'})
+ >> p2=plot(fresults.x(1:5:end), 
+fresults.snapshot{i}.eta(1:5:end),'ob','MarkerSize',5);
+ >> p2=plot(fresults.x(1:50:end), 
+fresults.snapshot{i}.eta(1:50:end),'ob','MarkerSize',8);
