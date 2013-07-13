@@ -13,7 +13,7 @@ function plotWave(data,bath,varargin)
 
     %% line plot of x,t,eta
     %% warning, this requires a matrix for t
-        if getOption('plotTime_viewSamples',false)
+        if ~isvector(t) && getOption('plotTime_viewSamples',false)
             figure(2); clf
             hold on
             for i=1:length(x2(1,:))

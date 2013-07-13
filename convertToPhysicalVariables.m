@@ -3,9 +3,8 @@ function vars = convertToPhysicalVariables(Phi, Psi, lambda, F, intF, options)
 	alpha = options.bath.slope;
 
 
-	Phi=Phi';
-	Psi=Psi';
-	lambda=lambda';
+	Phi    =    Phi'; % sigma x lambda
+	Psi    =    Psi'; % sigma x lambda
 
 	% Data Needed to convert both exact and aprox data
 	[LAM, Fgrid] = meshgrid(-lambda, F);

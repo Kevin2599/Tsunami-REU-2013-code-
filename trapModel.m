@@ -1,17 +1,17 @@
-% trapModel(options)
+% function trapModel(options)
 %
-% This program will find the solution to the tsunami runup problem on a
-% trapezoidal beach with a constant slope in the x direction.
-% It requires that the programs trapF.m and fixit.m be present.
+%	This program will find the solution to the tsunami runup problem on a
+%	trapezoidal beach with a constant slope in the x direction.
+%	It requires that the programs trapF.m and fixit.m be present.
 %
-% Options are read in using 'readOptions'
-% For all options, see 'modelOptions'
+%	Options are read in using 'readOptions'
+%	For all options, see 'modelOptions'
 %
-% Uses the functions:
-%  trapF, setupModel, runModel, convertToPhysicalVariables, toConstantTime, plotWave
+%	The model is comprised of the functions:
+%	 trapF, setupModel, runModel, convertToPhysicalVariables, toConstantTime, plotWave
 %
 % SEE ALSO
-% readOptions,modelOptions
+% readOptions, modelOptions
 
 % The following varables are used in this program:
 % W        - Vector that is used to find A.
@@ -138,7 +138,7 @@ function trapModel(varargin)
 		% doing the entire matrix is very slow
 		lambdaResults = applyFunToStruct(@(mat) mat(floor(options.timeFixStart*end)+1 : options.timeFixStride : floor(options.timeFixEnd*end) ,:), lambdaResults);
 
-		% x(l) t(l) z(l) ... => x(t) z(t) ...
+		% z(x(l), t(l)) ... => z(x,t) ...
 		[x_lin t_lin eta_lin u_lin] = toConstantTime(lambdaResults.x, lambdaResults.t, 1:max(max(lambdaResults.t)) , lambdaResults.eta, lambdaResults.u);
 		timeResults = struct('x',x_lin, 't',t_lin, 'eta',eta_lin, 'u',u_lin);
 
