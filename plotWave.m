@@ -6,6 +6,10 @@ function plotWave(data,bath,varargin)
 
     x = data.x; t = data.t; z = data.eta;
 
+    x_axis  = [min(min(x)), max(max(x)) ];
+    x_axis(2) = x_axis(2) + .05 * (x_axis(2) - x_axis(1));
+    z_axis  = [min(min(z)), max(max(z)) ];
+
     if getOption('plotBathymetry',false)
         plotWindow = makePlot('timePlot','saveMovie',getOption('saveTimePlot',false),'movieName','waterOutline.avi', 'movieLocation','octaveMovies', ...
                             'subplot',[4 1],'hold','off');
@@ -13,14 +17,15 @@ function plotWave(data,bath,varargin)
         dyPlot   = makeSubplot(plotWindow,3);
         zPlot    = makeSubplot(plotWindow,4);
 
-        max_slope = max(diff(bath.right - bath.left) ./ diff(bath.height));
-        disp_axis = z_axis * max_slope;
+        % max_slope = max(diff(bath.right - bath.left) ./ diff(bath.height));
+        % disp_axis = z_axis * max_slope;
 
-        [outlineInitial_x outlineInitial_y] = topViewOfWater(bath,[0; min(min(x))],[0; 0]);
+        x_samples = x(:,1) ./ (-1*min(min(x)));
+        [outlineInitial_x outlineInitial_y] = topViewOfWater(bath,x_samples,0*x_samples);
 
-        [bath_x bath_y] = meshgrid(x_axis,[bath.left; bath.right(end:-1:1)]);
-        bath_z = [bath.height bath.height ; bath.height(end:-1:1) bath.height(end:-1:1)] + ones(4,1) * (x_axis*bath.slope);
-        y_axis = [min(min(bath_y)) max(max(bath_y))];
+        % [bath_x bath_y] = meshgrid(x_axis,[bath.left; bath.right(end:-1:1)]);
+        % bath_z = [bath.height bath.height ; bath.height(end:-1:1) bath.height(end:-1:1)] + ones(4,1) * (x_axis*bath.slope);
+        % y_axis = [min(min(bath_y)) max(max(bath_y))];
     else
         plotWindow = makePlot('timePlot','saveMovie',getOption('saveTimePlot',false),'movieName','waterOutline.avi', 'movieLocation','octaveMovies', ...
                             'hold','off');
@@ -37,12 +42,6 @@ function plotWave(data,bath,varargin)
         end
         surf(x,t,z,'EdgeColor','none','LineStyle','none');
     end
-
-%% Bathymetry
-    x_axis  = [min(min(x)), max(max(x)) ];
-    x_axis(2) = x_axis(2) + .05 * (x_axis(2) - x_axis(1));
-    z_axis  = [min(min(z)), max(max(z)) ];
-
 
     timeValues = 1:size(x,2);
     if getOption('limitPlotT',false)
@@ -71,7 +70,7 @@ function plotWave(data,bath,varargin)
             plot(outline_x(1:end/2),outline_dy);
 
             xlim(x_axis);
-            ylim(disp_axis);
+            % ylim(disp_axis);
             ylabel('edge runup');
             grid on
         end

@@ -3,7 +3,7 @@ function m = makePlot(plotID,varargin)
 
 	persistent numPlots
 	if isempty(numPlots)
-		numPlots = 0
+		numPlots = 0;
 	else
 		numPlots = numPlots+1;
 	end

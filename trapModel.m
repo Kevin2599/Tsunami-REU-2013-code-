@@ -10,8 +10,7 @@
 %	The model is comprised of the functions:
 %	 trapF, setupModel, runModel, convertToPhysicalVariables, toConstantTime, plotWave
 %
-% SEE ALSO
-% readOptions, modelOptions
+%	See also: readOptions, modelOptions
 
 % The following varables are used in this program:
 % W        - Vector that is used to find A.

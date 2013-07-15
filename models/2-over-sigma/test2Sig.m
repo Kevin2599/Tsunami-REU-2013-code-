@@ -19,11 +19,11 @@ function [x_mesh t_samples eta_mesh] = test2Sig(const,lambda)
 	% phi/psi = sigma x lambda
 	for i=1:length(lambda)
 		[phi1 psi1] = evalPhi(func, lambda(i)*ones(size(sigma)), sigma);
-		[e_phi e_psi e_Phi] = exactPhi(sigma, lambda(i)*ones(size(sigma)), const);
+		% [e_phi e_psi e_Phi] = exactPhi(sigma, lambda(i)*ones(size(sigma)), const);
 		phi(:,i) = phi1; psi(:,i) = psi1;
-		plot(sigma, [phi1 e_phi psi1 e_psi]);
+		plot(sigma, [phi1 psi1]);
 		title(sprintf('lambda (%.2f/%.2f)',lambda(i),lambda(end)));
-		legend('phi','PHI','psi','PSI');
+		% legend('phi','PHI','psi','PSI');
 		drawnow();
 	end
 
@@ -45,15 +45,7 @@ function [x_mesh t_samples eta_mesh] = test2Sig(const,lambda)
 	[x_mesh t_samples eta_mesh] = toConstantTime(vars.x(2:end-1,:), vars.t(2:end-1,:), 'linear', vars.eta(2:end-1,:));
 
 	println('plotting')
-	clf;
-	y_axis = [min(min(eta_mesh)) max(max(eta_mesh))];
-	for i=1:length(t_samples);
-		plot(x_mesh(:,i), eta_mesh(:,i));
-		xlabel('X'); ylabel('eta');
-		title(['t = ' num2str(t_samples(i))]);
-		ylim(y_axis);
-		drawnow();
-	end
+	% plotWave(struct('x',x_mesh, 't',t_samples, 'eta',eta_mesh), struct('slope',.05, 'lr', @(h) h.^2));
 end
 
 %{

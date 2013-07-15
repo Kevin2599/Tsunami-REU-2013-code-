@@ -52,8 +52,8 @@
 	  -save [false]
 	  	Saves the data to external file for comparison with other models.
 
-	  -quickSave
-	  -quickLoad
+	  -quickSave [false]
+	  -quickLoad [false]
 	  	Caches the data from a run to make tweaking plots easier.
 
 	 Plotting
