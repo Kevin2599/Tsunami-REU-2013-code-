@@ -1,29 +1,80 @@
 %{
-options = modelOptions(varargin)
-	This loads options for the model to run.
-	The passed options are read using 'readOptions'.
-	Option precedence: console (typed in by user), saved options, defaults.
+    options = modelOptions(varargin)
+		This loads options for the model to run.
+		The passed options are read using 'readOptions'.
+		These options are passed to plotWave, which has its own set of options.
+		Option precedence: console (typed in by user), saved options, defaults.
 
-Model Options
+    Model Options
+	 -maxl [100]
+	 -timesteps [20,000]
+	 	lambda values that the model's evaluated at are 0:maxl/timesteps:maxl
 
-Run Options
- Data Retention
- Save/Load
- Plotting
+	 -dsigma:		[.01]
+	 -maxsigma:		[150]
+		sigma values that the model's evaluated at are 0:dsigma:maxsigma
 
-Options Options
- -saveOptions
-	saves the current saved/console options to file to be loaded automatically later
+	 -g [9.81]
+	 	gravity
 
- -dontLoadOptions
- 	prevents the saved options from being loaded
-	combine with 'saveOptions' to clear the current saved options
+	 -beach_slope [0.05]
+	 	slope of the bay in the X direction (alpha)
 
- -printAllOptions
-	shows the value of all options currently defined
+	 -bath_type ['trapezoid']
+	 	Defines the bathymetry of the bay on the yz plane
 
-SEE ALSO
-trapModel, readOptions
+		>> trapezoid \__/ options
+		 	-DJN_beachwidth [50]
+		 	-DJN_slopes     [.5]
+		 		The trapezoid's width and slope of the walls
+
+	 -xmax [5000]
+	 	?
+
+	 -trimAtBreak [false]
+		If the wave breaks, then the data after that point is removed
+
+    Run Options
+	 Data Retention
+	  -snapshots [100]
+	  -keeprate []
+		The numerical model has ~100x more data points than necessary.
+		These options trim the values of lambda for which data is saved.
+		- Snapshots specifies how many values of lambda are saved.
+		- Keeprate overrides snapshots and keeps every nth lambda value.
+
+	  -timeFixStart  [.0]
+	  -timeFixStride [10]
+	  -timeFixEnd    [.1]
+	  	Trims the values of sigma to (start*length:stride:end*length)
+
+	 Save/Load
+	  -save [false]
+	  	Saves the data to external file for comparison with other models.
+
+	  -quickSave
+	  -quickLoad
+	  	Caches the data from a run to make tweaking plots easier.
+
+	 Plotting
+	  -plotLambda [true]
+	 	Plots x(lambda) eta(lambda) t(lambda)
+
+	  -plotTime [false]
+	 	Plots x(t) eta(t)
+
+    Options Options
+	 -saveOptions [false]
+		saves the current saved/console options to file to be loaded automatically later
+
+	 -dontLoadOptions
+	 	prevents the saved options from being loaded
+		combine with 'saveOptions' to clear the current saved options
+
+	 -printAllOptions
+		shows the value of all options currently defined
+
+    See also: trapModel, readOptions
 %}
 
 function options = modelOptions(varargin)

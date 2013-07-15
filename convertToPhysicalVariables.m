@@ -3,8 +3,10 @@ function vars = convertToPhysicalVariables(Phi, Psi, lambda, F, intF, options)
 	alpha = options.bath.slope;
 
 
-	Phi    =    Phi'; % sigma x lambda
-	Psi    =    Psi'; % sigma x lambda
+	if size(Phi,2) ~= length(lambda) % basic error checking
+		Phi    =    Phi'; % sigma x lambda
+		Psi    =    Psi'; % sigma x lambda
+	end
 
 	% Data Needed to convert both exact and aprox data
 	[LAM, Fgrid] = meshgrid(-lambda, F);
@@ -12,8 +14,8 @@ function vars = convertToPhysicalVariables(Phi, Psi, lambda, F, intF, options)
 
 	% Convert Aprox.
 	vars.u   = Psi./Fgrid;
-	vars.eta = (Phi-vars.u.^(2))/(2*g);
 	vars.t   = abs((LAM-vars.u)/(alpha*g));
+	vars.eta = (Phi-vars.u.^(2))/(2*g);
 	vars.x   = (Phi-vars.u.^(2)-intgrid)/(2*alpha*g);
 
 	%[J, UL, US]=Jacobian(F,g,alpha,u,sigma,lambda,dsigma,dlambda);

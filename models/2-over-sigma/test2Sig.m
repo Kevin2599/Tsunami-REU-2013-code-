@@ -4,7 +4,7 @@ function [x_mesh t_samples eta_mesh] = test2Sig(const,lambda)
 	sigma = (0:const.delSigma:const.maxSigma)';
 
 	phi_0 = initialHump(const.a, const.sigma0, const.p, sigma);
-	phi_0 = phi_0 - mean(phi_0);
+	% phi_0 = phi_0 - mean(phi_0); % seems to make the initial condition fit better
 	psi_0 = zeros(size(sigma));
 
 	println('Solving the equation');
@@ -15,10 +15,15 @@ function [x_mesh t_samples eta_mesh] = test2Sig(const,lambda)
 
 	println('Evaluating at specific values')
 	[lambda_mesh sigma_mesh] = meshgrid(lambda, sigma);
-	[phi psi] = evalPhi(func, lambda_mesh, sigma_mesh);
 	figure(1); clf;
+	% phi/psi = sigma x lambda
 	for i=1:length(lambda)
-		plot(sigma, phi(:,i));
+		[phi1 psi1] = evalPhi(func, lambda(i)*ones(size(sigma)), sigma);
+		[e_phi e_psi e_Phi] = exactPhi(sigma, lambda(i)*ones(size(sigma)), const);
+		phi(:,i) = phi1; psi(:,i) = psi1;
+		plot(sigma, [phi1 e_phi psi1 e_psi]);
+		title(sprintf('lambda (%.2f/%.2f)',lambda(i),lambda(end)));
+		legend('phi','PHI','psi','PSI');
 		drawnow();
 	end
 
@@ -28,6 +33,7 @@ function [x_mesh t_samples eta_mesh] = test2Sig(const,lambda)
 	options.g = 9.81; options.bath = struct('slope',.05);
 	options.trimAtBreak = false;
 	vars = convertToPhysicalVariables(phi', psi', lambda(:), F, intF, options);
+
 
 	figure(1); clf; hold on
 	for i=1:length(lambda)
@@ -40,14 +46,16 @@ function [x_mesh t_samples eta_mesh] = test2Sig(const,lambda)
 
 	println('plotting')
 	clf;
-	for i=1:length(t_samples)
+	y_axis = [min(min(eta_mesh)) max(max(eta_mesh))];
+	for i=1:length(t_samples);
 		plot(x_mesh(:,i), eta_mesh(:,i));
 		xlabel('X'); ylabel('eta');
 		title(['t = ' num2str(t_samples(i))]);
+		ylim(y_axis);
 		drawnow();
 	end
 end
 
 %{
-	const = struct('sigma0', 2.9, 'delSigma', 0.01, 'maxSigma', 5, 'a', 0.1, 'p', 1, 'num_lambda', 400);
+	const = struct('sigma0', 2.9, 'delSigma', 0.01, 'maxSigma', 5, 'a', 0.1, 'p', 1, 'num_lambda', 40);
 %}

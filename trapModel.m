@@ -134,7 +134,6 @@ function trapModel(varargin)
 
 		% get rid of lambda=[1,end] b/c they fuck griddata up
 		lambdaResults = applyFunToStruct(@(mat) mat(2:end-1,:) , lambdaResults);
-
 		% doing the entire matrix is very slow
 		lambdaResults = applyFunToStruct(@(mat) mat(floor(options.timeFixStart*end)+1 : options.timeFixStride : floor(options.timeFixEnd*end) ,:), lambdaResults);
 
@@ -186,7 +185,7 @@ function trapModel(varargin)
 	end
 
 	if options.plotTime
-		plotWave( timeResults, bath, options);
+		plotWave( timeResults, bath, options, 'plotBathymetry',true, 'limitPlotT',100:140);
 	end
 
 end %function
