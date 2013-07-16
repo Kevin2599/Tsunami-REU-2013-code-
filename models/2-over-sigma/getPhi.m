@@ -1,6 +1,6 @@
 function func = getPhi(sigma,phi0,psi0,n)
 	xeqtanx = @(ns) arrayfun((@(n) fzero((@(x) atan(x) + n*pi -x),[(n-.5)*pi (n+.5)*pi])),ns);
-	lambda = xeqtanx(1:n) ./ sigma(end);
+	lambda = xeqtanx(0:n) ./ sigma(end);
 
 	if sigma(1) == 0
 		phi0 = phi0(2:end);
