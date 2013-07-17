@@ -9,6 +9,13 @@
 % there are more x-samples near the shoreline, this captures that
 
 function [x_mesh, t_samples, varargout] = toConstantTime(x2, t2, timeSamples, varargin)
+    % IDEA
+    % use interp1 on constant lambda to align with respect to t
+    %  This should be faster, and not screw up the boundary
+
+
+
+
     options.dummyVar = [];
     if isstruct(varargin{1})
         options = varargin{1};

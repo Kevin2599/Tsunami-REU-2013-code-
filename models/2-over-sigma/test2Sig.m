@@ -8,10 +8,7 @@ function [x_mesh t_samples eta_mesh] = test2Sig(const,lambda)
 	% psi_0 = zeros(size(sigma));
 
 	println('Solving the equation');
-	func = getPhi(sigma, phi_0, psi_0, const.num_lambda)
-	clf; plot(func.A);
-	func
-	return
+	func = getPhi(sigma, phi_0, psi_0, const.num_lambda);
 
 	func.sigma = sigma;
 	func.phi_0 = phi_0;
@@ -21,7 +18,7 @@ function [x_mesh t_samples eta_mesh] = test2Sig(const,lambda)
 	figure(1); clf;
 	% phi/psi = sigma x lambda
 	for i=1:length(lambda)
-		[phi1 psi1] = evalPhi(func, lambda(i)*ones(size(sigma)), sigma);
+		[phi1 psi1] = evalPhi(func, lambda(i), sigma);
 		[e_phi e_psi e_Phi] = exactPhi(sigma, lambda(i)*ones(size(sigma)), const);
 		 phi(:,i) =  phi1;  psi(:,i) =  psi1;
 		ephi(:,i) = e_phi; epsi(:,i) = e_psi;

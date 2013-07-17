@@ -1,17 +1,16 @@
-function [phi psi] = evalPhi(func, lambda,sigma)
-	% f_Phi = @(l,s) sum( (func.A.*sin(func.lambda_n * l) + func.B.*cos(func.lambda_n * l)) .* sin(func.lambda_n * s) / s);
+%single value of lambda
 
-	ln = func.lambda_n;
-	A  = func.A;
-	B  = func.B;
+function [phi psi] = evalPhi(func, lambda, sigma)
+	% Phi = sum( (A.*sin(ln * lambda) + B.*cos(ln * l)) .* sinax_over_x(ln, sigma);
 
+	A  = repmat( func.A ,1,length(sigma));
+	B  = repmat( func.B ,1,length(sigma));
+	[sigma ln] = meshgrid(sigma,func.lambda_n);
 
-	f_phi = @(l,s) sum( ln .* (A.*cos(ln * l) - B.*sin(ln * l)) .*   sinax_over_x(ln, s));
-	f_psi = @(l,s) sum(       (A.*sin(ln * l) + B.*cos(ln * l)) .* d_sinax_over_x(ln, s));
+	phi = sum(ln .*  (A.*cos(ln .* lambda) - B.*sin(ln .* lambda)) .*   sinax_over_x(ln, sigma));
+	psi = sum(       (A.*sin(ln .* lambda) + B.*cos(ln .* lambda)) .* d_sinax_over_x(ln, sigma));
 
-
-	phi = arrayfun(f_phi,lambda,sigma);
-	psi = arrayfun(f_psi,lambda,sigma);
+	phi = phi(:); psi = psi(:);
 end
 
 function y = d_sinax_over_x(a,x)
@@ -28,7 +27,7 @@ function y = d_sinax_over_x(a,x)
 
 	ax = a.*x;
 
-	close0 = ax <.1;
+	close0 = ax < .1;
 	far0   = ~close0;
 
 	y = zeros(size(ax));
