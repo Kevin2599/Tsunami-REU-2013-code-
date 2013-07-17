@@ -88,15 +88,15 @@ tic
 
 
 dlambda=.01;          % change to change dlambda
-dsigma=.01;              % Defint the change in sigma
-maxl=80;                 % maximum for lambda
+dsigma=.001;              % Defint the change in sigma
+maxl=30;                 % maximum for lambda
 m=2;                     % m difines the bay shape |y|^m
 a=.5;                    % a is the amplutude of our paulse
 s0=15;                   % so is the mean of out paulse
 p=1.5;                   % p is the  varence in paulse
 keeprate=10;             % keeprate determans the time step one will keep 10 keeprate gives deltalambda=.1
 g=9.81;                     % Set gravity
-alpha=.5;                 % Set slope
+alpha=.1;                 % Set slope
 plotb=1;                  % Bool to plot
 
 
@@ -154,7 +154,7 @@ A(n,n)=1;
 % define the initial Phi (wave height)
 Phi_nm1=-4*a*sigma.^(-1).*((sigma-s0)/p^2.*exp(-1*((sigma-s0)/p).^2)+(sigma+s0)/p^2.*exp(-((sigma+s0)/p).^2)); % at \lambda=0
 %Phi_nm1=a*(exp(-1*((sigma-s0)/p).^2));
-Phi_nm1=2*g*-0.0001/0.6065*exp(-2e-5*(1000+x).^2).*(1000+x);
+%Phi_nm1=2*g*-0.0001/0.6065*exp(-2e-5*(1000+x).^2).*(1000+x);
 Phi_nm1(1)=0;
 
 

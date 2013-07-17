@@ -96,8 +96,8 @@ dsigma=.01;              % Our change in Sigma from program
 maxsigma=150;             % The maximum value for sigma that we want.
 
 
-DJN_beachwidth=50;
-DJN_slopes=0.5;
+DJN_beachwidth=.5;
+DJN_slopes=1;
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

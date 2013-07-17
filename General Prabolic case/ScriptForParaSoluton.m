@@ -12,7 +12,7 @@ alpha=.05;
 xmax=4000;
 x=-[0:.001:10 10.001:.1:xmax];
 g=9.81;
-[eta,~,etat]=eta_0(x);
+[eta,u,etat]=eta_0(x);
 sigma=2*sqrt((etat*eta-x*alpha)*g*(m+1)/m);
 Sigma_L=max(sigma);
 
@@ -31,37 +31,54 @@ C_n=zeros(Num_Roots,1);
 D_n=zeros(Num_Roots,1);
 
 besselpart=zeros(Num_Roots,length(sigma));
-for n=1:Num_Roots%need to make besselj better so that x can be 0
-    
+
+% FIX TO LINEAR SYSTEM
+% for n=1:Num_Roots
+%     
+%     besselpart(n,:)=besselj(1/m,sqrt(-1*Lambda_n(n))*sigma)./sigma.^(1/m);
+%     %fix the zero point
+%     besselpart(n,1)=besseljo(1/m,Lambda_n(n),0);
+%     
+%     
+%     [eta,u]=eta_0(x);
+%     C_n(n)=trapz(sigma,(sqrt(-1*Lambda_n(n))*2*g*eta.*besselpart(n,:)));
+%     D_n(n)=u*trapz(sigma(2:end),(besselpart(n,2:end).*cumsimps(sigma(2:end),m/(m+1).*sigma(2:end).*eta_0(-sigma(2:end)).*sqrt(g./(alpha*-x(2:end))))));
+%     if (plotb)
+%         if(n==Num_Roots)
+%             figure(1)
+%             plot(sigma,besselpart(n,:),'.b')
+%             hold on
+%             plot(sigma(1:end-1),diff(besselpart(n,:))./diff(sigma),'.r','MarkerSize',1)
+%             plot(sigma,0.*sigma,'k')
+%             legend('Eig(sigma)','Eigp(sigma)');
+%             hold off
+%             figure(2)
+%             plot(x,besselpart(n,:),'.b')
+%             hold on
+%             plot(x(1:end-1),diff(besselpart(n,:))./diff(x),'.r','MarkerSize',1)
+%             plot(x,0.*x,'k')
+%             legend('Eig(x)','Eigp(x)');
+%             set(gca,'xdir','reverse')
+%             hold off
+%         end
+%     end
+% end
+% using the matrix.
+Amatrix=zeros(length(sigma),Num_Roots);
+besselpart=zeros(Num_Roots,length(sigma));
+for n=1:Num_Roots
     besselpart(n,:)=besselj(1/m,sqrt(-1*Lambda_n(n))*sigma)./sigma.^(1/m);
     %fix the zero point
     besselpart(n,1)=besseljo(1/m,Lambda_n(n),0);
     
-    
-    [eta,u]=eta_0(x);
-    C_n(n)=trapz(sigma,(sqrt(-1*Lambda_n(n))*2*g*eta.*besselpart(n,:)));
-    % Use eta0 flag later
-    D_n(n)=u*trapz(sigma(2:end),(besselpart(n,2:end).*cumsimps(sigma(2:end),m/(m+1).*sigma(2:end).*eta_0(-sigma(2:end)).*sqrt(g./(alpha*-x(2:end))))));
-    if (plotb)
-        if(n==Num_Roots)
-            figure(1)
-            plot(sigma,besselpart(n,:),'.b')
-            hold on
-            plot(sigma(1:end-1),diff(besselpart(n,:))./diff(sigma),'.r','MarkerSize',1)
-            plot(sigma,0.*sigma,'k')
-            legend('Eig(sigma)','Eigp(sigma)');
-            hold off
-            figure(2)
-            plot(x,besselpart(n,:),'.b')
-            hold on
-            plot(x(1:end-1),diff(besselpart(n,:))./diff(x),'.r','MarkerSize',1)
-            plot(x,0.*x,'k')
-            legend('Eig(x)','Eigp(x)');
-            set(gca,'xdir','reverse')
-            hold off
-        end
-    end
+    Amatrix(:,n)=(sqrt(-1*Lambda_n(n)))*besselpart(n,:);
 end
+C_n=2*g*eta/Amatrix';
+D_n=u*C_n;
+
+
+
+
 
 figure(3)
 plot(C_n,'.-b')
@@ -114,7 +131,6 @@ if plotb
 end
 disp('finding phi and psi...')
 
-
 phi=zeros(length(sigma),length(lambda)-1);
 
 phi(:,1)=(p2(:,2)-p2(:,1))/(lambda(2)-lambda(1));
@@ -159,7 +175,7 @@ u2   =   u2(2:end-1,:);
 
 %[x_lin t_lin eta_lin u_lin] = toConstantTime(x2,t2, 1:max(max(t2)) ,eta2, u2);
 
-
+%PUT NEW STUFF HERE
 toc
 figure(4)
 scale=10;
