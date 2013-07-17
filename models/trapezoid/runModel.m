@@ -1,4 +1,4 @@
-function [Phiout Psiout lambda x0 eta0] = runModel(sigma,W,dW,H,F,options)
+function [Phiout Psiout lambda] = runModel(sigma,W,dW,H,F,options)
     dlambda= options.maxl/options.timesteps;
     dsigma = options.dsigma;
     alpha = options.bath.slope;
@@ -28,18 +28,18 @@ function [Phiout Psiout lambda x0 eta0] = runModel(sigma,W,dW,H,F,options)
     Max_H=interp1(sigma,H,options.maxsigma);
     xmax=Max_H/alpha;
 
-    x0=-[0:1:xmax];
-    %eta0=-0.0001/0.6065*exp(-2e-5*(1000+x0).^2).*(1000+x0); %alpha=0.01
+    DJN_x=-[0:1:xmax];
+    %DJN_eta=-0.0001/0.6065*exp(-2e-5*(1000+DJN_x).^2).*(1000+DJN_x); %alpha=0.01
     
-    [eta0 DJN_flag]=eta_0(x0);
+    [DJN_eta DJN_flag]=eta_0(DJN_x);
     
-    %eta0=0.01*(1-tanh((1000+x0)/200 ))/2
+    %DJN_eta=0.01*(1-tanh((1000+DJN_x)/200 ))/2
     
     %We need to convert (x, t, \eta, u) to (\sigma, \lambda, \phi, \psi)
-    DJN_H=eta0-x0*alpha;
+    DJN_H=DJN_eta-DJN_x*alpha;
     DJN_Sigma=interp1(H, sigma, DJN_H);
 
-    DJN_u=DJN_flag * eta0.*sqrt(g./(-alpha*x0));
+    DJN_u=DJN_flag * DJN_eta.*sqrt(g./(-alpha*DJN_x));
     DJN_u(isnan(DJN_u))=0;
 
 
@@ -48,7 +48,7 @@ function [Phiout Psiout lambda x0 eta0] = runModel(sigma,W,dW,H,F,options)
 
 
 
-    DJN_Phi=2*g*eta0;
+    DJN_Phi=2*g*DJN_eta;
 
     % Define the initial Phi (wave height)
     % Phi_nm1=-4*a*sigma.^(-1).*((sigma-s0)/p^2.*exp(-1*((sigma-s0)/p).^2)+(sigma+s0)/p^2.*exp(-((sigma+s0)/p).^2));

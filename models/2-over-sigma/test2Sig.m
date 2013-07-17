@@ -1,7 +1,7 @@
 function [x_mesh t_samples eta_mesh] = test2Sig(const,lambda)
 	println('Setting up initial conditions');
 
-	sigma = (0:const.delSigma:const.maxSigma)';
+	sigma = (0:const.dsigma:const.maxsigma)';
 
 	[phi_0 psi_0 ~] = exactPhi(sigma, zeros(size(sigma)), const);
 	% phi_0 = phi_0 - mean(phi_0); % seems to make the initial condition fit better
@@ -71,5 +71,5 @@ function [x_mesh t_samples eta_mesh] = test2Sig(const,lambda)
 end
 
 %{
-	const = struct('sigma0', 2.9, 'delSigma', 0.01, 'maxSigma', 5, 'a', 0.1, 'p', 1, 'num_lambda', 40);
+	const = struct('sigma0', 2.9, 'dsigma', 0.01, 'maxsigma', 5, 'a', 0.1, 'p', 1, 'num_lambda', 40);
 %}

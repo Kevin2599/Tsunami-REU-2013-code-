@@ -102,24 +102,23 @@ function trapModel(varargin)
 
 		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 		% We generate the space-determined variables sigma, F, H, H0, intF, dF, W, and dW.
-		[sigma,F,H,H0,intF,dF,W,dW] = trapF(options, 2*(bath.trap_width) + 2*bath.slope * (options.xmax/bath.trap_slope) );
+		[sigma,F,H,H0,intF,dF,W,dW] = trapF(options, bath);
 		W(1)=1e100; %W(1) is the infinity, just make it huge, instead of the Inf, DJN 4/10/13
-		W = W';
+		W = W(:);
 		
+		% modelVariables.{F intF}
+		% {H H0 dF W dW}
+
 		%For no potential.
 		%W=0*W;
 		%dW=0*dW;
 		
 		
-	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	% Build the starting conditions from the user inputs
-		println('Building model...')
-		[Phi_nm1,Phi_n, Psi_nm1,Psi_n,counter,A,dlambda,W,PHI_LAMBDA, DJN_x, DJN_eta] = setupModel(sigma,W,dW,H,F,options);
 
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	% Solve the model for Psi and Phi
 		println('Running model...')
-		[Phiout Psiout lambda] = runModel(sigma,Phi_nm1,Phi_n,Psi_nm1,Psi_n,counter,A,dlambda,W,PHI_LAMBDA,F,options);
+		[Phiout Psiout lambda x0 eta0] = runModel(sigma,W,dW,H,F,options);
 
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	% Convert back to physical varables
@@ -145,13 +144,13 @@ function trapModel(varargin)
 		fprintf('  - Simulation compeleted in %d seconds\n', ceil(etime(clock(),start_time)));
 
 		if options.quickSave
-			save('.savedTrapModel.mat',  'lambdaResults','timeResults','bath', 'DJN_x','DJN_eta');
+			save('.savedTrapModel.mat',  'lambdaResults','timeResults','bath', 'x0','eta0');
 		end
 		if options.save
 			for i=1:size(x2,2)
-				results.snapshot{i}.x=x2(:,i);
-				results.snapshot{i}.eta=eta2(:,i);
-				results.snapshot{i}.time=t2(2,i);
+				results.snapshot{i}.x=lambdaResults.x(:,i);
+				results.snapshot{i}.eta=lambdaResults.eta(:,i);
+				results.snapshot{i}.time=lambdaResults.t(2,i);
 			end
 			results.max_runup=max(max(eta2));
 			results.case=['case_',num2str(bath.trap_width),'m_',num2str(1/bath.trap_slope),'_',num2str(bath.slope)];
@@ -180,7 +179,7 @@ function trapModel(varargin)
 	% x=-3*max(max(x2)):.1:2*max(max(x2));
 	if options.plotLambda
 		plotWave(lambdaResults, bath, options);
-		plot(DJN_x, DJN_eta,'-b');
+		plot(x0, eta0,'-b');
 	end
 
 	if options.plotTime
