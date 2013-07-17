@@ -52,6 +52,10 @@ for i=10:nshots
     
     
     %Tweak some graphics
+    fresults.max_runup=max(fresults.snapshot{1}.eta);
+    for lp=2:size(fresults.snapshot,2)
+        fresults.max_runup=max(fresults.max_runup,max(fresults.snapshot{lp}.eta));
+    end
     axis([-30 500 -0.1 fresults.max_runup*1.1])
     xlabel('Distance from the shore, meters.');
     ylabel('Wave height, meters.')

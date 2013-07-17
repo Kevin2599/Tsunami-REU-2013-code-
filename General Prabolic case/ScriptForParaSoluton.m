@@ -1,10 +1,10 @@
 clear all
 tic
-Num_Roots=40;
+Num_Roots=35;
 m=2;
 
 lambda_S=0;
-lambda_E=80;
+lambda_E=120;
 plotb=0;
 
 %put numbers for our problem
@@ -179,14 +179,14 @@ u2   =   u2(2:end-1,:);
 toc
 figure(4)
 scale=10;
-for i=1:length(x2(1,:))
+for i=1:2:length(x2(1,:))
     plot(x2(:,i),eta2(:,i))
     hold on
-    plot(x2(:,i),u2(:,i),'r')
+    %plot(x2(:,i),u2(:,i),'r')
     plot([max(max(x2)) -scale*max(max(x2))],alpha*[max(max(x2)) -scale*max(max(x2))],'k')
     plot(0,0,'^k')
     set(gca,'xdir','reverse')
-    legend('eta(x)','u(x)','bay')
+    legend('eta(x)','bay')
     axis([-scale*max(max(x2)) max(max(x2)) min(min(eta2)) max(max(eta2))])
     title(['t = ' num2str(t2(2,i))]);
     hold off
