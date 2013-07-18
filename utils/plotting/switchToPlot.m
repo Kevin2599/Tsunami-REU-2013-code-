@@ -1,4 +1,4 @@
-function m=switchToPlot(m,subplotIndex)
+function m=switchToPlot(m)
 	if m.plotHandle == -1
 		global plotIDs
 		if ~exist('plotIDs')
@@ -19,8 +19,9 @@ function m=switchToPlot(m,subplotIndex)
 	elseif gcf() ~= m.plotHandle
 		figure(m.plotHandle)
 	end
-	if exist('subplotIndex')
-		subplot(m.subplotDim(1),m.subplotDim(2),subplotIndex);
+	
+	if isfield(m,'subplotIndex')
+		subplot(m.subplotDim(1),m.subplotDim(2),m.subplotIndex);
 	end
 	if isfield(m,'hold')
 		hold(m.hold)
