@@ -1,6 +1,6 @@
 clear all
 tic
-Num_Roots=100;
+Num_Roots=80;
 m=2;
 
 lambda_S=0;
@@ -11,8 +11,8 @@ plotb=0;
 alpha=.05;
 Sigma_L=80;
 g=1;%9.81;
-sigma=[0:.001:10 10.001:.01:Sigma_L];
-
+%sigma=[0:.001:10 10.001:.01:Sigma_L];
+sigma=0:1:Sigma_L;
 % sigma=zeros(200,1);
 % sigma(1)=Sigma_L*1.1;
 % dx=Sigma_L/10;
@@ -41,18 +41,20 @@ D_n=zeros(Num_Roots,1);
 
 
 
-% From the inner product
+%From the inner product
 % besselpart=zeros(Num_Roots,length(sigma));
 % for n=1:Num_Roots%need to make besselj better so that x can be 0
-%
+% 
 %     besselpart(n,:)=besselj(1/m,sqrt(-1*Lambda_n(n))*sigma)./sigma.^(1/m);
 %     %fix the zero point
 %     besselpart(n,1)=besseljo(1/m,Lambda_n(n),0);
-%
-%
-%     [phi pot]=phi_0(sigma);
+% 
+% 
+%     [phi pot,A, p, sigma_0]=phi_0(sigma);
 %     C_n(n)=trapz(sigma,(sqrt(-1*Lambda_n(n))*phi.*besselpart(n,:)));%(-Lambda_n(n))^.25/sqrt(2/pi).*
-%
+% %     f=@(xt) (sqrt(-1*Lambda_n(n))).*besselj(1/m,sqrt(-1*Lambda_n(n))*xt)./xt.^(1/m).*...
+% %         (-4*A*xt.^(-1).*((xt-sigma_0)/p^2.*exp(-1*((xt-sigma_0)/p).^2)+(xt+sigma_0)/p^2.*exp(-((xt+sigma_0)/p).^2)))';
+% %     C_n(n)=integral(f,0,Sigma_L);
 %     D_n(n)=pot;
 %     if (plotb)
 %         if(n==Num_Roots)
@@ -63,7 +65,7 @@ D_n=zeros(Num_Roots,1);
 %             plot(sigma,0.*sigma,'k')
 %             legend('Eig(sigma)','Eigp(sigma)');
 %             hold off
-%
+% 
 % %             figure(2)
 % %             plot(x,besselpart(n,:),'.b')
 % %             hold on
@@ -78,17 +80,17 @@ D_n=zeros(Num_Roots,1);
 
 
 % using the matrix.
-Amatrix=zeros(length(sigma),Num_Roots);
+Amatrix=zeros(length(sigma),Num_Roots-1);
 besselpart=zeros(Num_Roots,length(sigma));
-for n=1:Num_Roots
+for n=2:Num_Roots
     besselpart(n,:)=besselj(1/m,sqrt(-1*Lambda_n(n))*sigma)./sigma.^(1/m);
     %fix the zero point
     besselpart(n,1)=besseljo(1/m,Lambda_n(n),0);
     
-    Amatrix(:,n)=(sqrt(-1*Lambda_n(n)))*besselpart(n,:);
+    Amatrix(:,n-1)=(sqrt(-1*Lambda_n(n)))*besselpart(n,:);
 end
 [phi pot,A, p, sigma_0]=phi_0(sigma);
-C_n=phi/Amatrix';
+C_n=[0 phi/Amatrix'];
 D_n=C_n*pot;
 
 
