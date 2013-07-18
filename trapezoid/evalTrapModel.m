@@ -85,7 +85,9 @@
 % x1       - Our distance output for the exact solution. NOTE MATRIX
 % x2       - Our distance output for the aprox solution. NOTE MATRIX
 
-function results = trapModel(options)
+function results = evalTrapModel(options)
+	bath = options.bath;
+
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	% We generate the space-determined variables sigma, F, H, H0, intF, dF, W, and dW.
 	[sigma,F,H,H0,intF,dF,W,dW] = trapF(options, bath);
@@ -95,13 +97,6 @@ function results = trapModel(options)
 	%For no potential.
 	%W=0*W;
 	%dW=0*dW;
-	
-	
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Solve the model for Psi and Phi
-	println('Running model...')
-	[Phiout Psiout lambda x0 eta0] = evalTrapModel(sigma,W,dW,H,F,options);
 
 
     dlambda= options.maxl/options.timesteps;
@@ -315,5 +310,5 @@ function results = trapModel(options)
     end
 
 
-	results = struct('phi',Phiout, 'psi',Psiout, 'lambda',lambda ,'x0',x0 ,'eta0',eta0];
+	results = struct('phi',Phiout, 'psi',Psiout, 'lambda',lambda ,'x0',DJN_x ,'eta0',DJN_eta, 'F',F, 'intF',intF);
 end %function

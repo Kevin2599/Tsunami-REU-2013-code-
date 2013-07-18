@@ -20,8 +20,8 @@ function plotWave(data,bath,varargin)
         % max_slope = max(diff(bath.right - bath.left) ./ diff(bath.height));
         % disp_axis = z_axis * max_slope;
 
-        x_samples = x(:,1) ./ (-1*min(min(x)));
-        [outlineInitial_x outlineInitial_y] = topViewOfWater(bath,x_samples,0*x_samples);
+        x_samples = linspace(0, min(min(x)), 50);
+        [outlineInitial_x outlineInitial_y] = topViewOfWater(bath,x_samples(:),0*x_samples(:));
 
         % [bath_x bath_y] = meshgrid(x_axis,[bath.left; bath.right(end:-1:1)]);
         % bath_z = [bath.height bath.height ; bath.height(end:-1:1) bath.height(end:-1:1)] + ones(4,1) * (x_axis*bath.slope);
