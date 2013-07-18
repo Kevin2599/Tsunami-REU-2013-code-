@@ -71,5 +71,5 @@ function [x_mesh t_samples eta_mesh] = test2Sig(const,lambda)
 end
 
 %{
-	const = struct('sigma0', 2.9, 'dsigma', 0.01, 'maxsigma', 5, 'a', 0.1, 'p', 1, 'num_lambda', 40);
+	const = struct('sigma0', 2.9, 'dsigma', 0.01, 'maxsigma', 15, 'a', 0.1, 'p', 1, 'num_lambda', 40);
 %}
