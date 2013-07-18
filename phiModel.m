@@ -16,12 +16,12 @@ function phiModel(varargin)
 	else % run the model
 		start_time = clock();
 
-		println('Running Model...')
+		println('Running model...')
 		results = options.model(options);
 
-		println('Converting to Physical Variables...')
+		println('Converting to physical variables...')
 		lambdaResults = convertToPhysicalVariables(results.phi, results.psi, results.lambda, results.F, results.intF, options);
-		lambdaResults.lambda = results.lambda;
+		lambdaResults.lambda = results.lambda(:);
 
 
 		println('Aligning with respect to time...')
@@ -32,10 +32,10 @@ function phiModel(varargin)
 		lambdaResults = applyFunToStruct(@(mat) mat(floor(options.timeFixStart*end)+1 : options.timeFixStride : floor(options.timeFixEnd*end) ,:), lambdaResults);
 
 		% z(x(l), t(l)) ... => z(x,t) ...
-		[x_lin t_lin eta_lin u_lin] = toConstantTime(lambdaResults.x, lambdaResults.t, 1:max(max(lambdaResults.t)) , lambdaResults.eta, lambdaResults.u);
+		[x_lin t_lin eta_lin u_lin] = alignToTime(lambdaResults.x, lambdaResults.t, 1:max(max(lambdaResults.t)) , lambdaResults.eta, lambdaResults.u);
 		timeResults = struct('x',x_lin, 't',t_lin, 'eta',eta_lin, 'u',u_lin);
 
-		fprintf('  - Simulation compeleted in %d seconds\n', ceil(etime(clock(),start_time)));
+		fprintf('  - Simulation compeleted in %.2f seconds\n', etime(clock(),start_time));
 
 	% Save the results
 		if options.quickSave
