@@ -236,4 +236,7 @@ function [sigma,F,H,H0,intF,dF,W,dW] = trapF(const,bath)
 	%Let's also do the asmyptotics of dW.
 	asympdW = -(1./(sigma.^2)) + 1/(3*g*beta*y0);
 	dF = smoothdF;
+
+
+	W = W(:);
 end

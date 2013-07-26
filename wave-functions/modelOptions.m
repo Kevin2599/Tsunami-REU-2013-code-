@@ -80,7 +80,7 @@
 function options = modelOptions(varargin)
 
 
-	defaultOptions = struct('maxl',100,'timesteps',20000,'snapshots',100,'g',9.81, 'beach_slope',.05, 'bath_type', 'trapezoid', ...
+	defaultOptions = struct('maxl',100,'timesteps',20000,'snapshots',100,'g',9.81, 'beach_slope',.05, 'model_type', 'trapezoid', ...
                                  'dsigma',.01,'maxsigma',150,'xmax',5000,'DJN_beachwidth',50,'DJN_slopes',.5, ...
                             'trimAtBreak',false, ...
                             'timeFixStart',0.0, 'timeFixStride',10, 'timeFixEnd',0.1, ...
@@ -113,7 +113,8 @@ function options = modelOptions(varargin)
     end
 
     options.bath.slope = options.beach_slope;
-    if strcmp(options.bath_type,'trapezoid')
+    if strcmp(options.model_type,'trapezoid')
+    	options.model = @trapEval;
 	    options.bath.trap_width = options.DJN_beachwidth;
 	    options.bath.trap_slope = options.DJN_slopes;
 	    options.bath.lr = @(h,bath) trapezoid_lr(h, bath.trap_width, bath.trap_slope);
