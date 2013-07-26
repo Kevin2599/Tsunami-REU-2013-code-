@@ -78,7 +78,8 @@ function plotWave(data,bath,varargin)
     %% side view
         if exist('zPlot')
             zPlot = switchToPlot(zPlot);
-            % plot(x2(:,i),eta2(:,i)', 'b')
+
+            plot(x_axis, [0 0], 'g');
             plot(x(:,i),z(:,i));%, '.r');
 
             plot(x_axis , bath.slope*x_axis,'r');
