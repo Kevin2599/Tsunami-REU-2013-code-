@@ -161,7 +161,7 @@ end
 
 disp('final conversion')
 [LAM, Fgrid] = meshgrid(-lambda, m/(m+1)*sigma);
-[~, intgrid] = meshgrid(-lambda, 1/2*m/(m+1)*(sigma.^2-sigma(1)^2));
+[~, intgrid] = meshgrid(-lambda, 1/2*m/(m+1)*(sigma.^2));
 
 u2   = psi./Fgrid;
 eta2 = (phi-u2.^(2))/(2*g);
