@@ -118,6 +118,14 @@ function options = modelOptions(varargin)
 	    options.bath.trap_width = options.DJN_beachwidth;
 	    options.bath.trap_slope = options.DJN_slopes;
 	    options.bath.lr = @(h,bath) trapezoid_lr(h, bath.trap_width, bath.trap_slope);
+	elseif strcmp(options.model_type,'2/sigma')
+
+		options.model = @eval2Sig;
+		options.bath.lr = @(h) [-(h.^.5) (h.^.5)];
+		options.a = readOption(options,'a', .1);
+		options.p = readOption(options,'p', 1);
+		options.num_lambda = readOption(options,'num_lambda', 40);
+		options.sigma0 = readOption(options,'sigma0', 2.9);
 	end
 
 	if readOption(options,'printAllOptions',false)

@@ -1,4 +1,9 @@
 function [x_mesh t_samples eta_mesh] = test2Sig(const,lambda)
+	if ~exist('const')
+		const = struct('sigma0', 2.9, 'dsigma', 0.01, 'maxsigma', 15, 'a', 0.1, 'p', 1, 'num_lambda', 40);
+		lambda = 0:.1:10;
+	end
+
 	println('Setting up initial conditions');
 
 	sigma = (0:const.dsigma:const.maxsigma)';
