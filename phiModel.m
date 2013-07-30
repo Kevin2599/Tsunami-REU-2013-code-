@@ -8,7 +8,7 @@
 
 
 function phiModel(varargin)
-	options = modelOptions(varargin{:});
+	options = modelSetup(varargin{:});
 	bath = options.bath;
 
 	if options.quickLoad

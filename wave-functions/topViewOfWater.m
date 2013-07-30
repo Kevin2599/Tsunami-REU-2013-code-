@@ -10,14 +10,17 @@ function [xs ys dys] = topViewOfWater(bay, waveX, waveHeight, magnification)
 	initialHeight =  - bay.slope*waveX;
 
 	[outlineLeft outlineRight] = bay.lr(waveHeight + initialHeight, bay);
-	[origOutlineLeft origOutlineRight] = bay.lr(initialHeight, bay);
-	
-	dys = (outlineRight - outlineLeft) - (origOutlineRight - origOutlineLeft);
-	dys = dys(end:-1:1);
 
 	if exist('magnification') && magnification ~= 1
+		[origOutlineLeft origOutlineRight] = bay.lr(initialHeight, bay);
+		
+		dys = (outlineRight - outlineLeft) - (origOutlineRight - origOutlineLeft);
+		dys = dys(end:-1:1);
+
 		outlineLeft  = (1-magnification) * origOutlineLeft  + magnification * outlineLeft;
 		outlineRight = (1-magnification) * origOutlineRight + magnification * outlineRight;
+	else
+		dys = [];
 	end
 
 	xs = [waveX(end:-1:1); waveX];

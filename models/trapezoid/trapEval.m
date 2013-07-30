@@ -57,7 +57,6 @@
 %            to the wave equation. Needed to shuffle data.
 % Phiout   - n by length(lambda) matrix that contains out approxamation for
 %            Phi.
-% plotb    - bool to turn on plot.
 % Psi      - Length n vector that holds the curent time step for our solution
 %            to the wave equation.
 % Psi_n    - Length n vector that holds the current time step for our solution
@@ -89,7 +88,6 @@ function results = trapEval(options)
 
     timesteps = options.timesteps;            % number of time steps between \lambda=0, and \lambda=maxl, %DJN 4/10/13
     keeprate  = options.keeprate;     % keep every \it{keeprate}-th step.
-    plotb     = 1;                 % Bool to plot
     dlambda   = options.maxl/options.timesteps;
     dsigma    = options.dsigma;
     alpha     = options.bath.slope;
