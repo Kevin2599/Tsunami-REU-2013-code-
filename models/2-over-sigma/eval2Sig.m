@@ -1,32 +1,32 @@
 function results = eval2Sig(options, bath)
-	println('Setting up initial conditions');
+	println('Setting up model...');
 
 	sigma  = options.sigma;
 	lambda = options.lambda;
-	phi_0 = options.phi0;
-	psi_0 = options.psi0;
 
-	println('Solving the equation');
-	func = getPhi(sigma, phi_0, psi_0, options.num_lambda);
+	func = getPhi(sigma, options.phi0, options.psi0, options.num_lambda);
 
-	println('Evaluating at specific values')
-	[lambda_mesh sigma_mesh] = meshgrid(lambda, sigma);
+	println('Evaluating at specific values...')
 	figure(1); clf;
 	% phi/psi = sigma x lambda
 	for i=1:length(lambda)
 		[phi1 psi1] = evalPhi(func, lambda(i), sigma);
-		[e_phi e_psi e_Phi] = exactPhi(sigma, lambda(i)*ones(size(sigma)), const);
 		 phi(:,i) =  phi1;  psi(:,i) =  psi1;
-		ephi(:,i) = e_phi; epsi(:,i) = e_psi;
-		plot(sigma, [phi1 e_phi phi1-e_phi]);
+
+		if options.showError
+			[e_phi e_psi e_Phi] = exactPhi(sigma, lambda(i)*ones(size(sigma)), const);
+			ephi(:,i) = e_phi; epsi(:,i) = e_psi;
+
+			plot(sigma, [phi1 phi1-e_phi]);
+			legend('phi','phi err');
+		else
+			plot(sigma, phi1);
+		end
 		title(sprintf('lambda (%.2f/%.2f)',lambda(i),lambda(end)));
-		legend('phi','phi err');
 		grid on
 		drawnow();
 	end
 
-
-	println('Converting to physical variables')
 	F    = (2/3) * sigma;
 	intF = (1/3) * sigma.^2;
 

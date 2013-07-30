@@ -8,9 +8,6 @@ function [phi psi Phi] = exactPhi(sigma,lambda,vars)
 end
 
 function Phi = exact__Phi(sigma,lambda,vars)
-	% function y = gaussianFunction(amplitude, offset, width, x, derivative)
-	% gaussianFunction(vars.a./sigma, sig0Sign.*vars.sigma0, vars.p, sigma + lamSign*lambda)
-	% e = @(lamSign, sig0Sign) exp(- (((sigma + lamSign.*lambda + sig0Sign.*vars.sigma0)/vars.p).^2) );
 	e = @(lamSign, sig0Sign) gaussianFunction(sig0Sign.*vars.sigma0, vars.p, sigma + lamSign*lambda);
 	Phi = (vars.a ./ sigma) .* ( e(1,-1) - e(-1,-1) + e(1,1) - e(-1,1) );
 end

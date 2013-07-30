@@ -2,8 +2,13 @@
     options = modelSetup(varargin)
 		This loads options for the model to run.
 		The passed options are read using 'readOptions'.
-		These options are passed to plotWave, which has its own set of options.
-		Option precedence: console (typed in by user), saved options, defaults.
+		These options are passed to plotWave and the model, which have their own set of options.
+
+		Option precedence: console (typed in by user), saved options, model options, defaults.
+
+	 -model_type ['trapezoid']
+		'trapezoid' is trapModel, gets options from trapOptions
+		'2/sigma' is a test case, gets options from sigmaOver2Options
 
     Model Options
 	 -maxl [100]
@@ -87,7 +92,7 @@ function options = modelSetup(varargin)
                             'timeFixStart',0.0, 'timeFixStride',10, 'timeFixEnd',0.1, ...
                             'quickLoad',false,'quickSave',true,'save',false, ...
                             'plotLambda',true,'plotTime',false);
-	
+
 	defaultOptions.phi0_psi0 = @(opt) deal(opt.a * gaussianFunction(opt.sigma0, opt.p, opt.sigma,1), zeros(size(opt.sigma)));
 
 	savedOptions = struct();

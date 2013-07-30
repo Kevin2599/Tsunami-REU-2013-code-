@@ -16,15 +16,15 @@ function phiModel(varargin)
 	else % run the model
 		start_time = clock();
 
-		println('Running model...')
+			println('Running model...')
 		results = options.model(options);
 
-		println('Converting to physical variables...')
+			println('Converting to physical variables...')
 		lambdaResults = convertToPhysicalVariables(results.phi, results.psi, results.lambda, results.F, results.intF, options);
 		lambdaResults.lambda = results.lambda(:);
 
 
-		println('Aligning with respect to time...')
+			println('Aligning with respect to time...')
 
 		% get rid of lambda([1,end]) b/c they're NaN
 		lambdaResults = applyFunToStruct(@(mat) mat(2:end-1,:) , lambdaResults);
@@ -47,7 +47,7 @@ function phiModel(varargin)
 				results.snapshot{i}.eta=lambdaResults.eta(:,i);
 				results.snapshot{i}.time=lambdaResults.t(2,i);
 			end
-			results.max_runup=max(max(eta2));
+			results.max_runup=max(max(lambdaResults.eta));
 			results.case=['case_',num2str(bath.trap_width),'m_',num2str(1/bath.trap_slope),'_',num2str(bath.slope)];
 			save(results.case,'results');
 		end

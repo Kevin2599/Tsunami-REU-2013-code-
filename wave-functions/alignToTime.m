@@ -34,6 +34,7 @@ function [x_mesh, t_samples, varargout] = alignToTime(x2, t2, timeSamples, varar
     xSamples = readOption(options,'toConstantTime_xSamples','default');
     if ~ischar(xSamples)
         % FIXME
+        error('Sorry, specifying xSamples manually isn''t written yet');
     end
 end
 
