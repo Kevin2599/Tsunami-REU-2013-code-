@@ -6,8 +6,9 @@ function [y oneorzeroU oneorzeroEta] =eta_0(x)
 
 	y=-0.00001/0.6065*exp(-2e-5*(1000+x).^2).*(1000+x); 
 	%y=.1*exp(-((x+1000)/50).^2);
-    
+  
 	y(abs(y)<1e-5)=0;
+    plot(x,y)
 	% y=y*0;
 	oneorzeroU = 0;
     oneorzeroEta=1;

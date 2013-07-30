@@ -86,14 +86,14 @@ clc
 % Define all needed user inputs
 
 tic
-maxl=110;                 % maximum for lambda
-timesteps=50000;            % number of time steps between \lambda=0, and \lambda=maxl, %DJN 4/10/13
+maxl=50;                 % maximum for lambda
+timesteps=30000;            % number of time steps between \lambda=0, and \lambda=maxl, %DJN 4/10/13
 keeprate=timesteps/100;     % keep every \it{keeprate}-th step.
 g=9.81;                  % Set gravity
-alpha=.05;               % Set slope
+alpha=1/100;               % Set slope
 plotb=1;                 % Bool to plot
 dsigma=.01;              % Our change in Sigma from program
-maxsigma=350;             % The maximum value for sigma that we want.
+maxsigma=150;             % The maximum value for sigma that we want.
 
 
 DJN_beachwidth=50;
@@ -138,7 +138,7 @@ A(n,n)=1;
 
 %DJN
 %Define the initial profile
-DJN_x=-[0:1:2000];
+DJN_x=-[0:1:35046];
 %Comparison with the FUNWAVE model
 
 %eta_0 gives eta and u

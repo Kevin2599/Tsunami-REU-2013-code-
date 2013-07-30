@@ -1,8 +1,8 @@
 clear all;
 
-load('funwave_results/case_50m_2_nw.mat','-mat');
+load('funwave_results/funwave.mat','-mat');
 fresults=results;
-load('matts_results/analytical_nw_case_50m_2_0.01tmp.mat','-mat');
+load('matts_results/analytical.mat','-mat');
 mresults=results;
 
 
