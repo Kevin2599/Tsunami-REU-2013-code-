@@ -161,13 +161,13 @@ end
 
 function dv_dx = secondOrderDifference(v, dx)
     n = length(v);
-    dv_dx = zeros(length(v),1);
+    dv_dx = zeros(n,1);
 
     dv_dx(    1) = -3*v(  1) + 4*v(  2) - v(    3); % Second order  forward difference
     dv_dx(2:n-1) =    v(3:n)            - v(1:n-2); % Second order  central difference
     dv_dx(    n) = -3*v(  n) + 4*v(n-1) - v(  n-2); % Second order backward difference
 
-    dv_dx = dv_dx ./ (2*dx)
+    dv_dx = dv_dx ./ (2*dx);
 end
 
 
