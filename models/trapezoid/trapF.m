@@ -42,15 +42,19 @@
 % If you have questions, you can contact me (Lander Ver Hoef) at
 % lverhoef@alaska.edu.
 
-function [sigma,F,H,H0,intF,dF,W,dW] = trapF(const,bath)
+function [sigma,F,H,H0,intF,dF,W,dW] = trapF(varargin)
 
-	beta     = bath.trap_slope;
-	y0       = bath.trap_width/2;
-	dsigma   = const.dsigma;
-	sigmamax = const.maxsigma;
-	g        = const.g;
-	ymax     = 2*bath.trap_width + 2*bath.slope * const.xmax/bath.trap_slope;
-
+	if nargin == 2
+		[const bath] = varargin{:};
+		beta     = bath.trap_slope;
+		y0       = bath.trap_width/2;
+		dsigma   = const.dsigma;
+		sigmamax = const.maxsigma;
+		g        = const.g;
+		ymax     = 2*bath.trap_width + 2*bath.slope * const.xmax/bath.trap_slope;
+	else
+		[beta,y0,dsigma,sigmamax,ymax,g] = varargin{:};
+	end
 
 	%We define our internal intervals.
 	yinterval=.001;

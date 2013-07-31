@@ -98,7 +98,7 @@ function results = trapEval(options)
     %and dW.
 
     [sigma,F,H,H0,intF,dF,W,dW] = trapF(options, options.bath);
-    W(1)=1e100; %W(1) is the infinity, just make it huge, instead of the Inf, DJN 4/10/13
+    W(1)=1e100; %W(1) is infinity, but just make it huge.
 
     n = length(sigma);
 
@@ -109,8 +109,8 @@ function results = trapEval(options)
 
     disp('Building model...')
 
-    dsigma2=dsigma*dsigma;   % Find dlambda^2 and dsigma^2
-    dlambda2=dlambda*dlambda;
+    dsigma2  =  dsigma* dsigma;
+    dlambda2 = dlambda*dlambda;
 
     A=sparse(n,n);
     b=zeros(n,1);
@@ -118,9 +118,9 @@ function results = trapEval(options)
 
     A(1,1)=1;               % Define the matrix A, W and dW needed for our model
     for i=2:n-1
-        A(i, i-1)=   -(    dlambda2/(dsigma2) - dlambda2/(2*dsigma)*W(i)                    );
-        A(i, i)  = 1 -( -2*dlambda2/(dsigma2)                           + dlambda2*dW(i)    );
-        A(i, i+1)=   -(    dlambda2/(dsigma2) + dlambda2/(2*dsigma)*W(i)                    );
+        A(i, i-1)=   -(    dlambda2/(dsigma2) - dlambda2/(2*dsigma)*W(i)                  );
+        A(i, i)  = 1 -( -2*dlambda2/(dsigma2)                            + dlambda2*dW(i) );
+        A(i, i+1)=   -(    dlambda2/(dsigma2) + dlambda2/(2*dsigma)*W(i)                  );
     end
     A(n,n)=1;
 
@@ -132,13 +132,9 @@ function results = trapEval(options)
 
     %eta_0 gives eta and u
     [DJN_eta,U_0]=eta_0(DJN_x);
-
-
-
-    % DJN_eta=-9.0315e-4*exp(-1.5e-5*(1000+DJN_x).^2).*(1000+DJN_x); %alpha=0.01
     DJN_eta(abs(DJN_eta)<1e-5)=0;
 
-    DJN_u=U_0*DJN_eta.*sqrt(g./(-alpha*DJN_x));
+    DJN_u=U_0*DJN_eta.*sqrt(g./(-alpha*DJN_x - DJN_eta));
 
     %DJN_eta=0.01*(1-tanh((1000+DJN_x)/200 ))/2
     plot(DJN_x, DJN_eta)
@@ -160,17 +156,11 @@ function results = trapEval(options)
     Phi_nm1=interp1(DJN_Sigma, DJN_Phi, sigma);
     Phi_nm1(isnan(Phi_nm1))=0;
     Phi_nm1(1)=0;
+    Phi_nm1(end)=Phi_nm1(end-1);
 
-    Phi_nm1=Phi_nm1';   %Make it the column, DJN 4/10/13
+    Phi_nm1=Phi_nm1(:);   %Make it a column, DJN 4/10/13
 
-    %Define the initial Psi and then the next time step (wave velocity)
-    PHI_sigma=zeros(n,1);                                                % Pre-allocate for speed
-    PHI_sigma(1)=(-Phi_nm1(3)+4*Phi_nm1(2)-3*Phi_nm1(1))/(2*dsigma);     % Second order forwards difference
-    for i=2:n-1
-        PHI_sigma(i)=(Phi_nm1(i+1)-Phi_nm1(i-1))/(2*dsigma);             % Second order central difference
-    end
-    PHI_sigma(n)=(-3*Phi_nm1(n)+4*Phi_nm1(n-1)-Phi_nm1(n-2))/(2*dsigma); % Second order backwards difference
-
+    PHI_sigma = secondOrderDifference(Phi_nm1)./(2*dsigma);
 
     DJN_u(isnan(DJN_u))=0;
     u_sigma=interp1(DJN_Sigma, DJN_u, sigma);
@@ -178,21 +168,17 @@ function results = trapEval(options)
 
 
     Psi_nm1=F.*u_sigma;
-    Psi_nm1=Psi_nm1';   %Make it the column, DJN 4/10/13
-    %zeros(n,1);                                          % psi=0, %Make it the column, DJN 4/10/13
+
+    Psi_nm1=Psi_nm1(:);   %Make it the column, DJN 4/10/13
 
 
     Psi_n=Psi_nm1+PHI_sigma*dlambda;                                     % Compute psi at the second step
     %DJN 4/10/13 %Psi=Psi_n;                                                   % Define Psi as the nth step
 
 
-    %Find Phi at the next time step using Psi_n
-    PSI_sigma=zeros(n,1); 
-    PSI_sigma(1)=(-Psi_nm1(3)+4*Psi_nm1(2)-3*Psi_nm1(1))/(2*dsigma)+Psi_nm1(1)*W(1);     % Second order forwards difference
-    for i=2:n-1
-        PSI_sigma(i)=(Psi_nm1(i+1)-Psi_nm1(i-1))/(2*dsigma)+Psi_nm1(i)*W(i);             % Second order central difference
-    end
-    PSI_sigma(n)=(-3*Psi_nm1(n)+4*Psi_nm1(n-1)-Psi_nm1(n-2))/(2*dsigma)+Psi_nm1(n)*W(n); % Second order backwards difference
+
+    PSI_sigma = secondOrderDifference(Psi_nm1)./(2*dsigma) + Psi_nm1.*W;
+
     Phi_n=Phi_nm1+dlambda*(PSI_sigma);                                                   % Compute phi at the nth step
     %DJN 4/10/13 %Phi=Phi_n;                                                                   % Define Psi as the nth step
 
@@ -208,7 +194,7 @@ function results = trapEval(options)
 
     disp('Running model...')
 
-    %Pre-allocate for the speed %DJN 4/10/13
+    %Pre-allocate for speed %DJN 4/10/13
     Psiout=zeros(ceil(timesteps/keeprate), n);
     Phiout=zeros(ceil(timesteps/keeprate), n);
     lambda=zeros(ceil(timesteps/keeprate), 1);
@@ -242,9 +228,9 @@ function results = trapEval(options)
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%%%%%%%%%%%%%%%%%%%%Linear Boundary%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        A(end,end)=dsigma+dlambda;
-        A(end,end-1)=-dlambda;
-        b(n)=dsigma*Psi_n(n);
+        % A(end,end)=dsigma+dlambda;
+        % A(end,end-1)=-dlambda;
+        % b(n)=dsigma*Psi_n(n);
         
         
                 
@@ -253,11 +239,7 @@ function results = trapEval(options)
         Psi_nm1=Psi_n;              %We don't really need Psi vector, it just got eliminated to save time, DJN 4/10/13
         Psi_n=A\b;
         
-        PSI_sigma(    1) = -Psi_n(  3) + 4*Psi_n(  2) - 3*Psi_n(    1); % Second order forwards difference
-        PSI_sigma(2:n-1) =  Psi_n(3:n)                -   Psi_n(1:n-2); % Second order central  difference
-        PSI_sigma(    n) = -Psi_n(n-2) + 4*Psi_n(n-1) - 3*Psi_n(    n); % Second order backwards difference
-
-        PSI_sigma = PSI_sigma./(2*dsigma) + W.*Psi_n;
+        PSI_sigma = secondOrderDifference(Psi_n)./(2*dsigma) + W.*Psi_n;
         
 
         Phi = 4/3*Phi_n - 1/3*Phi_nm1 + 2/3*PSI_sigma*dlambda;                             % Define the next Phi
@@ -282,4 +264,12 @@ function results = trapEval(options)
     results = struct('phi',Phiout, 'psi',Psiout, 'lambda',lambda ,'x0',DJN_x ,'eta0',DJN_eta, 'F',F, 'intF',intF);
 
     % save(['analytical_nw_',results.case,'tmp.mat'], 'results')
+end
+
+function d = secondOrderDifference(v)
+    n = length(v);
+    d = zeros(length(v),1);
+    d(    1) = -3*v(  1) + 4*v(  2) - v(    3); % Second order  forward difference
+    d(2:n-1) =    v(3:n)            - v(1:n-2); % Second order  central difference
+    d(    n) = -3*v(  n) + 4*v(n-1) - v(  n-2); % Second order backward difference
 end
