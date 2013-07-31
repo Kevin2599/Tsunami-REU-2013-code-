@@ -8,6 +8,7 @@
 
 
 function phiModel(varargin)
+		println('Loading variables...')
 	options = modelSetup(varargin{:});
 	bath = options.bath;
 
@@ -16,7 +17,6 @@ function phiModel(varargin)
 	else % run the model
 		start_time = clock();
 
-			println('Running model...')
 		results = options.model(options);
 
 			println('Converting to physical variables...')
@@ -26,12 +26,12 @@ function phiModel(varargin)
 
 			println('Aligning with respect to time...')
 
-		% get rid of lambda([1,end]) b/c they're NaN
+			% get rid of lambda([1,end]) b/c they're NaN
 		lambdaResults = applyFunToStruct(@(mat) mat(2:end-1,:) , lambdaResults);
-		% doing the entire matrix is very slow
+			% doing the entire matrix is very slow
 		lambdaResults = applyFunToStruct(@(mat) mat(floor(options.timeFixStart*end)+1 : options.timeFixStride : floor(options.timeFixEnd*end) ,:), lambdaResults);
 
-		% z(x(l), t(l)) ... => z(x,t) ...
+			% z(x(l), t(l)) ... => z(x,t) ...
 		[x_lin t_lin eta_lin u_lin] = alignToTime(lambdaResults.x, lambdaResults.t, 1:max(max(lambdaResults.t)) , lambdaResults.eta, lambdaResults.u);
 		timeResults = struct('x',x_lin, 't',t_lin, 'eta',eta_lin, 'u',u_lin);
 

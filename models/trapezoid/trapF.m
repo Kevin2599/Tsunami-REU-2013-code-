@@ -46,6 +46,7 @@ function [sigma,F,H,H0,intF,dF,W,dW] = trapF(varargin)
 
 	if nargin == 2
 		[const bath] = varargin{:};
+		
 		beta     = bath.trap_slope;
 		y0       = bath.trap_width/2;
 		dsigma   = const.dsigma;

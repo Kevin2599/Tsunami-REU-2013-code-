@@ -107,44 +107,22 @@ function results = trapEval(options)
     % Build starting need information from user inputs and build the matrix A
     % that will be used to solve our system
 
-    disp('Building model...')
+    println('Building model...')
 
     dsigma2  =  dsigma* dsigma;
     dlambda2 = dlambda*dlambda;
 
-    A=sparse(n,n);
-    b=zeros(n,1);
-
-
-    A(1,1)=1;               % Define the matrix A, W and dW needed for our model
+    A=sparse(n,n); A(1,1) = 1; A(n,n) = 1;               % Define the matrix A, W and dW needed for our model
     for i=2:n-1
-        A(i, i-1)=   -(    dlambda2/(dsigma2) - dlambda2/(2*dsigma)*W(i)                  );
-        A(i, i)  = 1 -( -2*dlambda2/(dsigma2)                            + dlambda2*dW(i) );
-        A(i, i+1)=   -(    dlambda2/(dsigma2) + dlambda2/(2*dsigma)*W(i)                  );
+        A(i, i-1) =   -(    dlambda2/(dsigma2) - dlambda2/(2*dsigma)*W(i)                  );
+        A(i, i)   = 1 -( -2*dlambda2/(dsigma2)                            + dlambda2*dW(i) );
+        A(i, i+1) =   -(    dlambda2/(dsigma2) + dlambda2/(2*dsigma)*W(i)                  );
     end
-    A(n,n)=1;
 
 
-    %DJN
-    %Define the initial profile
-    DJN_x=-[0:1:options.xmax];
-    %Comparison with the FUNWAVE model
-
-    %eta_0 gives eta and u
-    [DJN_eta,U_0]=eta_0(DJN_x);
-    DJN_eta(abs(DJN_eta)<1e-5)=0;
-
-    DJN_u=U_0*DJN_eta.*sqrt(g./(-alpha*DJN_x - DJN_eta));
-
-    %DJN_eta=0.01*(1-tanh((1000+DJN_x)/200 ))/2
-    plot(DJN_x, DJN_eta)
-
-    %We need to convert (x, t, \eta, u) to (\sigma, \lambda, \phi, \psi)
-    DJN_H=DJN_eta-DJN_x*alpha;
-    DJN_Sigma=interp1(H, sigma, DJN_H);
-
-    DJN_Phi=2*g*DJN_eta;
-
+    [x0 eta0 u0] = options.initialWave(options);
+    [Phi_nm1 Psi_nm1] = convertToPhiPsi(x0,eta0,u0, g,alpha,H,F,sigma);
+    plot(x0, eta0)
 
     %------------------MODEL STARTS HERE-----------------------
     %----------------------------------------------------------
@@ -153,26 +131,17 @@ function results = trapEval(options)
     % Phi_nm1=-4*a*sigma.^(-1).*((sigma-s0)/p^2.*exp(-1*((sigma-s0)/p).^2)+(sigma+s0)/p^2.*exp(-((sigma+s0)/p).^2));
     % Phi_nm1(1)=0;
 
-    Phi_nm1=interp1(DJN_Sigma, DJN_Phi, sigma);
     Phi_nm1(isnan(Phi_nm1))=0;
-    Phi_nm1(1)=0;
-    Phi_nm1(end)=Phi_nm1(end-1);
+    Phi_nm1(  1) = 0;
+    Phi_nm1(end) = Phi_nm1(end-1);
 
-    Phi_nm1=Phi_nm1(:);   %Make it a column, DJN 4/10/13
+    Phi_nm1 = Phi_nm1(:);
 
     PHI_sigma = secondOrderDifference(Phi_nm1)./(2*dsigma);
 
-    DJN_u(isnan(DJN_u))=0;
-    u_sigma=interp1(DJN_Sigma, DJN_u, sigma);
-    u_sigma(isnan(u_sigma))=0;
 
 
-    Psi_nm1=F.*u_sigma;
-
-    Psi_nm1=Psi_nm1(:);   %Make it the column, DJN 4/10/13
-
-
-    Psi_n=Psi_nm1+PHI_sigma*dlambda;                                     % Compute psi at the second step
+    Psi_n = Psi_nm1 + PHI_sigma*dlambda;                                     % Compute psi at the second step
     %DJN 4/10/13 %Psi=Psi_n;                                                   % Define Psi as the nth step
 
 
@@ -192,12 +161,12 @@ function results = trapEval(options)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Solve the model for Psi and Phi
 
-    disp('Running model...')
+    println('Running model...')
 
     %Pre-allocate for speed %DJN 4/10/13
-    Psiout=zeros(ceil(timesteps/keeprate), n);
-    Phiout=zeros(ceil(timesteps/keeprate), n);
-    lambda=zeros(ceil(timesteps/keeprate), 1);
+    Psiout = zeros(ceil(timesteps/keeprate), n);
+    Phiout = zeros(ceil(timesteps/keeprate), n);
+    lambda = zeros(ceil(timesteps/keeprate), 1);
 
     step=0;
     l=1;                            % Index to keep only parts of our informaion
@@ -216,13 +185,8 @@ function results = trapEval(options)
 
     l=l+1;
     for step=2:timesteps    %we start from the third step, since the first two are already computed, DJN 4/10/13
-    %DJN  b(1)=0;                     % Define b as the right side of our system
-    %     for i=2:n-1
-    %         b(i)=2*Psi_n(i)-Psi_nm1(i);
-    %     end
-    %     b(n)=0;
          
-        b=2*Psi_n-Psi_nm1;          %Convert into the vector operation, DJN 4/10/13  
+        b = 2*Psi_n - Psi_nm1;
         b(1)=0; b(n)=0;
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -232,11 +196,8 @@ function results = trapEval(options)
         % A(end,end-1)=-dlambda;
         % b(n)=dsigma*Psi_n(n);
         
-        
                 
-                
-                
-        Psi_nm1=Psi_n;              %We don't really need Psi vector, it just got eliminated to save time, DJN 4/10/13
+        Psi_nm1=Psi_n;
         Psi_n=A\b;
         
         PSI_sigma = secondOrderDifference(Psi_n)./(2*dsigma) + W.*Psi_n;
@@ -261,15 +222,17 @@ function results = trapEval(options)
         end
     end
 
-    results = struct('phi',Phiout, 'psi',Psiout, 'lambda',lambda ,'x0',DJN_x ,'eta0',DJN_eta, 'F',F, 'intF',intF);
-
-    % save(['analytical_nw_',results.case,'tmp.mat'], 'results')
+    results = struct('phi',Phiout, 'psi',Psiout, 'lambda',lambda ,'x0',x0 ,'eta0',eta0, 'F',F, 'intF',intF);
 end
 
 function d = secondOrderDifference(v)
     n = length(v);
     d = zeros(length(v),1);
+
     d(    1) = -3*v(  1) + 4*v(  2) - v(    3); % Second order  forward difference
     d(2:n-1) =    v(3:n)            - v(1:n-2); % Second order  central difference
     d(    n) = -3*v(  n) + 4*v(n-1) - v(  n-2); % Second order backward difference
 end
+
+
+
