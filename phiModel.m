@@ -5,6 +5,20 @@
 	% 	Aligns results with respect to t
 	% 	Saves the results
 	% 	Plots the results
+	%
+% Authors:
+%	Lander Ver Hoef     (2012) lverhoef@alaska.edu
+%		trapF.m
+%   Jeremiah Harrington (2012) jeharrington@alaska.edu.
+%		powerF.m
+%	Matt                (2012-3)
+%	Daniel              (2013)
+%	John Pender         (2013) jpender8@alaska.edu
+%		Most of the not-model code
+%		alignToTime.m
+%		plotWave.m
+%		topViewOfWater.m
+
 
 
 function phiModel(varargin)
@@ -62,3 +76,5 @@ function phiModel(varargin)
 	if options.plotTime
 		plotWave( timeResults, bath, options, 'plotBathymetry',true, 'limitPlotT',100:140);
 	end
+end
+

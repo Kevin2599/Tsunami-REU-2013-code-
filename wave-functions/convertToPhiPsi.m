@@ -13,6 +13,11 @@ function [phi psi] = convertToPhiPsi(x,eta,u, g,alpha, H,F,sigma)
     phi = 2*g*eta;
     phi = interp1(sigma_x, phi, sigma);
 
-    psi=F.*u_sigma;
-    psi=psi(:);
+    phi(isnan(phi))=0;
+    phi(  1) = 0;
+    phi(end) = phi(end-1);
+    phi = phi(:);
+
+    psi = F.*u_sigma;
+    psi = psi(:);
 end
