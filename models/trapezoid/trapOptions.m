@@ -1,5 +1,5 @@
 function modelOptions = trapOptions(options)
-	modelOptions = combineStructs( struct('DJN_beachwidth',50,'DJN_slopes',.5,'uFlag',0), options);
+	modelOptions = combineStructs( struct('DJN_beachwidth',50,'DJN_slopes',.5,'uFlag',0,'plotModelProgress',true), options);
 
 	modelOptions.model = @trapEval;
 	modelOptions.bath.lr = @(h,bath) trapezoid_lr(h, bath.trap_width, bath.trap_slope);

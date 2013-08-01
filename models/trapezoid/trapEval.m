@@ -146,28 +146,33 @@ function results = trapEval(options)
             Phiout(l,:) = Phi_curr;
             lambda(l)   = step*dlambda;
 
-            hold off;
-            plot(sigma(1:n-2),Phi_curr(1:n-2),'.b')
-            set(gca,'xdir','reverse')
-            title(['Step ' num2str(step) ' (' num2str(100 *step /options.timesteps) '%)'])
-            drawnow();
+            if options.plotModelProgress
+                hold off;
+                plot(sigma(1:n-2),Phi_curr(1:n-2),'.b');
+                set(gca,'xdir','reverse');
+                title(['Step ' num2str(step) ' (' num2str(100 *step /options.timesteps) '%)']);
+                drawnow();
+            else
+                printf('\r Step %d (%.1f%%)',step,100*step/options.timesteps);
+            end
 
             l=l+1;
         end
     end
+    println('');
 
     results = struct('phi',Phiout, 'psi',Psiout, 'lambda',lambda ,'x0',x0 ,'eta0',eta0, 'F',F, 'intF',intF);
 end
 
 function dv_dx = secondOrderDifference(v, dx)
     n = length(v);
-    dv_dx = zeros(n,1);
+    dv = zeros(n,1);
 
-    dv_dx(    1) = -3*v(  1) + 4*v(  2) - v(    3); % Second order  forward difference
-    dv_dx(2:n-1) =    v(3:n)            - v(1:n-2); % Second order  central difference
-    dv_dx(    n) = -3*v(  n) + 4*v(n-1) - v(  n-2); % Second order backward difference
+    dv(    1) = -3*v(  1) + 4*v(  2) - v(    3); % Second order  forward difference
+    dv(2:n-1) =    v(3:n)            - v(1:n-2); % Second order  central difference
+    dv(    n) = -3*v(  n) + 4*v(n-1) - v(  n-2); % Second order backward difference
 
-    dv_dx = dv_dx ./ (2*dx);
+    dv_dx = dv .* (1/(2*dx));
 end
 
 
