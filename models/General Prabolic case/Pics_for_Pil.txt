@@ -1,0 +1,125 @@
+
+for i=2:10:length(p2(1,:))
+    plot(sigma,p2(:,i))
+    hold on
+    plot([max(max(sigma)) min(min(sigma))] ,[0 0],'k')
+    legend('error','zero')
+    xlabel('Sigma')
+
+
+
+    plot(x(:,i),eta(:,i),'.b')
+    %plot(x2(:,i),u2(:,i),'.r')
+    plot([max(max(x)) -scale*max(max(x))],alpha*[max(max(x)) -scale*max(max(x))],'k')     %notation?
+    plot(0,0,'^k')
+    set(gca,'xdir','reverse')
+    xlabel('x')
+    legend('eta(x)','error','bay')
+    axis([-scale*max(max(x)) max(max(x)) scale/5*min(min(eta)) scale/5*max(max(eta))])
+
+
+    pause(.01)
+    hold off
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%% Save 1
+aviobj = VideoWriter('Sigma_EgienVector.avi');
+open(aviobj);
+
+fig=figure(1);
+
+for i=1:10:length(p2(1,:))
+    plot(sigma,p2(:,i))
+    hold on
+    plot([max(max(sigma)) min(min(sigma))] ,[0 0],'k')
+    legend('Bessel_2','zero')
+    xlabel('Sigma')
+    pause(.01)
+    hold off
+F = getframe(fig);
+    writeVideo(aviobj,F);
+end
+
+
+close(fig);
+ close(aviobj);
+
+
+
+
+
+%%Save 2
+
+aviobj = VideoWriter('x_EgienVector.avi');
+open(aviobj);
+
+fig=figure(1);
+scale=50;
+for i=1:10:length(lambda)
+    plot(x(:,i),eta(:,i),'.b')
+    hold on
+    %plot(x2(:,i),u2(:,i),'.r')
+plot([0,-99999],[0,0])
+    plot([max(max(x)) -scale*max(max(x))],alpha*[max(max(x)) -scale*max(max(x))],'k') %notation?
+    plot(0,0,'^k')
+    set(gca,'xdir','reverse')
+    xlabel('x')
+    legend('eta(x)','0','bay')
+    axis([-scale*max(max(x)) max(max(x)) scale/5*min(min(eta)) scale/5*max(max(eta))])
+    title(['t = ' num2str(t(2,i))]);
+    hold off
+    pause(.1)
+F = getframe(fig);
+    writeVideo(aviobj,F);
+end
+
+
+close(fig);
+ close(aviobj);
+
+
+
+%%Save 3
+
+
+aviobj = VideoWriter('x_EgienVector_full.avi');
+open(aviobj);
+
+fig=figure(1);
+scale=50;
+for i=1:length(lambda)
+    plot(x(:,i),eta(:,i),'b')
+    hold on
+    %plot(x2(:,i),u2(:,i),'.r')
+plot([0,-99999],[0,0])
+    %plot([max(max(x)) -scale*max(max(x))],alpha*[max(max(x)) -scale*max(max(x))],'k') %notation?
+    %plot(0,0,'^k')
+    set(gca,'xdir','reverse')
+    xlabel('x')
+    legend('eta(x)','0')
+    %axis([-scale*max(max(x)) max(max(x)) scale/5*min(min(eta)) scale/5*max(max(eta))])
+    title(['t = ' num2str(t(2,i))]);
+    hold off
+    pause(.1)
+F = getframe(fig);
+    writeVideo(aviobj,F);
+end
+
+
+close(fig);
+ close(aviobj);

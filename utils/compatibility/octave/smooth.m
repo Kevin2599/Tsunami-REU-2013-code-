@@ -5,7 +5,8 @@
 %  this just implements the 'moving average' method.
 % http://www.mathworks.com/help/curvefit/smooth.html
 
-function yy = smooth(y, span=5)
+function yy = smooth(y)
+span=5;
 	half = floor(span/2);
 	if half*2 + 1 ~= span
 		error('span must be odd: span=%d',span)
