@@ -86,13 +86,13 @@ clc
 % Define all needed user inputs
 
 tic
-maxl=110;                 % maximum for lambda
-timesteps=50000;            % number of time steps between \lambda=0, and \lambda=maxl, %DJN 4/10/13
-keeprate=timesteps/100;     % keep every \it{keeprate}-th step.
-g=9.81;                  % Set gravity
+maxl=100;                 % maximum for lambda
+timesteps=10000;  % number of time steps between \lambda=0, and \lambda=maxl, %DJN 4/10/13
+keeprate=timesteps/1000;     % keep every \it{keeprate}-th step.
+g=1;                  % Set gravity
 alpha=.05;               % Set slope
 plotb=1;                 % Bool to plot
-dsigma=.01;              % Our change in Sigma from program
+dsigma=.005;              % Our change in Sigma from program
 maxsigma=350;             % The maximum value for sigma that we want.
 
 
@@ -118,7 +118,7 @@ n = length(sigma);
 % that will be used to solve our system
 
 disp('Building model...')
-dlambda=maxl/timesteps;     % Define dlambda %DJN correction 4/10/13
+dlambda=maxl/timesteps     % Define dlambda %DJN correction 4/10/13
 
 dsigma2=dsigma*dsigma;   % Find dlambda^2 and dsigma^2
 dlambda2=dlambda*dlambda;
@@ -172,7 +172,18 @@ DJN_Phi=2*g*DJN_eta;
 Phi_nm1=interp1(DJN_Sigma, DJN_Phi, sigma);
 Phi_nm1(isnan(Phi_nm1))=0;
 Phi_nm1(1)=0;
-Phi_nm1(end)=Phi_nm1(end-1);
+
+
+a=.5;                    % a is the amplutude of our paulse
+s0=15;                   % so is the mean of out paulse
+p=1.5;                   % p is the  varence in paulse
+Phi_nm1=-4*a*sigma.^(-1).*((sigma-s0)/p^2.*exp(-1*((sigma-s0)/p).^2)+(sigma+s0)/p^2.*exp(-((sigma+s0)/p).^2)); % at \lambda=0
+%Phi_nm1=4*a*sigma.^(-1).*(exp(-1*((sigma-s0)/p).^2));
+Phi_nm1(1)=0;
+
+
+
+
 
 Phi_nm1=Phi_nm1';   %Make it the column, DJN 4/10/13
 
@@ -256,9 +267,9 @@ for step=2:timesteps    %we start from the third step, since the first two are a
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%%%%%%%%%%%%%%%%%%%%Linear Boundary%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%     A(end,end)=dsigma+dlambda;
-%     A(end,end-1)=-dlambda;
-%     b(n)=dsigma*Psi_n(n);
+    A(end,end)=dsigma+dlambda;
+    A(end,end-1)=-dlambda;
+    b(n)=dsigma*Psi_n(n);
     
     
             
@@ -266,7 +277,7 @@ for step=2:timesteps    %we start from the third step, since the first two are a
             
     Psi_nm1=Psi_n;              %We don't really need Psi vector, it just got eliminated to save time, DJN 4/10/13
     Psi_n=A\b;
-    
+    Psi_n(1)=0;
     PSI_sigma(1)=(-Psi_n(3)+4*Psi_n(2)-3*Psi_n(1))/(2*dsigma)+W(1)*Psi_n(1);     % Second order forwards differene
     for i=2:n-1
         PSI_sigma((i))=(Psi_n(i+1)-Psi_n(i-1))/(2*dsigma)+W(i)*Psi_n(i);           % Second order centeral differene
@@ -312,7 +323,9 @@ eta2=(Phiout-u2.^(2))/(2*g);
 t2=-(LAM-u2)/(alpha*g);
 x2 = (Phiout-u2.^(2)-intgrid)/(2*alpha*g);
 
-
+max(max(eta2))
+min(min(eta2))
+return
 %%%%%%%%%
 x21=x2(3:end,:);       t21=t2(3:end,:);
 eta21=eta2(3:end,:);   u21=u2(3:end,:);

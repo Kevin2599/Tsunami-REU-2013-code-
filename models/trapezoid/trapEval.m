@@ -83,7 +83,7 @@ function results = trapEval(options)
 
     [Phi_prev Psi_prev] = convertToPhiPsi(x0,eta0,u0, g,alpha,H,F,sigma);
     % Phi_prev= -4*a*sigma.^(-1) .* ( (sigma-s0)/p^2 .* exp(-((sigma-s0)/p).^2) + (sigma+s0)/p^2 .* exp(-((sigma+s0)/p).^2));
-    % Phi_prev(1)=0;
+    Phi_prev(1)=0;
 
   % The matrix A solves for the next psi values in the system
     A=sparse(n,n); A(1,1) = 1; A(n,n) = 1;
@@ -133,6 +133,7 @@ function results = trapEval(options)
       % Solve for Psi
         Psi_prev = Psi_curr;
         Psi_curr = A\b;
+        Psi_curr(1) = 0;
         PSI_sigma = secondOrderDifference(Psi_curr,dsigma) + W.*Psi_curr;
 
       % Solve for Phi
