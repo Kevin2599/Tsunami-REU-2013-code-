@@ -88,7 +88,7 @@ clc
 tic
 maxl=30;                 % maximum for lambda
 timesteps=30000;            % number of time steps between \lambda=0, and \lambda=maxl, %DJN 4/10/13
-keeprate=timesteps/100;     % keep every \it{keeprate}-th step.
+keeprate=timesteps/1000;     % keep every \it{keeprate}-th step.
 g=9.81;                  % Set gravity
 alpha=1/100;               % Set slope
 plotb=1;                 % Bool to plot
@@ -172,11 +172,7 @@ DJN_Phi=2*g*DJN_eta;
 Phi_nm1=interp1(DJN_Sigma, DJN_Phi, sigma);
 Phi_nm1(isnan(Phi_nm1))=0;
 Phi_nm1(1)=0;
-%hold points
-index=max(find(Phi_nm1));
-for i=index:length(Phi_nm1)
-Phi_nm1(i)=Phi_nm1(index);
-end
+Phi_nm1(end)=Phi_nm1(end-1);
 
 Phi_nm1=Phi_nm1';   %Make it the column, DJN 4/10/13
 
@@ -193,24 +189,14 @@ DJN_u(isnan(DJN_u))=0;
 u_sigma=interp1(DJN_Sigma, DJN_u, sigma);
 u_sigma(isnan(u_sigma))=0;
 
-%hold points
-index=max(find(u_sigma));
-for i=index:length(u_sigma)
-u_sigma(i)=u_sigma(index);
-end
-
 
 Psi_nm1=F.*u_sigma;
 
 %hold points
-Psi_nm1(1)=0;
-
-% index=max(find(Psi_nm1));
-% psiend=Psi_nm1(index);
-% 
-% for i=index:length(Psi_nm1)
-%     Psi_nm1(i)=psiend;
-% end
+index=find(Psi_nm1,2);
+psiend=Psi_nm1(end-1);
+    Psi_nm1(1)=0;
+    Psi_nm1(end)=psiend;
 Psi_nm1=Psi_nm1';   %Make it the column, DJN 4/10/13
 %zeros(n,1);                                          % psi=0, %Make it the column, DJN 4/10/13
 
@@ -219,10 +205,8 @@ Psi_n=Psi_nm1+PHI_sigma*dlambda;                                     % Compute p
 %DJN 4/10/13 %Psi=Psi_n;  
 % Define Psi as the nth step
 %hold points
-%     Psi_n(1)=0;
-%     for i=index:length(Psi_nm1)
-%         Psi_n(i)=psiend;
-%     end
+    Psi_n(1)=0;
+    Psi_n(end)=psiend;
 
 %Find Phi at the next time step using Psi_n
 PSI_sigma=zeros(n,1); 
@@ -354,10 +338,6 @@ plot(t);
 figure(3)
 surf(t2,x2,eta2)
 shading interp
-figure(4)
-plot(diff(t))
-min(diff(t))
-close all
 return;
 %%%%%%%%%
 x21=x2(3:end,:);       t21=t2(3:end,:);
