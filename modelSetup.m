@@ -85,13 +85,13 @@
 function options = modelSetup(varargin)
 
 
-	defaultOptions = struct('maxl',100,'timesteps',20000,'snapshots',100,'g',9.81,'dsigma',.01,'maxsigma',150,'xmax',5000, ...
+	defaultOptions = struct('maxl',100,'timesteps',20000,'snapshots',100,'g',9.81,'init_dsigma',.01,'dsigma',.01,'maxsigma',150,'xmax',5000, ...
 							'beach_slope',.05, 'model_type', 'trapezoid', ...
 							'a',.1, 'p',1, 'sigma0',2.9, ...
                             'trimAtBreak',false, ...
                             'timeFixStart',0.0, 'timeFixStride',10, 'timeFixEnd',0.1, ...
                             'quickLoad',false,'quickSave',true,'save',false, ...
-                            'plotLambda',true,'plotTime',false);
+                            'plotLambda',true,'plotTime',false,'plotModelProgress',true,'logProgress',true);
 
 	defaultOptions.phi0_psi0 = @(opt) deal(opt.a * gaussianFunction(opt.sigma0, opt.p, opt.sigma,1), zeros(size(opt.sigma)));
 
@@ -149,4 +149,12 @@ function options = modelSetup(varargin)
 	if readOption(options,'printAllOptions',false)
 		disp(options)
 	end
+	if options.logProgress
+		options.log = @println;
+		options.logf = @malprintf;
+	else
+		options.log = @NOP;
+		options.logf = @NOP;
+	end
+
 end

@@ -1,5 +1,4 @@
-function printf(varargin)
-	fprintf(varargin{:});
+function flushConsole()
 	if inoctave()
 		fflush(stdout);
 	else

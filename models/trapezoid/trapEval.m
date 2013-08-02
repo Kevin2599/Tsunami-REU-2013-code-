@@ -154,7 +154,7 @@ function results = trapEval(options)
                 title(['Step ' num2str(step) ' (' num2str(100 *step /options.timesteps) '%)']);
                 drawnow();
             else
-                printf('\r Step %d (%.1f%%)',step,100*step/options.timesteps);
+                malprintf('\r Step %d (%.1f%%)',step,100*step/options.timesteps);
             end
 
             l=l+1;
