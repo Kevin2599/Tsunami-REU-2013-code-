@@ -56,7 +56,7 @@ function err = initDifference(defaults, var1_name,var1s, var2_name,var2s)
 			func = getPhi(defaults.sigma, phi0,psi0, defaults.nlambda);
 			[phi1 psi1] = evalPhi(func,0,defaults.sigma);
 
-			err(i,j) = safeIntegrate((phi1 - phi0).^2) / safeIntegrate(abs(phi0));
+			err(i,j) = safeNorm(phi1 - phi0) / safeNorm(phi0);
 
 			malprintf('\r%s (%.2f/%.2f) %s (%.2f/%.2f) total progress: %d/%d',var1_name, var1,var1s(end), var2_name,var2, var2s(end),...
 				(i-1)*length(var2s) + j-1   ,    length(var2s)*length(var1s) );
@@ -65,7 +65,7 @@ function err = initDifference(defaults, var1_name,var1s, var2_name,var2s)
 	println('');
 end
 
-function iarr = safeIntegrate(arr)
+function iarr = safeNorm(arr, varargin)
 	arr(isnan(arr)) = 0;
-	iarr = sum(arr);
+	iarr = norm(arr,varargin{:});
 end
