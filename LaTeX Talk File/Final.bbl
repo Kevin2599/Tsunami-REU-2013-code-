@@ -1,0 +1,35 @@
+\begin{thebibliography}{ZPGO05}
+
+\bibitem[CG58]{Carrier}
+G.F. Carrier and H.P Greenspan.
+\newblock Water waves of finite amplitude on a sloping beach.
+\newblock {\em Journal of Fluid Mechanics}, 4(1):97--109, May 1958.
+
+\bibitem[CWY03]{WuYeh}
+George~F. Carrier, Tai~Tei Wu, and Harry Yeh.
+\newblock Tsunami run-up and draw-down on a plane beach.
+\newblock {\em Journal of Fluid Mechanics}, 475:79--99, January 2003.
+
+\bibitem[DP11]{Didenkulova}
+Ira Didenkulova and Efim Pelinovsky.
+\newblock Nonlinear wave evolution and runup in an inclined channel of a
+  parabolic cross-section.
+\newblock {\em Physics of Fluids}, 23(8), August 2011.
+
+\bibitem[Far93]{PDEBook}
+Stanley~J. Farlow.
+\newblock {\em Partial Differential Equations for Scientists and Engineers}.
+\newblock Dover Publications, dover edition edition, 1993.
+
+\bibitem[Joh97]{waterwavesintro}
+Robin~Stanley Johnson.
+\newblock {\em A Modern Introduction to the Mathematical Theory of Water
+  Waves}.
+\newblock Cambridge University Press, 1997.
+
+\bibitem[ZPGO05]{Zahibo}
+Narcisse Zahibo, Efim Pelinovsky, Vladimir Golinko, and Nataly Osipenko.
+\newblock Tsunami wave runup on coasts of narrow bays.
+\newblock {\em CORD Conference Proceedings}, 02 2005.
+
+\end{thebibliography}

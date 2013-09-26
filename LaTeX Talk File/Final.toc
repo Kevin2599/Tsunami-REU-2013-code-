@@ -1,0 +1,6 @@
+\beamer@endinputifotherversion {3.26pt}
+\beamer@sectionintoc {1}{Introduction}{3}{0}{1}
+\beamer@sectionintoc {2}{Mathematical Setup}{22}{0}{2}
+\beamer@sectionintoc {3}{Analytics}{32}{0}{3}
+\beamer@sectionintoc {4}{Results}{48}{0}{4}
+\beamer@sectionintoc {5}{Conclusion}{55}{0}{5}
