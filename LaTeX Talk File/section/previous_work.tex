@@ -8,6 +8,8 @@
 % 2.4.2  Include equations to get back to physical variables
 % 2.4.3  Analytical F(?) and thus W(?) for |y|^m case
 
+
+\section{Previous Work}
 	\begin{frame}
 		\frametitle{Introduction to the Bay Shapes}
 		In the field of Tsunami run-up research, there are several natural bay shapes to examine:
@@ -57,178 +59,93 @@
 		%Insert a graphic of a trapezoidal cross-section'd bay here. Float left.
 		Characteristics of bays of trapezoidal cross-section:
 		\begin{itemize}
-			\item Again, constant slope;
-			\item Cross-section is determined by a symmetrical trapezoid, where the slope of the walls is $\beta$ and the distance across the base is $2 y_0$;
+			\item Constant slope
+			\item Cross-section is determined by a symmetrical trapezoid\\
+			slope of the walls is $\beta$\\
+			distance across the base is $2 y_0$
 			\item Behavior of waves in such a bay is unknown. 
 		\end{itemize}
-		The search for analytical solutions to model the behavior of tsunamis in these bays was the topic of our REU.
+		These bays where the focus of the previous REU.
 	\end{frame}
 
 	\begin{frame}
-		\frametitle{Further Terminology}
-		There are a few other terms we use:
+		\frametitle{Terminology}
 		\begin{itemize}
-			\item $\eta(x,t)$ is the perturbation away from the normal water level at time $t$ and distance $x$ from shore.
-			\item $H(x,t)$ is the total water depth. Note that $H(x,t) = h(x) + \eta(x,t)$.
-			\item Note that for all the cases we will consider, $h(x) = -\alpha x$, where $\alpha$ is a non-negative constant. Since $x$ is typically negative in our domain, $h$ will usually be non-negative, and $H$ must always be non-negative.
+			\item $\eta(x,t)$ is the perturbation of water level at time $t$, distance $x$ from shore.
+			\item $H(x,t)$ is the total water depth. Note: $H(x,t) = h(x) + \eta(x,t)$.
+			\item $S(H)$ is the cross-sectional area of the bay. Note
+				\[ S(H) = \int_0^{H(x,t)} f(y) \delta y \]
+			\item $u(x,t)$ is the average water velocity on a cross-section perpendicular to the cross-section.
+			\item We only consider $h(x) = -\alpha x$, where $\alpha$ is a non-negative constant. Since $x$ is typically negative in our domain, $h$ will usually be non-negative, and $H$ must always be non-negative.
 		\end{itemize}
 	\end{frame}
-
 	\begin{frame}
-		\frametitle{Derivation of Wave Equation}
-		\textbf{Material Derivative}
-		\begin{align*}
-			\frac{D}{Dt} &= \frac{\partial}{\partial t} + \textbf{u}\cdot\nabla\\
-			&= \frac{\partial}{\partial t} + u\frac{\partial}{\partial x} + v\frac{\partial}{\partial y} + w\frac{\partial}{\partial z}
-		\end{align*}
-		where $ \textbf{u}(x,y,z,t) = u\textbf{i}+v\textbf{j}+w\textbf{k} $ is an instantaneous flow velocity vector.\\
-		Incompressible flow is defined by holding $\frac{D \rho}{D t} = 0$.
-	\end{frame}
-
-	\begin{frame}
-		\frametitle{Derivation of Wave Equation}
-		The equations which constitute the focus of our study are derived from physical conservation equations: the first being conservation of mass:
-		\begin{align}
-			0 &= \frac{ \partial \rho }{\partial t} + \nabla \cdot ( \rho \textbf{u} )\\
-			&= \frac{\partial \rho}{\partial t} + \rho \left( \nabla \cdot \textbf{u} \right) + \left( \textbf{u} \cdot \nabla \right) \rho \notag \\
-			&= \frac{D \rho}{D t} + \rho \nabla \cdot \textbf{u} \notag
-		\end{align}
-		\begin{align}
-			\frac{D \rho}{D t} &=0 \notag \\
-			\Rightarrow  \nabla \cdot \textbf{u}& = 0 \label{delu}
-		\end{align}
-	\end{frame}
-
-	\begin{frame}
-		%For this slide to make sense, we need to introduce eta, f, a+, a-, etc.
-		\frametitle{Derivation of Wave Equation}
-		We integrate \eqref{delu} across a $y,z$-cross-section, $A$, of area $S$.
-		\begin{align}
-			0 &= \int_{A} \nabla \cdot \textbf{u} \ dA \notag\\
-			&= \int_{A} \frac{\partial u}{\partial x} + \frac{\partial v}{\partial y} + \frac{\partial w}{\partial z} \ dy \ dz \notag\\
-			&= \int_A \frac{\partial u}{\partial x} \ dA +\int_z v(y_{\max})-v(y_{\min}) \ dz + \int_y w(z_{\max}) - w(z_{\min})\ dy \notag\\
-			&= \frac{\partial}{\partial x} \int_A u \ dA + \frac{\partial S}{\partial t} \notag\\
-			\label{swe1} &= \frac{\partial}{\partial x} (\bar{u}S) +  \frac{\partial S}{\partial t}
-		\end{align}
-	\end{frame}
-
-	\begin{frame}
-		\frametitle{Derivation of Wave Equation}
-		The second equation is based on \textit{Euler's Equation}.  We define a region $V$ immersed in fluid.
-		\begin{align*}
-			&\int_{V} (\rho \textbf{F} - \nabla P) \ dv & \text{Total force acting on fluid.}\\
-			&\frac{d}{dt} \left( \int_{V} \rho \textbf{u} \ dv \right) & \text{Rate of change of momentum of fluid in $V$.}\\
-			-& \int_{\chi} \rho \textbf{u}(\textbf{u}\cdot \textbf{n}) \ d\chi & \text{Rate of flow of momentum across $\chi$ into $V$.}
-		\end{align*}
-	\end{frame}
-
-	\begin{frame}
-		\frametitle{Derivation of Wave Equation}
-		\begin{align}
-			&&\frac{d}{dt} \left( \int_{V} \rho\textbf{u} \ dv \right) &= \int_{V} ( \rho \textbf{F} - \nabla P) \ dv - \int_{\chi} \rho \textbf{u}(\textbf{u}\cdot \textbf{n}) \ d\chi \notag\\
-			&\Rightarrow
-			& \textbf{0} &= \int_{V} \left( \rho \frac{D\textbf{u}}{dt} - \rho \textbf{F} + \nabla P \right) \ dv \notag\\
-			&\Rightarrow
-			&\frac{D\textbf{u}}{dt} &= - \frac{1}{\rho} \nabla P + \label{eulers} \textbf{F} 
-		\end{align}
-	\end{frame}
-
-	\begin{frame}
-		\frametitle{Derivation of Wave Equation}
-		Examine the z-component of Euler's equation \eqref{eulers}:
-		\begin{align}
-			\frac{Dw}{Dt} = -\frac{1}{\rho}\frac{\partial P}{\partial z} -g \notag\\
-			\frac{\partial P}{\partial z} = -\rho g \notag\\
-			P = \rho g (\eta - z) \label{pressure}
-		\end{align}
-	\end{frame}
-
-	\begin{frame}
-		\frametitle{Derivation of Wave Equation}
-		We take equation \eqref{eulers},
-		\begin{align*}
-			\frac{D\textbf{u}}{dt} = - \frac{1}{\rho} \nabla P + \textbf{F} \tag*{\eqref{eulers}}
-		\end{align*}
-		and reduce it to equality of the \textbf{i} components:
-		\begin{align*}
-			\pderiv{u}{t} + u\pderiv{u}{x} = -\frac{1}{\rho}\pderiv{P}{x},
-		\end{align*}
-		which we can simplify with equation \eqref{pressure}:
-		\begin{align*}
-			P = \rho g (\eta - z) \tag*{\eqref{pressure}}
-		\end{align*}
-		\begin{align}
-			\label{eulersi}\pderiv{u}{t} + u\pderiv{u}{x} = -g \pderiv{\eta}{x}
-		\end{align}
-	\end{frame}
-
-	\begin{frame}
-		\frametitle{Derivation of Wave Equation}
-		Now, we integrate \eqref{eulersi} across the same $y,z$-cross-section $A$, of area $S$.\\
-		\begin{align} 
-			\text{LHS:}& & \int_A \pderiv{u}{t} + u\pderiv{u}{x} \ dA &= \left( \pderiv{\bar{u}}{t} + \bar{u} \pderiv{\bar{u}}{x} \right) S  \label{LHS}\\
-			\text{RHS:}& & \int_A -g \pderiv{\eta}{x} \ dA &= -gS \pderiv{\eta}{x} \notag\\
-			& & &= gS \left( \pderiv{h}{x} - \pderiv{H}{x} \label{RHS} \right)
-		\end{align}
-	\end{frame}
-
-	\begin{frame}
-		\frametitle{Derivation of Wave Equation}
-		By combining \eqref{LHS} and \eqref{RHS}, we integrate \eqref{eulers}!
-		\begin{align}
-			\left( \pderiv{\bar{u}}{t} + \bar{u} \pderiv{\bar{u}}{t} \right) S = g \left( \pderiv{h}{x} - \pderiv{H}{x} \right) S \notag \\
-			\label{swe2} \Rightarrow \pderiv{\bar{u}}{t} + \bar{u} \pderiv{\bar{u}}{t} + g\pderiv{H}{x} &= g\pderiv{h}{x} 
-		\end{align}
-	\end{frame}
-
-	\begin{frame}
-		\frametitle{Derivation of Wave Equation}
-		From this point forward, we use the symbol $u$ to represent $\bar{u}$.  Thus,
+		\frametitle{Shallow-Water Wave Equations}
+		Assuming that there is no lateral fluid motion:
 		\begin{framed} \begin{align}
-			\frac{\partial S}{\partial t} + \frac{\partial}{\partial x}(uS) &= 0, \tag*{\eqref{swe1}}\\
-			\frac{\partial u}{\partial t} + u \frac{\partial u}{\partial x} + g \frac{\partial H}{\partial x} &= g \frac{dh}{dx}. \tag*{\eqref{swe2}}
+			\label{swe1} S_t + (uS)_x &= 0\\
+			\label{swe2} u_t + u u_x + g H_x &= g h_x
 		\end{align} \end{framed}
-		These are the wave equations that we will attempt to solve for our bays.
-	\end{frame}
-
-
-\section{Mathematical Setup}
-
-	\begin{frame}
-		\frametitle{Transformation to $\sigma$, $\lambda$}
-		We begin with the non-linear shallow water equations
-		\begin{align} 
-			\tag*{\eqref{swe1}}
-			\frac{\partial S}{\partial t} + \frac{\partial}{\partial x} (uS) &= 0  \\
-			\tag*{\eqref{swe2}}
-			\frac{\partial u}{\partial t} + u \frac{\partial u}{\partial x} + g \frac{\partial H}{\partial x} &= g \frac{dh}{dx}
-		\end{align}
-		where $S$ is the cross-sectional area, $u$ is the averaged flow velocity, and $H = \eta(x,t) + h(x)$, where $h$ is unperturbed water depth and $\eta$ is the height of the perturbation.
-		
+		%swe1 is conservation of mass
+		%swe2 is conservation of momentum
 		We have initial conditions that at $t=0$, $u(x,0) = 0$ and $\eta(x,0) = \eta_0(x)$, and boundary conditions that as $x$ becomes large, $u$ and $\eta$ become small, and that at the moving shoreline, $u(x,t)$ is bounded.
-		
 	\end{frame}
 
-
-\begin{frame}
-\frametitle{Riemann Invariants}
-From these two equations, we can find Riemann Invariants
-\[
-I_\pm = u \pm \int \sqrt{\frac{g}{S}\frac{dS}{dH}} dH + g \alpha t
-\]
-Applying these to \eqref{swe1} and \eqref{swe2}, we get
-\begin{equation}\label{invariants1}
-\frac{\partial I_\pm}{\partial t} + c_{\pm} \frac{\partial I_\pm}{\partial x} = 0
-\end{equation}
-where
-\[
-c_\pm = u \pm \sqrt{g S \frac{dH}{dS}}.
-\]
-Note that we can write \eqref{invariants1} as
-\[
-\frac{\partial (I_\pm, x)}{\partial (t,x)} + c_\pm \frac{\partial(t, I_\pm)}{\partial (t,x)} = 0.
-\]
-\end{frame}
+	\slide[Conversion to Matrices] {
+		Noting that because $S(H) = \int_0^{H(x,t)} f(y) \delta y$, $S_t = S_H H_t$ and $S_x = S_H H_x$.
+		\begin{align*}
+			A_H H_t + A_H u H_x + A u_x &= 0\\
+			u_t + g H_x + u u_x &= g h_x
+		\end{align*}
+		dividing the top equation by $A_H$, we have the following system
+		\[
+			\left [ \begin{array}{ccc} H \\ u \end{array} \right ]_t
+			+ \left [ \begin{array}{ccc} u & A/A_H \\ g & u \end{array} \right ]
+				\left [ \begin{array}{ccc} H \\ u \end{array} \right ]_x
+			= \left [ \begin{array}{ccc} 0 \\ gh_x \end{array} \right ]
+		\]
+		which will be referred to as
+		\begin{align}
+			\label{sweMat1} v_t + X v_x = b
+		\end{align}
+	}
+	\slide[Characteristic Equation] {
+		Assuming there's a characteristic function $c(x,t)$
+		\[v_s = v_x x_s + v_t t_s \]
+		substituting in \eqref{sweMat1}
+		\begin{align*}
+			 v_s &= v_x x_x + (b - X v_x) t_s \\
+			&= (I x_s - X t_s) v_x + b t_s
+		\end{align*}
+	}
+	\slide[Eigenvectors] {
+		If $(I x_s - X t_s)$ is nonsingular, then our solutions are trivial (zero). Thus, for non-trivial solutions
+		\[ | I x_s - X t_s | = 0 \]
+		then we can solve for $x_s$
+		\[ x_s = (u \pm \sqrt{g A / A_H}) t_s = \lambda_\pm t_s \]
+		if we set $t_s = 1$
+		\[ v_s = (I \lambda_\pm - X) v_x + b \]
+		Eigenvector decomposition
+		\[ V_\pm^\ast X = \lambda_\pm V_\pm^\ast ,
+			\qquad \text{where} V_\pm^\ast = \mat{ \pm \sqrt{g A_H / A} \\ 1} \]
+	}
+	\slide[Riemann Invariants] {
+		The Riemann Inveriants are derived from the eigenvectors
+		\[ V_\pm = \mat{ \pm \sqrt{g A_H / A} \\ 1} = \mat{I_H \\ I_u},
+			\qquad I_\pm = u \pm \int \sqrt{g A_H / A} \cdot dH \]
+		note that
+		\[ V_\pm^\ast v_z = \mat {I_H & I_u} \mat{H \\ u}_z = I_z \]
+		thus
+		\begin{align*}
+			V^\ast_\pm(v_t + X v_x) &= V_\pm^\ast b \\
+			I_t + \lambda_\pm I_x &= g h_x \\
+			(\pderiv{}{t} + \lambda_\pm \pderiv{}{x})(I_\pm - g h_x t)
+		\end{align*}
+		we're using constant sloped bays, so $h=\alpha x$ and $h_x = \alpha$.
+	}
+	\slide[Hodograph Transform] {
+		
+	}
 
 \begin{frame}
 \frametitle{Hodograph Transform}
