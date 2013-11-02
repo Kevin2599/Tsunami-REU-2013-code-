@@ -11,7 +11,40 @@
 
 
 %3.11
-\slide[Boundary Conditions]{
+\begin{frame}
+\frametitle{Finding IC's in Terms of $\Phi$}
+Old IC's were $u(x,0) = 0$ and $\eta(x,0) = \eta_0(x)$
+As
+\[
+u = \frac{1}{F(\sigma)} \frac{\partial \Phi}{\partial \sigma}.
+\]
+and
+\[
+\eta =  \frac{1}{2g} \left(\frac{\partial \Phi}{\partial \lambda} - u^2 \right)
+\]
+We can write new IC's as
+\[
+\Phi(\sigma,0) = \int\limits_0^\sigma u_0(x_{\sigma'})F(\sigma')d\sigma'=0 \text{ and } \frac{\partial \Phi(\sigma,0)}{\partial \lambda} = 2g\eta_0.
+\]
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Finding BC's in Terms of $\Phi$*}
+Old BC's were $x=L$, $\frac{u(x_L,t)}{F(\sigma_{x_L})}=0$ 'wall' and that at the moving shoreline, $u(x,t)$ is bounded. As 
+\[
+u = \frac{1}{F(\sigma)} \frac{\partial \Phi}{\partial \sigma}.
+\]
+Our new BC's are
+\[
+\frac{\partial \Phi(\sigma_{x_L},\lambda)}{\partial \sigma} = 0 \text{ and } \frac{\partial \Phi(0,\lambda)}{\partial \sigma} = 0.
+\]
+\end{frame}
+
+
+\slide[Boundary Conditions*]{
+% I think it is better to start in physical space as we are setting the wall there
+% then to find the simga_l for the x_l and to fix that sigma_l
 We chose to let:
 \begin{align*}
 \Phi_\sigma (0,\lambda)=0& ~ ~ ~ ~ \Phi_\sigma (L,\lambda)=0
@@ -25,6 +58,10 @@ and
 u(x_{\sigma_L},t)=0 ~ ~ ~ \text{Reflecting vertical wall}
 \]
 }
+
+
+
+
 % 3.1.1.1
 \slide[Potential Issue with BC's]{
 We assume that $x_{\sigma_L}=const$ but
@@ -51,7 +88,7 @@ x({\sigma_L},\lambda)=\frac{1}{2g\alpha}\left(  \Phi_\lambda(\sigma_L,\lambda)-2
 			\text{PDE: }& $\Phi_{\lambda \lambda}$&$=L\Phi$ \\\\
 			\text{BC: }& $\Phi_\sigma (0,\lambda)$&$=0$\\
 								 & $\Phi_\sigma (L,\lambda)$&$=0$\\\\
-			\text{IC: }& $\Phi(\sigma,0)$&=$\int\limits_0^\sigma u_0(\sigma ')F(\sigma ')d \sigma'$\\
+			\text{IC: }& $\Phi(\sigma,0)$&=$\int\limits_0^\sigma u_0(\sigma ')F(\sigma ')d \sigma'=0$\\
 								 & $\Phi_\lambda(\sigma,0)$&=$2g\eta_0$\\
 			\end{tabular}
 			$\text{ where }L=\frac{\partial^2}{\partial \sigma^2}+\frac{m+1}{m\sigma}\frac{\partial}{\partial \sigma}$, $\sigma\in [0,\infty]$,and $\lambda\in [0,\infty)$

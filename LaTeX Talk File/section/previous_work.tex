@@ -14,9 +14,8 @@
 		\begin{itemize}
 			\item The plane beach;
 			\item Bays of parabolic cross-section;
-			\item Bays of trapezoidal cross-section.
 		\end{itemize}
-		There has been extensive study of the plane beach and bays of parabolic cross-section, but tsunami behavior in bays of trapezoidal cross-section has not yet been examined.
+		There has been extensive study of the plane beach and bays of parabolic cross-section, but tsunami behavior in bays of general U-shaped bays of finite length has not been examined.
 		
 		In each case, we assume that the bottom profile is separable: \emph{i.e.}
 		\[   z(x,y) = f(y) - h(x)  \]
@@ -29,7 +28,7 @@
 	\frametitle{The Plane Beach}
 		Characteristics of the plane beach:
 		\begin{itemize}
-			\item Potentially non-constant slope;
+			\item Constant slope;
 			\item Uniform across y-axis;
 			\item Can be simplified to 2 dimensions.
 		\end{itemize}
@@ -47,22 +46,10 @@
 			\item Parabolic cross-section along y-axis;
 			\item Behavior of waves in such a channel can still be simplified to 2 dimensions.
 		\end{itemize}
-		This more complicated problem was analyzed in a recent paper by Dr. Ira Didenkulova and Dr. Efim Pelinovsky, in which they showed that it was possible to reduce this problem to one that is analogous to the 2-dimensional case, and thus analytical solutions are possible.
+		This more complicated problem was analyzed in a recent paper by Dr. Ira Didenkulova and Dr. Efim Pelinovsky, in which they showed that it was possible to reduce this problem to one that is analogous to the 2-dimensional case, and thus analytical solutions are possible for the infinite length case.
 	\end{frame}
 
-	\slide[Bays of Trapezoidal Cross-section]{\includegraphics[width=\linewidth]{bay/trapezoidalbay.png}}
-
-	\begin{frame}
-		\frametitle{Bays of Trapezoidal Cross-section}
-		%Insert a graphic of a trapezoidal cross-section'd bay here. Float left.
-		Characteristics of bays of trapezoidal cross-section:
-		\begin{itemize}
-			\item Again, constant slope;
-			\item Cross-section is determined by a symmetrical trapezoid, where the slope of the walls is $\beta$ and the distance across the base is $2 y_0$;
-			\item Behavior of waves in such a bay is unknown. 
-		\end{itemize}
-		The search for analytical solutions to model the behavior of tsunamis in these bays was the topic of our REU.
-	\end{frame}
+	
 
 	\begin{frame}
 		\frametitle{Further Terminology}
@@ -74,121 +61,21 @@
 		\end{itemize}
 	\end{frame}
 
-	\begin{frame}
-		\frametitle{Derivation of Wave Equation}
-		\textbf{Material Derivative}
-		\begin{align*}
-			\frac{D}{Dt} &= \frac{\partial}{\partial t} + \textbf{u}\cdot\nabla\\
-			&= \frac{\partial}{\partial t} + u\frac{\partial}{\partial x} + v\frac{\partial}{\partial y} + w\frac{\partial}{\partial z}
-		\end{align*}
-		where $ \textbf{u}(x,y,z,t) = u\textbf{i}+v\textbf{j}+w\textbf{k} $ is an instantaneous flow velocity vector.\\
-		Incompressible flow is defined by holding $\frac{D \rho}{D t} = 0$.
-	\end{frame}
+	
 
 	\begin{frame}
-		\frametitle{Derivation of Wave Equation}
-		The equations which constitute the focus of our study are derived from physical conservation equations: the first being conservation of mass:
-		\begin{align}
-			0 &= \frac{ \partial \rho }{\partial t} + \nabla \cdot ( \rho \textbf{u} )\\
-			&= \frac{\partial \rho}{\partial t} + \rho \left( \nabla \cdot \textbf{u} \right) + \left( \textbf{u} \cdot \nabla \right) \rho \notag \\
-			&= \frac{D \rho}{D t} + \rho \nabla \cdot \textbf{u} \notag
-		\end{align}
-		\begin{align}
-			\frac{D \rho}{D t} &=0 \notag \\
-			\Rightarrow  \nabla \cdot \textbf{u}& = 0 \label{delu}
-		\end{align}
-	\end{frame}
-
-	\begin{frame}
-		%For this slide to make sense, we need to introduce eta, f, a+, a-, etc.
-		\frametitle{Derivation of Wave Equation}
-		We integrate \eqref{delu} across a $y,z$-cross-section, $A$, of area $S$.
-		\begin{align}
-			0 &= \int_{A} \nabla \cdot \textbf{u} \ dA \notag\\
-			&= \int_{A} \frac{\partial u}{\partial x} + \frac{\partial v}{\partial y} + \frac{\partial w}{\partial z} \ dy \ dz \notag\\
-			&= \int_A \frac{\partial u}{\partial x} \ dA +\int_z v(y_{\max})-v(y_{\min}) \ dz + \int_y w(z_{\max}) - w(z_{\min})\ dy \notag\\
-			&= \frac{\partial}{\partial x} \int_A u \ dA + \frac{\partial S}{\partial t} \notag\\
-			\label{swe1} &= \frac{\partial}{\partial x} (\bar{u}S) +  \frac{\partial S}{\partial t}
-		\end{align}
-	\end{frame}
-
-	\begin{frame}
-		\frametitle{Derivation of Wave Equation}
-		The second equation is based on \textit{Euler's Equation}.  We define a region $V$ immersed in fluid.
-		\begin{align*}
-			&\int_{V} (\rho \textbf{F} - \nabla P) \ dv & \text{Total force acting on fluid.}\\
-			&\frac{d}{dt} \left( \int_{V} \rho \textbf{u} \ dv \right) & \text{Rate of change of momentum of fluid in $V$.}\\
-			-& \int_{\chi} \rho \textbf{u}(\textbf{u}\cdot \textbf{n}) \ d\chi & \text{Rate of flow of momentum across $\chi$ into $V$.}
-		\end{align*}
-	\end{frame}
-
-	\begin{frame}
-		\frametitle{Derivation of Wave Equation}
-		\begin{align}
-			&&\frac{d}{dt} \left( \int_{V} \rho\textbf{u} \ dv \right) &= \int_{V} ( \rho \textbf{F} - \nabla P) \ dv - \int_{\chi} \rho \textbf{u}(\textbf{u}\cdot \textbf{n}) \ d\chi \notag\\
-			&\Rightarrow
-			& \textbf{0} &= \int_{V} \left( \rho \frac{D\textbf{u}}{dt} - \rho \textbf{F} + \nabla P \right) \ dv \notag\\
-			&\Rightarrow
-			&\frac{D\textbf{u}}{dt} &= - \frac{1}{\rho} \nabla P + \label{eulers} \textbf{F} 
-		\end{align}
-	\end{frame}
-
-	\begin{frame}
-		\frametitle{Derivation of Wave Equation}
-		Examine the z-component of Euler's equation \eqref{eulers}:
-		\begin{align}
-			\frac{Dw}{Dt} = -\frac{1}{\rho}\frac{\partial P}{\partial z} -g \notag\\
-			\frac{\partial P}{\partial z} = -\rho g \notag\\
-			P = \rho g (\eta - z) \label{pressure}
-		\end{align}
-	\end{frame}
-
-	\begin{frame}
-		\frametitle{Derivation of Wave Equation}
-		We take equation \eqref{eulers},
-		\begin{align*}
-			\frac{D\textbf{u}}{dt} = - \frac{1}{\rho} \nabla P + \textbf{F} \tag*{\eqref{eulers}}
-		\end{align*}
-		and reduce it to equality of the \textbf{i} components:
-		\begin{align*}
-			\pderiv{u}{t} + u\pderiv{u}{x} = -\frac{1}{\rho}\pderiv{P}{x},
-		\end{align*}
-		which we can simplify with equation \eqref{pressure}:
-		\begin{align*}
-			P = \rho g (\eta - z) \tag*{\eqref{pressure}}
-		\end{align*}
-		\begin{align}
-			\label{eulersi}\pderiv{u}{t} + u\pderiv{u}{x} = -g \pderiv{\eta}{x}
-		\end{align}
-	\end{frame}
-
-	\begin{frame}
-		\frametitle{Derivation of Wave Equation}
-		Now, we integrate \eqref{eulersi} across the same $y,z$-cross-section $A$, of area $S$.\\
-		\begin{align} 
-			\text{LHS:}& & \int_A \pderiv{u}{t} + u\pderiv{u}{x} \ dA &= \left( \pderiv{\bar{u}}{t} + \bar{u} \pderiv{\bar{u}}{x} \right) S  \label{LHS}\\
-			\text{RHS:}& & \int_A -g \pderiv{\eta}{x} \ dA &= -gS \pderiv{\eta}{x} \notag\\
-			& & &= gS \left( \pderiv{h}{x} - \pderiv{H}{x} \label{RHS} \right)
-		\end{align}
-	\end{frame}
-
-	\begin{frame}
-		\frametitle{Derivation of Wave Equation}
-		By combining \eqref{LHS} and \eqref{RHS}, we integrate \eqref{eulers}!
-		\begin{align}
-			\left( \pderiv{\bar{u}}{t} + \bar{u} \pderiv{\bar{u}}{t} \right) S = g \left( \pderiv{h}{x} - \pderiv{H}{x} \right) S \notag \\
-			\label{swe2} \Rightarrow \pderiv{\bar{u}}{t} + \bar{u} \pderiv{\bar{u}}{t} + g\pderiv{H}{x} &= g\pderiv{h}{x} 
-		\end{align}
-	\end{frame}
-
-	\begin{frame}
-		\frametitle{Derivation of Wave Equation}
+		\frametitle{Wave Equation*}
+		% Put the basic assumptions and talk about the general idea but do not derive everything
+		% It took too much time when I gave my talks and it does not help to gain a better understanding
+		% We will need the time to get through the results and explaining how the solution works
+		% Ill leve it up to you to talk about eulers eq and the C of Mass eq and the assumptions/ make the slides you want.
 		From this point forward, we use the symbol $u$ to represent $\bar{u}$.  Thus,
 		\begin{framed} \begin{align}
-			\frac{\partial S}{\partial t} + \frac{\partial}{\partial x}(uS) &= 0, \tag*{\eqref{swe1}}\\
-			\frac{\partial u}{\partial t} + u \frac{\partial u}{\partial x} + g \frac{\partial H}{\partial x} &= g \frac{dh}{dx}. \tag*{\eqref{swe2}}
+			\frac{\partial S}{\partial t} + \frac{\partial}{\partial x}(uS) &= 0, \label{swe1}\\
+			\frac{\partial u}{\partial t} + u \frac{\partial u}{\partial x} + g \frac{\partial H}{\partial x} &= g \frac{dh}{dx}. \label{swe2}
 		\end{align} \end{framed}
 		These are the wave equations that we will attempt to solve for our bays.
+		% I will mention no dispersion and the compairison when you are done with your part (no slide)
 	\end{frame}
 
 
@@ -205,7 +92,7 @@
 		\end{align}
 		where $S$ is the cross-sectional area, $u$ is the averaged flow velocity, and $H = \eta(x,t) + h(x)$, where $h$ is unperturbed water depth and $\eta$ is the height of the perturbation.
 		
-		We have initial conditions that at $t=0$, $u(x,0) = 0$ and $\eta(x,0) = \eta_0(x)$, and boundary conditions that as $x$ becomes large, $u$ and $\eta$ become small, and that at the moving shoreline, $u(x,t)$ is bounded.
+		We have initial conditions that at $t=0$, $u(x,0) = 0$ and $\eta(x,0) = \eta_0(x)$, and boundary conditions that at $x=L$, $\frac{u(x_L,t)}{F(\sigma_{x_L})}=0$ 'wall' and that at the moving shoreline, $u(x,t)$ is bounded.
 		
 	\end{frame}
 
@@ -259,7 +146,7 @@ F(\sigma) = c_+ - c_- = 2 \sqrt{gS \frac{dH}{dS}}.
 \end{frame}
 
 \begin{frame}
-\frametitle{Change of Variables}
+\frametitle{Change of Variables 2}
 In these new variables, \eqref{hodograph} becomes
 \[
 \frac{\partial^2 t}{\partial \lambda^2} - \frac{\partial^2 t}{\partial \sigma^2} - \left( \frac{2 + \frac{dF}{d\sigma}}{F(\sigma)} \right) \frac{\partial t}{\partial \sigma} = 0,
@@ -277,7 +164,7 @@ In order to find $x$, we also obtain from \eqref{hodograph} that
 \[
 g \alpha \frac{\partial x}{\partial \sigma} = - u \frac{\partial u}{\partial \sigma} - \frac{F(\sigma)}{2} + \frac{F(\sigma)}{2} \frac{\partial u}{\partial \lambda}.
 \]
-To integrate this, we define $\Phi(\sigma,\lambda)$ by
+To integrate this, we define a potential function $\Phi(\sigma,\lambda)$ by
 \[
 u = \frac{1}{F(\sigma)} \frac{\partial \Phi}{\partial \sigma}.
 \]
@@ -291,8 +178,32 @@ Hence
 \]
 \end{frame}
 
+
+
+
+
+
+
+
 \begin{frame}
-\frametitle{Finding $\Phi$}
+\frametitle{Backsubstituting to Physical Variables}
+We have the following backsubstitution equations:
+\[
+u = \frac{\phi_\sigma}{F(\sigma)} \text{ and } \eta = \frac{1}{2g}\left(\phi_\lambda - u^2\right)
+\]
+\[
+x = \frac{1}{2g\alpha} \left(\phi_\lambda - 2gH - u^2 \right) \text{ and } t = \frac{\lambda - u}{\alpha g}.
+\]
+We know that this backsubstitution is possible because the 4-part Jacobian matrix
+\[
+\frac{\partial (x,t,u,\eta)}{\partial (\sigma,\lambda,\phi_\sigma,\phi_\lambda)}
+\]
+has a non-zero determinant.
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Writing an Equation in Terms of $\Phi$}
 We substitute our definition of $\Phi$ into \eqref{finalu} to obtain
 \begin{equation}\label{Phieq}
 \frac{\partial^2 \Phi}{\partial \lambda^2} - \frac{\partial^2 \Phi}{\partial \sigma^2} - W(\sigma) \frac{\partial \Phi}{\partial \sigma} = 0,
@@ -302,289 +213,29 @@ where
 W(\sigma) = \frac{2 + \frac{dF}{d\sigma}}{F(\sigma)}.
 \]
 We can think of $\sigma$ as a space-like variable and $\lambda$ as a time-like variable. So we have initial conditions at $\lambda = 0$,
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Finding $F$ and $W$ for U-shaped bays}
+We need to find $F(\sigma)$ for the case of a U-shaped bay ($|y^m|$). Recalling that
 \[
-\frac{\partial \Phi(\sigma,0)}{\partial \sigma} = 0 \text{ and } \frac{\partial \Phi(\sigma,0)}{\partial \lambda} = 2g\eta_0.
+F(\sigma)= 2 \sqrt{gS \frac{dH}{dS}} \text{ and } \sigma = \int_0^H \sqrt{\frac{g}{S} \frac{dS}{dH}}dH.
 \]
-Our boundary conditions are
+By integrating we can write $S(H)=2\frac{m}{m+1}H^{\frac{m+1}{m}}$ and also
 \[
-\frac{\partial \Phi(\infty,\lambda)}{\partial \sigma} = 0 \text{ and } \frac{\partial \Phi(0,\lambda)}{\partial \sigma} = 0.
+F(H)=2\sqrt{g} \sqrt{\frac{m}{m+1}} \sqrt{H} \text{ and } \sigma=2\sqrt{\frac{g(m+1)}{m}} H^{\frac12}
 \]
-\end{frame}
-
-\begin{frame}
-\frametitle{Introducing $\varphi$ and $\psi$}
-We define two new variables:
+So
+\[F(\sigma)=\frac{m}{(m+1)\sigma}
+\]
+and
 \[
-\varphi = \frac{\partial \Phi}{\partial \lambda} \text{ and } \psi = \frac{\partial \Phi}{\partial \sigma}.
-\]
-Notice that by the equality of second partial derivatives, $\dfrac{\partial \varphi}{\partial \sigma} = \dfrac{\partial \psi}{\partial \lambda}$.
-By substituting $\varphi$ and $\psi$ into \eqref{Phieq}, we obtain
-\[
-\frac{\partial \varphi}{\partial \lambda} - \frac{\partial \psi}{\partial \sigma} - W(\sigma) \psi = 0.
-\]
-Finally, we define $\Omega = \begin{pmatrix} \varphi \\ \psi \end{pmatrix}$.
-\end{frame}
-
-\begin{frame}
-\frametitle{The system in $\Omega$}
-We have the system of equations
-\[
-\dfrac{\partial \psi}{\partial \lambda} = \dfrac{\partial \varphi}{\partial \sigma} \text{ and } \frac{\partial \varphi}{\partial \lambda} = \frac{\partial \psi}{\partial \sigma} + W(\sigma) \psi.
-\]
-In matrix form, this is
-\[
-\Omega_\lambda = \begin{pmatrix} 0 & 1 \\ 1 & 0 \end{pmatrix} \Omega_\sigma + \begin{pmatrix} 0 & W \\ 0 & 0 \end{pmatrix} \Omega.
-\]
-We also have initial conditions
-\[
-\psi(\sigma, 0) = 0 \text{ and } \varphi(\sigma,0) = 2g\eta_0
-\]
-and boundary conditions
-\[
-\psi(\infty,\lambda) = 0 \text{ and } \psi(0,\lambda) = 0.
-\]
-\end{frame}
-
-\begin{frame}
-\frametitle{Backsubstituting to Physical Variables}
-We have the following backsubstitution equations:
-\[
-u = \frac{\psi}{F(\sigma)} \text{ and } \eta = \frac{1}{2g}\left(\varphi - u^2\right)
-\]
-\[
-x = \frac{1}{2g\alpha} \left(\varphi - 2gH - u^2 \right) \text{ and } t = \frac{\lambda - u}{\alpha g}.
-\]
-We know that this backsubstitution is possible because the 4-part Jacobian matrix
-\[
-\frac{\partial (x,t,u,\eta)}{\partial (\sigma,\lambda,\psi,\varphi)}
-\]
-has a non-zero determinant.
-\end{frame}
-
-\section{Analytics}
-
-\begin{frame}
-\frametitle{Known Analytics}
-From \eqref{Phieq}, the shallow water equations for the parabolic bay are: 
-\[
-\frac{\partial^2 \Phi}{\partial \lambda^2}-\frac{\partial^2 \Phi}{\partial \sigma^2}-\frac{2}{\sigma}\frac{\partial \Phi}{\partial \sigma}=0.
-\]
-Where we can find $u$, $\eta$ , $x$ and $t$ by the following non-linear transforms:\\
-\begin{align*}
-u=\frac{1}{\sigma}\frac{\partial \Phi}{\partial \sigma}&, \eta=-\frac{1}{g}\left(\frac{u^2}{2}-\frac{1}{3}\frac{\partial \Phi}{\partial \lambda}\right)\\
-t=\frac{u-\lambda}{g\alpha}&,x=\frac{1}{g\alpha}\left(\frac{u^2}{2}+\frac{\sigma^2}{6}-\frac{1}{3}\frac{\partial \Phi}{\partial \lambda}\right)
-\end{align*}
-\end{frame}
-
-
-\begin{frame}
-\frametitle{Known Analytics Cont.}
-We solve this in the semi-axis $\sigma \geq 0$ with the following conditions: \\
-\begin{align*}
-IC's:& \Phi|_{\lambda=0}=0\\
-&\frac{\partial\phi}{\partial \lambda}|_{\lambda=0}=\frac{\sigma^2}{2}-3g\alpha x(\sigma)|_{\lambda=0}\\
-\end{align*}
-Where $\Phi|_{\lambda=0}=0$ because the initial averaged cross-sectional water velocity is 0. We know the initial water height as $\sigma=\sqrt{6gH}$.
-\\ \vspace{3mm}
-BC's: Boundedness of water displacement and velocity at the shoreline and at infinity.
-\end{frame}
-
-\begin{frame}
-\frametitle{Known Analytics Cont.}
-The solution to this is:\\\vspace{7mm}
-$\Phi(\sigma,\lambda)=\frac{[\Theta(\lambda+\sigma)-\Theta(\lambda-\sigma)]H(\lambda-\sigma)-[\Theta(\sigma+\lambda)-\Theta(\sigma-\lambda)]H(\sigma-\lambda)}{\sigma}$\\\vspace{3mm}
-Where $H$ is the Heaviside function and $\Theta$ is determined by the initial wave function.
-\end{frame}
-
-\begin{frame}
-\frametitle{An Example run up problem}
-Let $\Theta(\sigma)=A e^{-(\frac{\sigma-\sigma_0}{p})^2}$ where $A$ is the wave height, $p$ is the wave length, and $\sigma_0$ represents the distance of the wave from the shore.\\
-The solution for this initial wave is:\\
-\begin{align*}
-\Phi(\sigma\geq0,\lambda)=&\frac{A}{\sigma} \left[ e^{-(\frac{\sigma+\lambda-\sigma_0}{p})^2}-e^{-(\frac{\sigma-\lambda-\sigma_0}{p})^2} \right. \\
-&\left. +e^{-(\frac{\sigma+\lambda+\sigma_0}{p})^2}-e^{-(\frac{\sigma-\lambda+\sigma_0}{p})^2} \right]
-\end{align*}
-\end{frame}
-
-\begin{frame}
-\frametitle{Maximum/Minimum run up/run down}
-
-For our N-Wave the maximum run up is:\[
-\frac{8A}{3p^2}e^{-\frac{3}{2}}
-\]
-And the minimum run down is:\[
--\frac{4A}{3p^2}
-\]
-\end{frame}
-
-\begin{frame}
-\frametitle{Trapezoidal case}
-In the process of determining $W(\sigma)$, we must find an expression for $\sigma(H)$, which is given by the integral expression
-\[
-\sigma(H) = \int_0^H \sqrt{\frac{g}{S} \frac{dS}{dH}}dH.
-\]
-In the parabolic case, this is easily computable. 
-\end{frame}
-\begin{frame}
-\frametitle{Trapezoidal case}
-In the trapezoidal case, however, this becomes
-\[
-\sigma(H) = \int_0^H \sqrt{2g\frac{H + \beta y_0}{H^2 - 2H \beta y_0}} dH,
-\]
-the solution of which involves elliptic integrals, and cannot be expressed in elementary functions. This is a critical stumbling-block to finding analytical solutions.
-\end{frame}
-
-%\section{Numeric Approximations}
-
-\begin{frame}
-\frametitle{F Finding Function}
-We need to approximate $F(\sigma)$.
-\begin{itemize}
-\item Numerically integrate $\sigma(H)$ using Simpson's rule.
-\item We need $H(\sigma)$, and need $\sigma$ to be evenly spaced.
-\item Define evenly spaced $\sigma$ then interpolate with $\sigma(H)$.
-\end{itemize}
-This approximation breaks down near $\sigma = 0$.
-\begin{itemize}
-\item We found an asymptotic expression of the behavior of $F$ as $\sigma \rightarrow 0$. 
-\item Found $\sigma$ where the asymptotic expression and numerical approximation met, and stitched them together at that point.
-\end{itemize}
-\end{frame}
-
-\begin{frame}
-\frametitle{Numerical Solution}
-The system we now need to solve is: \\
-\begin{center}
-\begin{tabular}{lll}\vspace{5mm}
-$ \Omega_\lambda=$&$\begin{pmatrix}
-  0&1 \\
-  1&0 
-\end{pmatrix} \Omega_\sigma \: \: +$&
-$\begin{pmatrix}
-  0&W \\
-  0&0 
-\end{pmatrix} \Omega$ \\ \vspace{1mm}
-IC's: &$ \psi(\sigma,0)$&$=0$\\\vspace{5mm}
- &$\varphi(\sigma,0)$&is a known function\\\vspace{1mm}
-BC's: &$ \psi(0,\lambda)$&$=0$\\\vspace{1mm}
- &$\psi(\infty,\lambda)$&$=0$\\\vspace{1mm}
-\end{tabular}
-\end{center}
-
-Where $\Omega= \begin{pmatrix} \varphi \\ \psi \end{pmatrix} $
-, $W=\dfrac{2 - F_\sigma}{F}$ and $F$ can be approximated.
-\end{frame}
-
-\begin{frame}
-\frametitle{Numerical Solution Cont.}
-
-We can rewrite this system as:
-\[
-\psi_{\lambda \lambda}=\psi_{\sigma\sigma}+W\psi_{\sigma}+W_\sigma\psi
-\]
-Where the boundary and initial conditions are the same as earlier stated and we can find $\varphi$ by $\varphi_\lambda = \psi_\sigma+W\psi$ 
-\end{frame}
-
-%We tried Explicit but it did not work because of the CLF criteria so we went to Implicit method.
-\begin{frame}
-\frametitle{Implicit Difference Method}
-Needed central differences:\\
-\begin{align*}% Note that n is the index for the \lambda change and n it the \sigma change
-\psi_{\lambda \lambda}&\approx \frac{\psi^{n+1}_i-2\psi^n_i+\psi^{n-1}_i}{(\Delta\lambda)^2}\\\vspace{3mm}
-\psi_{\sigma\sigma}&\approx \frac{\psi^{n+1}_{i+1}-2\psi^{n+1}_i+\psi^{n+1}_{i-1}}{(\Delta\sigma)^2}\\\vspace{3mm}
-\psi_\sigma&\approx \frac{\psi^{n+1}_{i+1}-\psi^{n+1}_{i-1}}{\Delta\sigma}\text{ and}\\\vspace{3mm}
-\psi&=\psi^{n+1}_i.\\
-\end{align*}
-\end{frame}
-
-
-\begin{frame}
-\frametitle{Implicit Difference Method Cont.}
-The implicit finite difference system is:
-\begin{align*}
-2\psi^{n}_i-\psi^{n-1}_i=&[1+2(\frac{\Delta\lambda}{\Delta\sigma})^2-W'_i(\Delta\lambda)^2]\psi^{n+1}_{i}\\
-													 &+[-(\frac{\Delta\lambda}{\Delta\sigma})^2-\frac{(\Delta\lambda)^2}{2\Delta\sigma}W_i]\psi^{n+1}_{i+1}\\
-													 &+[\frac{(\Delta\lambda)^2}{2\Delta\sigma} W_i-(\frac{\Delta\lambda}{\Delta\sigma})^2]\psi^{n+1}_{i-1}\\
-\end{align*}
-\end{frame}
-
-\begin{frame}
-\frametitle{Implicit Difference Method Cont.}
-We get the following matrix equation:
-\[
-\begin{pmatrix}
-  1&0&0&0&\ldots&0 \\
-  a_2&b_2&c_2&0&\ldots&0\\
-  0&\ddots&\ddots&\ddots&\ddots&0\\
-  0&0&0&a_{i-1}&b_{i-1}&c_{i-1}\\
-	0&0&0&0&\ldots&1
-\end{pmatrix}
-\begin{pmatrix}
-\psi_1^{n+1}\\
-\vdots\\
-\vdots\\
-\vdots\\
-\psi_i^{n+1}
-\end{pmatrix}=
-\begin{pmatrix}
-0\\
-G_2\\
-\vdots\\
-G_{i-1}\\
-0
-\end{pmatrix}
+W(\sigma) = \frac{2 + \frac{dF}{d\sigma}}{F(\sigma)}=\frac{m+2}{m\sigma}.
 \]
 
-\begin{tabular}{ll}\vspace{2mm}
-Where &$a_p=\frac{(\Delta\lambda)^2}{2\Delta\sigma} W_p-(\frac{\Delta\lambda}{\Delta\sigma})^2$,\\ \vspace{2mm} &$b_p=-(\frac{\Delta\lambda}{\Delta\sigma})^2-\frac{(\Delta\lambda)^2}{2\Delta\sigma}W_p$,\\ \vspace{2mm} &$c_p=1+2(\frac{\Delta\lambda}{\Delta\sigma})^2-W'_p(\Delta\lambda)^2$ \\
-and &$G_p=2\psi^n_p-\psi^{n-1}_p$
-\end{tabular}
 \end{frame}
 
-\begin{frame}
-\frametitle{Implicit Difference Method Cont.}
 
-\begin{columns}
-\column{0.5\textwidth}
-We need to reexamine our initial conditions to start building our numerical solution.\\
-\begin{align*}
-\psi^{0}_i&=0\\
-\psi_i^1&\approx\psi^0_i+\Delta\lambda (\psi^0_i)_\lambda\\
-&\approx0+\Delta\lambda(\varphi^0_i)_\sigma\\
-\varphi^0_i&=\text{known function}\\
-\varphi^1_i&\approx\varphi^0_i+\Delta\lambda(\varphi^0_i)_\lambda\\
-&\approx\varphi^0_i+\Delta\lambda[(\psi^0_i)_\sigma+\psi^0_iW_i]\\
-&\approx\varphi^0_i
-\end{align*}
 
-\column{0.6\textwidth}
-\vspace{.2\textheight}
-Stencil for our finite difference:\vspace{-5mm}
-\includegraphics{Stencil_for_Finite_difference.png}
-\end{columns}
-\end{frame}
 
-\begin{frame}
-\frametitle{Implicit Difference Method Conclusion}
-We can now solve for $\psi$ and using
-\[
- \varphi^n_i\approx \varphi^{n-1}_i+\Delta\lambda[(\psi^{n-1}_i)_\sigma+\psi^{n-1}_iW_i]
- \]
-we can solve for $\varphi$ to get an approximation to the run up problem. 
-\end{frame}
-
-\begin{frame}
-\frametitle{Issues with Backsubstitution}
-This was a particular stumbling block in our efforts to compare analytical and numerical data.\\
-\quad\\
-\begin{center}
-\begin{tabular}{c c}
-Our system & Pelinovski \& Didenkulova\\
-\hline
-$x$ points onshore & $x$ points offshore\\
-$u = \frac{1}{F} \cdot \frac{\partial \Phi}{\partial \sigma}$ & $u = \frac{1}{\sigma} \cdot \frac{\partial \Phi}{\partial \sigma}$
-\end{tabular}
-\end{center}
-All data is misscaled by $\pm \frac{2}{3}$!!\\
-The backsubstitution ceases to be well-defined.
-\end{frame}
