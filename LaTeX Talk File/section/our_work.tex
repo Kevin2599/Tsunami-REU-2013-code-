@@ -1,4 +1,6 @@
 % 3  Our work
+\section{2013 REU}
+
 % 3.1  Discuss our specific problem which allows us to apply spectral methods
 % 3.1.1  Boundary condition: shore condition and ?wall? at some distance L
 % 3.1.1.1  This is a potential problem we must keep track of? eta must be close to zero to avoid significant error.
@@ -63,24 +65,56 @@ u(x_{\sigma_L},t)=0 ~ ~ ~ \text{Reflecting vertical wall}
 
 
 % 3.1.1.1
+\slide[Boundary Conditions for a Closed Bay]{
+	Neither end of the bay moves
+	\[
+		\Phi_\sigma (0,\lambda)=0 \qquad \Phi_\sigma (L,\lambda)=0
+	\]
+	Because $u(x,t)= \frac{1}{F(\sigma)} \Phi_\sigma(\sigma,\lambda)$
+	\[
+		u(x_{\sigma=0},t)=A(t) ~ ~ ~ \text{reflecting wall If wave does not break}
+	\]
+	and a reflective vertical wall
+	\[
+		u(x_{\sigma_L},t)=0
+	\]
+}
+% 3.1.1.1  This is a potential problem we must keep track of? eta must be close to zero to avoid significant error.
 \slide[Potential Issue with BC's]{
-We assume that $x_{\sigma_L}=const$ but
-
-\[
-x({\sigma_L},\lambda)=\frac{1}{2g\alpha}\left(  \Phi_\lambda(\sigma_L,\lambda)-2g H(\sigma_L)-\frac{1}{F(\sigma_L)}\Phi_\sigma(\sigma_L,\lambda)\right)
-\]
+	We assume that $x_{\sigma_L}=const$ but
+	
+	\[
+	x({\sigma_L},\lambda)=\frac{1}{2g\alpha}\left(  \Phi_\lambda(\sigma_L,\lambda)-2g H(\sigma_L)-\frac{1}{F(\sigma_L)}\Phi_\sigma(\sigma_L,\lambda)\right)
+	\]
 
 }
 
 
 
+% 3.1.2  Mention physical examples where ?wall? could exist
+% 3.1.2.1  Actual physical wall-like object: dam, glacier, cliff, steep mountain, anything steep enough that does not move can be approximated as a wall
+% 3.1.2.2  Point out that the wave passes through but does not alter height (analogous to point in the middle of 2 standing waves)
+	\slide[Examples of Closed Bays] {
+		\begin{columns}
+			\begin{column}{.48 \textwidth}
+				\bi	\item Lituya Bay
+					\item Dammed reservoir
+					\item Glacial dams
+					\item Standing waves
+				\ei
+			\end{column}
+			\begin{column}{.48 \textwidth}
+				\includegraphics[width=1\textwidth]{bay/lituya.jpg}
+			\end{column}
+		\end{columns}
+	}
 
 
 
 
 
 
-% 3.2
+%- 3.2  Go through spectral method for arbitrary m with Bessel solution.
 	\begin{frame}
 		\frametitle{IVBP}
 			We wish to solve the following system:
@@ -96,15 +130,15 @@ x({\sigma_L},\lambda)=\frac{1}{2g\alpha}\left(  \Phi_\lambda(\sigma_L,\lambda)-2
 	
 	
 	
-		\begin{frame}
-		\frametitle{Solution Part 1}
-				Assume solutions have the form $\Phi(\sigma,\lambda)=T(\lambda)X(\sigma)$.  We now have
-				\begin{align*}
-				\Phi_{\lambda \lambda}&=\left(\frac{\partial^2}{\partial \sigma^2}+\frac{m+1}{m\sigma}\frac{\partial}{\partial \sigma}\right)\Phi\\\\
-				T''(\lambda)X(\sigma)&=T(\lambda)X''(\sigma)+\frac{m+1}{m\sigma}T(\lambda)X'(\sigma)\\\\
-				\frac{T''(\lambda)}{T(\lambda)}&=\frac{X''(\sigma)}{X(\lambda)}+\frac{m+1}{m\sigma}\frac{X'(\sigma)}{X(\sigma)}\\
-				\end{align*}
-				So $T''(\lambda)=CT(\lambda)$ and $X''(\sigma)+\frac{m+1}{m\sigma}X'(\sigma)=C X(\sigma)$
+	\begin{frame}
+	\frametitle{Solution Part 1}
+			Assume solutions have the form $\Phi(\sigma,\lambda)=T(\lambda)X(\sigma)$.  We now have
+			\begin{align*}
+			\Phi_{\lambda \lambda}&=\left(\frac{\partial^2}{\partial \sigma^2}+\frac{m+1}{m\sigma}\frac{\partial}{\partial \sigma}\right)\Phi\\\\
+			T''(\lambda)X(\sigma)&=T(\lambda)X''(\sigma)+\frac{m+1}{m\sigma}T(\lambda)X'(\sigma)\\\\
+			\frac{T''(\lambda)}{T(\lambda)}&=\frac{X''(\sigma)}{X(\sigma)}+\frac{m+1}{m\sigma}\frac{X'(\sigma)}{X(\sigma)}\\
+			\end{align*}
+			So $T''(\lambda)=CT(\lambda)$ and $X''(\sigma)+\frac{m+1}{m\sigma}X'(\sigma)=C X(\sigma)$
 	\end{frame}
 	
 	
@@ -122,8 +156,8 @@ x({\sigma_L},\lambda)=\frac{1}{2g\alpha}\left(  \Phi_\lambda(\sigma_L,\lambda)-2
 	
 	
 	
-		\begin{frame}
-		\frametitle{Solution Part 3}
+	\begin{frame}
+	\frametitle{Solution Part 3}
 		 Letting $\alpha=\frac 1m$, $\varphi=X(\sigma)\sigma ^\alpha$, $t=\sigma \sqrt{C}$ and doing some algebraic manipulations we can rewrite 
 		\[X''(\sigma)+\frac{m+1}{m\sigma}X'(\sigma)=C X(\sigma)\]
 		as
@@ -239,7 +273,28 @@ x({\sigma_L},\lambda)=\frac{1}{2g\alpha}\left(  \Phi_\lambda(\sigma_L,\lambda)-2
 	\end{frame}
 	
 
-	
+% 3.3  Mention for m=2 this solution is simplified to sin solution
+% 3.3.1  Still not fully analytic though because eigenvalues can only be found numerically
+
+	\slide[m=1 case: X] {
+		When m=1 (i.e. parabolic bay), we have 
+			\[X''(\sigma)+\frac{2}{\sigma}X'(\sigma)=\lambda_n X(\sigma)\]
+		which is nicely solved with
+			\[ X = A\frac{\sin(\lambda_n \sigma)}{\sigma} + B\frac{\cos(\lambda_n \sigma)}{\sigma} \]
+		Using the boundary conditions: $X'(0) = 0$ and $X' (L) = 0$, we find $B=0$ and
+			\[ \lambda_n L = \tan(\lambda_n L) \]
+		which can be solved implicitly for numerical solutions.
+	}
+	\slide[m=1 case: $\Phi$] {
+			\[ T'' - \lambda_n T = 0 \]
+		can be readily solved with
+			\[ T = \lambda_n [ A \sin (\lambda_n \lambda) + B \cos ( \lambda_n \lambda) ] \]
+		Pulling both X and T together:
+			\[ \phi = \lambda_n [ A  \cos (\lambda_n \lambda) - B \sin ( \lambda_n \lambda) ] \frac{\sin (\lambda_n \sigma)}{\sigma} \]
+			\[ \psi = \lambda_n [ A  \sin (\lambda_n \lambda) + B \cos ( \lambda_n \lambda) ] \pderiv{}{\sigma} \frac{\sin (\lambda_n \sigma)}{\sigma} \]
+		which can, using multiple $\lambda_n$, decompose an initial wave into its components.
+			\[ \phi_0 = \sum A \frac{\lambda_n}{\sigma} \sin(\lambda_n \sigma) \qquad \psi_0 = \sum B \frac{1}{\sigma} \sin(\lambda_n \sigma) \]
+	}
 	
 	
 	

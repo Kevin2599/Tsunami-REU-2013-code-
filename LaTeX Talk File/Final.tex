@@ -36,7 +36,9 @@
 \newcommand{\ee}{\end{enumerate}}
 \newcommand{\bi}{\begin{itemize}}
 \newcommand{\ei}{\end{itemize}}
+
 \newcommand{\slide}[2][]{\begin{frame}\frametitle{#1}#2\end{frame}}
+\newcommand{\mat}[1]{\left [ \begin{array}{ccc} #1 \end{array} \right ]}
 
 
 \title[Tsunami Modeling]{Tsunami Modeling in Parabolic Bays}
@@ -49,14 +51,14 @@
 \begin{document}
 	\begin{frame}
 		\titlepage
+		{\inserttotalframenumber}
 	\end{frame}
 	
 	\slide[Outline]{\tableofcontents}
 	
-	\input{section/introduction}
-	\input{section/previous_work}
+%	\input{section/introduction}
+%	\input{section/previous_work}
 	\input{section/our_work}
-	\input{section/results}
-	\input{section/conclusion}
-
+%	\input{section/results}
+%	\input{section/conclusion}
 \end{document}
