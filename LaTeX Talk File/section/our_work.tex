@@ -109,12 +109,6 @@ u(x_{\sigma_L},t)=0 ~ ~ ~ \text{Reflecting vertical wall}
 		\end{columns}
 	}
 
-
-
-
-
-
-%- 3.2  Go through spectral method for arbitrary m with Bessel solution.
 	\begin{frame}
 		\frametitle{IVBP}
 			We wish to solve the following system:
@@ -131,7 +125,7 @@ u(x_{\sigma_L},t)=0 ~ ~ ~ \text{Reflecting vertical wall}
 	
 	
 	\begin{frame}
-	\frametitle{Solution Part 1}
+	\frametitle{Solution}
 			Assume solutions have the form $\Phi(\sigma,\lambda)=T(\lambda)X(\sigma)$.  We now have
 			\begin{align*}
 			\Phi_{\lambda \lambda}&=\left(\frac{\partial^2}{\partial \sigma^2}+\frac{m+1}{m\sigma}\frac{\partial}{\partial \sigma}\right)\Phi\\\\
@@ -142,9 +136,8 @@ u(x_{\sigma_L},t)=0 ~ ~ ~ \text{Reflecting vertical wall}
 	\end{frame}
 	
 	
-	
 	\begin{frame}
-		\frametitle{Solution Part 2}
+		\frametitle{Solution 2}
 		 We now want to solve the system of ODEs:
 		\[X''(\sigma)+\frac{m+1}{m\sigma}X'(\sigma)=C X(\sigma),\]
 		\[T''(\lambda)=CT(\lambda)\]
@@ -152,12 +145,44 @@ u(x_{\sigma_L},t)=0 ~ ~ ~ \text{Reflecting vertical wall}
 		\[\Phi_\sigma (0,\lambda)=0\text{, }\Phi_\sigma (L,\lambda)=0\]
 		\[ \Phi(\sigma,0)=\int\limits_0^\sigma u_0(\sigma ')F(\sigma ')d \sigma'\text{ and }\Phi_\lambda(\sigma,0)=2g\eta_0\]
 	\end{frame}
+
+
+
+% 3.3  Mention for m=2 this solution is simplified to sin solution
+% 3.3.1  Still not fully analytic though because eigenvalues can only be found numerically
+
+	\slide[m=1 case: X] {
+		When m=1 (i.e. parabolic bay), we have 
+			\[X''(\sigma)+\frac{2}{\sigma}X'(\sigma)=\lambda_n X(\sigma)\]
+		which is nicely solved with
+			\[ X = A\frac{\sin(\lambda_n \sigma)}{\sigma} + B\frac{\cos(\lambda_n \sigma)}{\sigma} \]
+		Using the boundary conditions: $X'(0) = 0$ and $X' (L) = 0$, we find $B=0$ and
+			\[ \lambda_n L = \tan(\lambda_n L) \]
+		which can be solved implicitly for numerical solutions.
+	}
+	\slide[m=1 case: $\Phi$] {
+			\[ T'' - \lambda_n T = 0 \]
+		can be readily solved with
+			\[ T = \lambda_n [ A \sin (\lambda_n \lambda) + B \cos ( \lambda_n \lambda) ] \]
+		Pulling both X and T together:
+			\[ \phi = \lambda_n [ A  \cos (\lambda_n \lambda) - B \sin ( \lambda_n \lambda) ] \frac{\sin (\lambda_n \sigma)}{\sigma} \]
+			\[ \psi = \lambda_n [ A  \sin (\lambda_n \lambda) + B \cos ( \lambda_n \lambda) ] \pderiv{}{\sigma} \frac{\sin (\lambda_n \sigma)}{\sigma} \]
+		which can, using multiple $\lambda_n$, decompose an initial wave into its components.
+			\[ \phi_0 = \sum A \frac{\lambda_n}{\sigma} \sin(\lambda_n \sigma) \qquad \psi_0 = \sum B \frac{1}{\sigma} \sin(\lambda_n \sigma) \]
+	}
+	
+	
+
+
+
+
+%- 3.2  Go through spectral method for arbitrary m with Bessel solution.	
 	
 	
 	
 	
 	\begin{frame}
-	\frametitle{Solution Part 3}
+	\frametitle{Generalized m}
 		 Letting $\alpha=\frac 1m$, $\varphi=X(\sigma)\sigma ^\alpha$, $t=\sigma \sqrt{C}$ and doing some algebraic manipulations we can rewrite 
 		\[X''(\sigma)+\frac{m+1}{m\sigma}X'(\sigma)=C X(\sigma)\]
 		as
@@ -271,31 +296,6 @@ u(x_{\sigma_L},t)=0 ~ ~ ~ \text{Reflecting vertical wall}
 		\end{pmatrix}\begin{pmatrix}C_1\\\vdots\\C_m\end{pmatrix}=\begin{pmatrix} 2g\eta_1\\\vdots \\2g\eta_n\end{pmatrix}
 		\]
 	\end{frame}
-	
-
-% 3.3  Mention for m=2 this solution is simplified to sin solution
-% 3.3.1  Still not fully analytic though because eigenvalues can only be found numerically
-
-	\slide[m=1 case: X] {
-		When m=1 (i.e. parabolic bay), we have 
-			\[X''(\sigma)+\frac{2}{\sigma}X'(\sigma)=\lambda_n X(\sigma)\]
-		which is nicely solved with
-			\[ X = A\frac{\sin(\lambda_n \sigma)}{\sigma} + B\frac{\cos(\lambda_n \sigma)}{\sigma} \]
-		Using the boundary conditions: $X'(0) = 0$ and $X' (L) = 0$, we find $B=0$ and
-			\[ \lambda_n L = \tan(\lambda_n L) \]
-		which can be solved implicitly for numerical solutions.
-	}
-	\slide[m=1 case: $\Phi$] {
-			\[ T'' - \lambda_n T = 0 \]
-		can be readily solved with
-			\[ T = \lambda_n [ A \sin (\lambda_n \lambda) + B \cos ( \lambda_n \lambda) ] \]
-		Pulling both X and T together:
-			\[ \phi = \lambda_n [ A  \cos (\lambda_n \lambda) - B \sin ( \lambda_n \lambda) ] \frac{\sin (\lambda_n \sigma)}{\sigma} \]
-			\[ \psi = \lambda_n [ A  \sin (\lambda_n \lambda) + B \cos ( \lambda_n \lambda) ] \pderiv{}{\sigma} \frac{\sin (\lambda_n \sigma)}{\sigma} \]
-		which can, using multiple $\lambda_n$, decompose an initial wave into its components.
-			\[ \phi_0 = \sum A \frac{\lambda_n}{\sigma} \sin(\lambda_n \sigma) \qquad \psi_0 = \sum B \frac{1}{\sigma} \sin(\lambda_n \sigma) \]
-	}
-	
 	
 	
 	
