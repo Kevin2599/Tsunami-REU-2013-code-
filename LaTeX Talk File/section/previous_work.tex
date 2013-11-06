@@ -1,3 +1,4 @@
+
 % 2  Previous Work
 % 2.1  Problem setup picture(s) (which shows all variables)
 % 2.2  Assumptions
@@ -9,132 +10,7 @@
 % 2.4.3  Analytical F(?) and thus W(?) for |y|^m case
 
 
-\section{Previous Work}
-	\begin{frame}
-		\frametitle{Introduction to the Bay Shapes}
-		In the field of Tsunami run-up research, there are several natural bay shapes to examine:
-		\begin{itemize}
-			\item The plane beach;
-			\item Bays of parabolic cross-section;
-		\end{itemize}
-		There has been extensive study of the plane beach and bays of parabolic cross-section, but tsunami behavior in bays of general U-shaped bays of finite length has not been examined.
-		
-		In each case, we assume that the bottom profile is separable: \emph{i.e.}
-		\[   z(x,y) = f(y) - h(x)  \]
-		where $z(x,y)$ is the bottom profile, $f(y)$ is an arbitrary function and $h(x)$ is an arbitrary non-negative function.
-	\end{frame}
-
-	\slide[The Plane Beach]{\includegraphics[width=\linewidth]{bay/planebeach.png}}
-
-	\begin{frame}
-	\frametitle{The Plane Beach}
-		Characteristics of the plane beach:
-		\begin{itemize}
-			\item Constant slope;
-			\item Uniform across y-axis;
-			\item Can be simplified to 2 dimensions.
-		\end{itemize}
-		This is the problem examined in the famous 1958 paper of Carrier and Greenspan. They showed that in this case, explicit solutions to the shallow water wave equations were possible.
-	\end{frame}
-
-	\slide[Bays of Parabolic Cross-section]{\includegraphics[width=\linewidth]{bay/parabolicbay.png}}
-
-	\begin{frame}
-		\frametitle{Bays of Parabolic Cross-section}
-		Characteristics of bays of parabolic cross-section:
-		Characteristics of bays of parabolic cross-section:
-		\begin{itemize}
-			\item Constant slope;
-			\item Parabolic cross-section along y-axis;
-			\item Behavior of waves in such a channel can still be simplified to 2 dimensions.
-		\end{itemize}
-		This more complicated problem was analyzed in a recent paper by Dr. Ira Didenkulova and Dr. Efim Pelinovsky, in which they showed that it was possible to reduce this problem to one that is analogous to the 2-dimensional case, and thus analytical solutions are possible for the infinite length case.
-	\end{frame}
-
-	\slide[Bays of Trapezoidal Cross-section]{\includegraphics[width=\linewidth]{bay/trapezoidalbay.png}}
-
-	\begin{frame}
-		\frametitle{Bays of Trapezoidal Cross-section}
-		%Insert a graphic of a trapezoidal cross-section'd bay here. Float left.
-		Characteristics of bays of trapezoidal cross-section:
-		\begin{itemize}
-			\item Constant slope
-			\item Cross-section is determined by a symmetrical trapezoid\\
-			slope of the walls is $\beta$\\
-			distance across the base is $2 y_0$
-			\item Behavior of waves in such a bay is unknown. 
-		\end{itemize}
-		These bays where the focus of the previous REU.
-	\end{frame}
-
-	\begin{frame}
-		\frametitle{Terminology}
-		\begin{itemize}
-			\item $\eta(x,t)$ is the perturbation of water level at time $t$, distance $x$ from shore.
-			\item $H(x,t)$ is the total water depth. Note: $H(x,t) = h(x) + \eta(x,t)$.
-			\item $S(H)$ is the cross-sectional area of the bay. Note
-				\[ S(H) = \int_0^{H(x,t)} f(y) \delta y \]
-			\item $u(x,t)$ is the average water velocity on a cross-section perpendicular to the cross-section.
-			\item We only consider $h(x) = -\alpha x$, where $\alpha$ is a non-negative constant. Since $x$ is typically negative in our domain, $h$ will usually be non-negative, and $H$ must always be non-negative.
-		\end{itemize}
-	\end{frame}
-<<<<<<< HEAD
-
-	
-
-	\begin{frame}
-		\frametitle{Wave Equation*}
-		% Put the basic assumptions and talk about the general idea but do not derive everything
-		% It took too much time when I gave my talks and it does not help to gain a better understanding
-		% We will need the time to get through the results and explaining how the solution works
-		% Ill leve it up to you to talk about eulers eq and the C of Mass eq and the assumptions/ make the slides you want.
-		From this point forward, we use the symbol $u$ to represent $\bar{u}$.  Thus,
-		\begin{framed} \begin{align}
-			\frac{\partial S}{\partial t} + \frac{\partial}{\partial x}(uS) &= 0, \label{swe1}\\
-			\frac{\partial u}{\partial t} + u \frac{\partial u}{\partial x} + g \frac{\partial H}{\partial x} &= g \frac{dh}{dx}. \label{swe2}
-		\end{align} \end{framed}
-		These are the wave equations that we will attempt to solve for our bays.
-		% I will mention no dispersion and the compairison when you are done with your part (no slide)
-	\end{frame}
-
-
-\section{Mathematical Setup}
-
-	\begin{frame}
-		\frametitle{Transformation to $\sigma$, $\lambda$}
-		We begin with the non-linear shallow water equations
-		\begin{align} 
-			\tag*{\eqref{swe1}}
-			\frac{\partial S}{\partial t} + \frac{\partial}{\partial x} (uS) &= 0  \\
-			\tag*{\eqref{swe2}}
-			\frac{\partial u}{\partial t} + u \frac{\partial u}{\partial x} + g \frac{\partial H}{\partial x} &= g \frac{dh}{dx}
-		\end{align}
-		where $S$ is the cross-sectional area, $u$ is the averaged flow velocity, and $H = \eta(x,t) + h(x)$, where $h$ is unperturbed water depth and $\eta$ is the height of the perturbation.
-		
-		We have initial conditions that at $t=0$, $u(x,0) = 0$ and $\eta(x,0) = \eta_0(x)$, and boundary conditions that at $x=L$, $\frac{u(x_L,t)}{F(\sigma_{x_L})}=0$ 'wall' and that at the moving shoreline, $u(x,t)$ is bounded.
-		
-	\end{frame}
-
-
-\begin{frame}
-\frametitle{Riemann Invariants}
-From these two equations, we can find Riemann Invariants
-\[
-I_\pm = u \pm \int \sqrt{\frac{g}{S}\frac{dS}{dH}} dH + g \alpha t
-\]
-Applying these to \eqref{swe1} and \eqref{swe2}, we get
-\begin{equation}\label{invariants1}
-\frac{\partial I_\pm}{\partial t} + c_{\pm} \frac{\partial I_\pm}{\partial x} = 0
-\end{equation}
-where
-\[
-c_\pm = u \pm \sqrt{g S \frac{dH}{dS}}.
-\]
-Note that we can write \eqref{invariants1} as
-\[
-\frac{\partial (I_\pm, x)}{\partial (t,x)} + c_\pm \frac{\partial(t, I_\pm)}{\partial (t,x)} = 0.
-\]
-\end{frame}
+\section{2012 REU}
 	\begin{frame}
 		\frametitle{Shallow-Water Wave Equations}
 		Assuming that there is no lateral fluid motion:
@@ -170,19 +46,19 @@ Note that we can write \eqref{invariants1} as
 		\[v_s = v_x x_s + v_t t_s \]
 		substituting in \eqref{sweMat1}
 		\begin{align*}
-			 v_s &= v_x x_x + (b - X v_x) t_s \\
+			 v_s &= v_x x_s + (b - X v_x) t_s \\
 			&= (I x_s - X t_s) v_x + b t_s
 		\end{align*}
 	}
 	\slide[Eigenvectors] {
 		If $(I x_s - X t_s)$ is nonsingular, then our solutions are trivial (zero). Thus, for non-trivial solutions
 		\[ | I x_s - X t_s | = 0 \]
-		then we can solve for $x_s$
-		\[ x_s = (u \pm \sqrt{g A / A_H}) t_s = \lambda_\pm t_s \]
+		then we can solve for $x_s$ (and define $c_\pm$)
+		\[ x_s = (u \pm \sqrt{g A / A_H}) t_s = c_\pm t_s \]
 		if we set $t_s = 1$
-		\[ v_s = (I \lambda_\pm - X) v_x + b \]
+		\[ v_s = (c_\pm - X) v_x + b \]
 		Eigenvector decomposition
-		\[ V_\pm^\ast X = \lambda_\pm V_\pm^\ast ,
+		\[ V_\pm^\ast X = c_\pm V_\pm^\ast ,
 			\qquad \text{where} V_\pm^\ast = \mat{ \pm \sqrt{g A_H / A} \\ 1} \]
 	}
 	\slide[Riemann Invariants] {
@@ -190,59 +66,88 @@ Note that we can write \eqref{invariants1} as
 		\[ V_\pm = \mat{ \pm \sqrt{g A_H / A} \\ 1} = \mat{I_H \\ I_u},
 			\qquad I_\pm = u \pm \int \sqrt{g A_H / A} \cdot dH \]
 		note that
-		\[ V_\pm^\ast v_z = \mat {I_H & I_u} \mat{H \\ u}_z = I_z \]
+		\[ V_\pm^\ast v_z = \mat {I_H & I_u} \mat{H \\ u}_z = I_H H_z + I_u u_z = I_z \]
 		thus
 		\begin{align*}
 			V^\ast_\pm(v_t + X v_x) &= V_\pm^\ast b \\
-			I_t + \lambda_\pm I_x &= g h_x \\
-			(\pderiv{}{t} + \lambda_\pm \pderiv{}{x})(I_\pm - g h_x t)
+			I_t + c_\pm I_x &= g h_x 
 		\end{align*}
 		we're using constant sloped bays, so $h=\alpha x$ and $h_x = \alpha$.
+%		Letting $J_\pm = I_\pm - g \alpha t$,
+		\begin{align}
+			\label{rInvar} (\pderiv{}{t} + c_\pm \pderiv{}{x})(I_\pm - g \alpha t) &= 0
+		\end{align}
 	}
 	\slide[Hodograph Transform] {
-		
+		The Hodograph transformation is an inversion of the variables in a Jacobian
+		\begin{align*}
+			\mat{{J_+}_x & {J_-}_x \\ {J_+}_t & {J_-}_t} \mat{x_{J_+} & t_{J_+} \\ x_{J_-} & t_{J_-}} &= \text{I}\\
+			\mat{{J_+}_x & {J_-}_x \\ {J_+}_t & {J_-}_t} &= \mat{x_{J_+} & t_{J_+}\\ x_{J_-} & t_{J_-}}^{-1} \\
+			\mat{{J_+}_x & {J_-}_x \\ {J_+}_t & {J_-}_t} &= 
+				\frac{1}{|x_{J_+}  t_{J_-} - t_{J_+} x_{J_-}|} 
+				\mat{t_{J_-} & -t_{J_+} \\ -x_{J_-} & x_{J_+}}
+		\end{align*}
 	}
-
-\begin{frame}
-\frametitle{Hodograph Transform}
-We apply a hodograph transform with Jacobian $\dfrac{\partial (t,x)}{\partial(I_+, I_-)}$. This Jacobian will be zero if, and only if, the wave breaks before it reaches shore. After applying the transform, we see that
-\[
-\frac{\partial(I_\pm,x)}{\partial(I_+,I_-)} + c_\pm \frac{\partial (t, I_\pm)}{\partial(I_+,I_-)} = 0,
-\]
-which can be written as
-\begin{equation}\label{hodograph}
-\frac{\partial x}{\partial I_\pm} - c_\mp \frac{\partial t}{\partial I_\pm} = 0.
-\end{equation}
-\end{frame}
-
-\begin{frame}
-\frametitle{Change of Variables}
-We define two new variables:
-\[
-\lambda = \frac{I_+ + I_-}{2} \text{ and } \sigma = \frac{I_+ - I_-}{2}.
-\]
-Notice that this implies that
-\begin{equation} \label{siglam}
-\lambda = u + \alpha g t \text{ and } \sigma = \int_0^H \sqrt{\frac{g}{S} \frac{dS}{dH}}dH.
-\end{equation}
-We also define
-\[
-F(\sigma) = c_+ - c_- = 2 \sqrt{gS \frac{dH}{dS}}.
-\]
-\end{frame}
-
-\begin{frame}
-\frametitle{Change of Variables 2}
-In these new variables, \eqref{hodograph} becomes
-\[
-\frac{\partial^2 t}{\partial \lambda^2} - \frac{\partial^2 t}{\partial \sigma^2} - \left( \frac{2 + \frac{dF}{d\sigma}}{F(\sigma)} \right) \frac{\partial t}{\partial \sigma} = 0,
-\]
-which, because of how $u,t,$ and $\lambda$ are related in \eqref{siglam}, is equivalent to
-\begin{equation}\label{finalu}
-\frac{\partial^2 u}{\partial \lambda^2} - \frac{\partial^2 u}{\partial \sigma^2} - \left( \frac{2 + \frac{dF}{d\sigma}}{F(\sigma)} \right) \frac{\partial u}{\partial \sigma} = 0.
-\end{equation}
-So we can find $t$ and $u$.
-\end{frame}
+	\slide[Hodograph Transform 2] {
+		We can rewrite \eqref{rInvar}
+		\[ (\pderiv{}{t} + c_\pm \pderiv{}{x})(I_\pm - g \alpha t) = 0 \]
+		as
+		\[ \mat{0 \\ 0} = \mat{1 & c_+ \\ 1 & c_-} \mat{{J_+}_t & {J_+}_x \\ {J_-}_t & {J_-}_x}\]
+		so we apply the hodograph transform to get
+		\[ \mat{0 \\ 0} = \mat{1 & c_+ \\ 1 & c_-} \mat{x_{J_-} & -x_{J_+} \\ -t_{J_-} & t_{J_+}}\]
+		which can be rewritten as
+		\[ \mat{ x_{J_+} \\ x_{J_-}} = {\mat{ c_- & 0 \\ 0 & c_+} \mat{t_{J_+} \\ t_{J_-}}} \]
+	}
+	\slide[Change of Variables] {
+		We define two new variables
+		\[
+		\lambda = \frac{I_+ + I_-}{2} \qquad \sigma = \frac{I_+ - I_-}{2}.
+		\]
+		such that
+		\[ \mat{\pderiv{}{J_+} \\ \pderiv{}{J_-}} = \mat{1 & 1 \\ 1 & -1} \mat{\pderiv{}{\lambda} \\ \pderiv{}{\sigma}} \]
+		When we rewrite our equation in the new variables
+		\[ \mat{ x_\lambda \\ x_\sigma} = \frac{1}{2} \mat{1 & 1 \\ 1 & -1} {\mat{ c_- & 0 \\ 0 & c_+}  \mat{1 & 1 \\ 1 & -1} 
+			\mat{t_\lambda \\ t_\sigma}} \]
+	}
+	\slide[Change of Variables 2] {
+		If we let 
+			\[ \phi_\pm = \frac{1}{2}(c_- \pm c_+) \]
+		then
+			\[ \frac{1}{2} \mat{1 & 1 \\ 1 & -1} \mat{ c_- & 0 \\ 0 & c_+}  \mat{1 & 1 \\ 1 & -1} =
+				\mat{\phi_+ & \phi_- \\ \phi_- & \phi_+} \]
+		Remember that
+			\[ c_\pm = u \pm \sqrt{g A / A_H} \qquad \lambda = u - \alpha g t \qquad \sigma = \int \sqrt{g A_H / A} dH\]
+		so
+			\[ \phi_+ = \lambda + \alpha g t \qquad \phi_- = \sqrt{g A / A_H} = - g H_\sigma = F(\sigma)\]
+	}
+	\slide[Final Equation] {
+		Note that 
+			\[ \mat{\phi_{+\sigma} & \phi_{+\lambda} \\ \phi_{-\sigma} & \phi_{-\lambda}} = 
+				\mat{\alpha g t_\sigma & 1 + \alpha g t_\lambda \\ -F_\sigma & 0 } \]
+		so
+			\[ \mat{\pderiv{}{\sigma} & -\pderiv{}{\lambda}}
+				\left ( \mat{ x_\lambda \\ x_\sigma} = \mat{\phi_+ & \phi_- \\ \phi_- & \phi_+} \mat{t_\lambda \\ t_\sigma} \right ) \]
+		gives us
+			\begin{align*}
+				(\phi_{+\sigma} - \phi_{-\lambda})t_\lambda + (\phi_{-\sigma} - \phi_{+\lambda})t_\sigma +
+					\phi_-(t_{\sigma\sigma} - t_{\lambda\lambda}) &= x_{\lambda \sigma} - x_{\sigma \lambda} \\
+				\alpha g t_\sigma t_\lambda - 
+					(F_\sigma + 1 + \alpha g t_\lambda)t_\sigma - F(t_{\sigma\sigma} - t_{\lambda\lambda}) &=0
+			\end{align*}
+			\begin{framed}
+				\[ t_{\lambda \lambda} - t_{\sigma \sigma} - \frac{(1 + F_\sigma)}{F} t_\sigma = 0 \]
+			\end{framed}
+	}
+	
+	\slide[How to think of the new Variables] {
+		$\sigma =  \int \sqrt{g A_H / A} dH$ is the space variable.
+		
+		$\lambda = u - \alpha g t$ is roughly the time variable, warped by the wave speed.
+		
+		$F = \sqrt{g A / A_H}$ warps the space variable $\sigma$ to the bay shape.
+	}
+	
+	\slide[BEGIN UNDER CONSTRUCTION] {}
 
 \begin{frame}
 \frametitle{Finding a relation for $x$}
@@ -323,5 +228,6 @@ W(\sigma) = \frac{2 + \frac{dF}{d\sigma}}{F(\sigma)}=\frac{m+2}{m\sigma}.
 \end{frame}
 
 
+	\slide[END UNDER CONSTRUCTION] {}
 
 
