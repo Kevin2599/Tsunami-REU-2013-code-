@@ -11,7 +11,37 @@
 % 4.3  Possibly use max. run up and min. run down as a convergence metric - when varying number of eigenvalues, sigma (or x) steps, and lambda steps - for other values of m
 % 4.4  Show how closely nonlinear system follows superposition principle ? measure of how linear/nonlinear the system is
 
+%gaussianFunction(offset, width, x, derivative)
+%	y = exp( - ((x - offset)./width).^2);
+\newcommand{\guassian}[2]{ e^{-(\frac{#1}{#2})^2}}
+
+
+%gaussianFunction(sig0Sign.*vars.sigma0, vars.p, sigma + lamSign*lambda)
+%Phi = (vars.a ./ sigma) .* ( e(1,-1) - e(-1,-1) + e(1,1) - e(-1,1) );
+
 \section{Results}
-	
+	\slide[Comparison to known Model] {
+		For a parabolic bay and the initial condition
+		\[ \Phi(\sigma, \lambda_0) = A \guassian{\sigma - \sigma_0}{p} \]
+		Pelinovsky and Didenkulova found an analytical solution
+		\[
+			\Phi(\sigma,\lambda) = 
+		\frac{a}{\sigma} \left (
+				\guassian{\sigma +\lambda -\sigma_0}{p} +
+				\guassian{\sigma +\lambda +\sigma_0}{p}-
+				\guassian{\sigma -\lambda -\sigma_0}{p} -
+				\guassian{\sigma -\lambda +\sigma_0}{p}
+			\right ) \]
+		which we can compare our model against.
+	}
+	\slide[Fit to initial condition peaks at $n_\lambda = 20$] {
+		\includegraphics[width=1\textwidth]{error/error_phi0.png}
+	}
+	\slide[Appropriateness of initial conditions] {
+		\includegraphics[width=1\textwidth]{error/err_sigma0_p.png}
+	}
+	\slide[Wave runup error analysis] {
+		\includegraphics[width=1\textwidth]{error/2_over_sigma_error.png}
+	}
 	\graphicspath{{section/Res/}}
 	\input{section/Res/res.tex}
