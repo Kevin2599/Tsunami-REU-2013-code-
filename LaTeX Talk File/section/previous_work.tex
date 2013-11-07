@@ -26,13 +26,13 @@
 	\slide[Conversion to Matrices] {
 		Noting that because $S(H) = \int_0^{H(x,t)} f(y) \delta y$, $S_t = S_H H_t$ and $S_x = S_H H_x$.
 		\begin{align*}
-			A_H H_t + A_H u H_x + A u_x &= 0\\
+			S_H H_t + S_H u H_x + S u_x &= 0\\
 			u_t + g H_x + u u_x &= g h_x
 		\end{align*}
-		dividing the top equation by $A_H$, we have the following system
+		dividing the top equation by $S_H$, we have the following system
 		\[
 			\left [ \begin{array}{ccc} H \\ u \end{array} \right ]_t
-			+ \left [ \begin{array}{ccc} u & A/A_H \\ g & u \end{array} \right ]
+			+ \left [ \begin{array}{ccc} u & S/S_H \\ g & u \end{array} \right ]
 				\left [ \begin{array}{ccc} H \\ u \end{array} \right ]_x
 			= \left [ \begin{array}{ccc} 0 \\ gh_x \end{array} \right ]
 		\]
@@ -54,17 +54,17 @@
 		If $(I x_s - X t_s)$ is nonsingular, then our solutions are trivial (zero). Thus, for non-trivial solutions
 		\[ | I x_s - X t_s | = 0 \]
 		then we can solve for $x_s$ (and define $c_\pm$)
-		\[ x_s = (u \pm \sqrt{g A / A_H}) t_s = c_\pm t_s \]
+		\[ x_s = (u \pm \sqrt{g S / S_H}) t_s = c_\pm t_s \]
 		if we set $t_s = 1$
 		\[ v_s = (c_\pm - X) v_x + b \]
 		Eigenvector decomposition
 		\[ V_\pm^\ast X = c_\pm V_\pm^\ast ,
-			\qquad \text{where} V_\pm^\ast = \mat{ \pm \sqrt{g A_H / A} \\ 1} \]
+			\qquad \text{where} V_\pm^\ast = \mat{ \pm \sqrt{g S_H / S} \\ 1} \]
 	}
 	\slide[Riemann Invariants] {
 		The Riemann Inveriants are derived from the eigenvectors
-		\[ V_\pm = \mat{ \pm \sqrt{g A_H / A} \\ 1} = \mat{I_H \\ I_u},
-			\qquad I_\pm = u \pm \int \sqrt{g A_H / A} \cdot dH \]
+		\[ V_\pm = \mat{ \pm \sqrt{g S_H / S} \\ 1} = \mat{I_H \\ I_u},
+			\qquad I_\pm = u \pm \int \sqrt{g S_H / S} \cdot dH \]
 		note that
 		\[ V_\pm^\ast v_z = \mat {I_H & I_u} \mat{H \\ u}_z = I_H H_z + I_u u_z = I_z \]
 		thus
@@ -116,9 +116,9 @@
 			\[ \frac{1}{2} \mat{1 & 1 \\ 1 & -1} \mat{ c_- & 0 \\ 0 & c_+}  \mat{1 & 1 \\ 1 & -1} =
 				\mat{\phi_+ & \phi_- \\ \phi_- & \phi_+} \]
 		Remember that
-			\[ c_\pm = u \pm \sqrt{g A / A_H} \qquad \lambda = u - \alpha g t \qquad \sigma = \int \sqrt{g A_H / A} dH\]
+			\[ c_\pm = u \pm \sqrt{g S / S_H} \qquad \lambda = u - \alpha g t \qquad \sigma = \int \sqrt{g S_H / S} dH\]
 		so
-			\[ \phi_+ = \lambda + \alpha g t \qquad \phi_- = \sqrt{g A / A_H} = - g H_\sigma = F(\sigma)\]
+			\[ \phi_+ = \lambda + \alpha g t \qquad \phi_- = \sqrt{g S / S_H} = - g H_\sigma = F(\sigma)\]
 	}
 	\slide[Final Equation] {
 		Note that 
@@ -142,11 +142,11 @@
 	}
 	
 	\slide[How to think of the new Variables] {
-		$\sigma =  \int \sqrt{g A_H / A} dH$ is the space variable.
+		$\sigma =  \int \sqrt{g S_H / S} dH$ is the space variable.
 		
 		$\lambda = u - \alpha g t$ is roughly the time variable, warped by the wave speed.
 		
-		$F = \sqrt{g A / A_H}$ warps the space variable $\sigma$ to the bay shape.
+		$F = \sqrt{g S / S_H}$ warps the space variable $\sigma$ to the bay shape.
 	}
 
 

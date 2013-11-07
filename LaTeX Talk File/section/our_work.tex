@@ -94,20 +94,6 @@ u(x_{\sigma_L},t)=0 ~ ~ ~ \text{Reflecting vertical wall}
 % 3.1.2  Mention physical examples where ?wall? could exist
 % 3.1.2.1  Actual physical wall-like object: dam, glacier, cliff, steep mountain, anything steep enough that does not move can be approximated as a wall
 % 3.1.2.2  Point out that the wave passes through but does not alter height (analogous to point in the middle of 2 standing waves)
-	\slide[Examples of Closed Bays] {
-		\begin{columns}
-			\begin{column}{.48 \textwidth}
-				\bi	\item Lituya Bay
-					\item Dammed reservoir
-					\item Glacial dams
-					\item Standing waves
-				\ei
-			\end{column}
-			\begin{column}{.48 \textwidth}
-				\includegraphics[width=1\textwidth]{bay/lituya.jpg}
-			\end{column}
-		\end{columns}
-	}
 
 	\begin{frame}
 		\frametitle{IVBP}
@@ -151,16 +137,16 @@ u(x_{\sigma_L},t)=0 ~ ~ ~ \text{Reflecting vertical wall}
 % 3.3  Mention for m=2 this solution is simplified to sin solution
 % 3.3.1  Still not fully analytic though because eigenvalues can only be found numerically
 
-	\slide[m=1 case: X] {
-		When m=1 (i.e. parabolic bay), we have 
+	\slide[m=2 case: X] {
+		When m=2 (i.e. parabolic bay), we have
 			\[X''(\sigma)+\frac{2}{\sigma}X'(\sigma)=\lambda_n X(\sigma)\]
-		which is nicely solved with
+		which is nicely solved with a linear superposition of
 			\[ X = A\frac{\sin(\lambda_n \sigma)}{\sigma} + B\frac{\cos(\lambda_n \sigma)}{\sigma} \]
 		Using the boundary conditions: $X'(0) = 0$ and $X' (L) = 0$, we find $B=0$ and
 			\[ \lambda_n L = \tan(\lambda_n L) \]
 		which can be solved implicitly for numerical solutions.
 	}
-	\slide[m=1 case: $\Phi$] {
+	\slide[m=2 case: $\Phi$] {
 			\[ T'' - \lambda_n T = 0 \]
 		can be readily solved with
 			\[ T = \lambda_n [ A \sin (\lambda_n \lambda) + B \cos ( \lambda_n \lambda) ] \]
