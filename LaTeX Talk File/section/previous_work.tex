@@ -135,7 +135,9 @@
 					(F_\sigma + 1 + \alpha g t_\lambda)t_\sigma - F(t_{\sigma\sigma} - t_{\lambda\lambda}) &=0
 			\end{align*}
 			\begin{framed}
-				\[ t_{\lambda \lambda} - t_{\sigma \sigma} - \frac{(1 + F_\sigma)}{F} t_\sigma = 0 \]
+				\begin{align}
+					\label{finaleq} t_{\lambda \lambda} - t_{\sigma \sigma} - \frac{(1 + F_\sigma)}{F} t_\sigma = 0
+				\end{align}
 			\end{framed}
 	}
 	
@@ -151,7 +153,7 @@
 
 	\begin{frame}
 		\frametitle{Backsubstituting to find $x$}
-		In order to find $x$, we also obtain from \eqref{hodograph} that
+		In order to find $x$, we also obtain
 			\[ g \alpha x_\sigma = \frac{F(\sigma)}{2} u_\lambda - \frac{F(\sigma)}{2} - u u_\sigma.\]
 		To integrate this, we define a potential function $\Phi(\sigma,\lambda)$ such that
 			\[ u = \frac{1}{F(\sigma)} \Phi_\sigma. \]
@@ -164,7 +166,9 @@
 	\end{frame}
 
 	\slide[Backsubstituting to Physical Variables]{
-		We have the following backsubstitution equations:
+		Recall that 
+			\[ \lambda = u - \alpha g t \]
+		so we can solve for all physical variables:
 		\begin{align*}
 			u &= \frac{\Phi_\sigma}{F(\sigma)} \\
 			\eta &= \frac{1}{2g} (\Phi_\lambda - u^2) \\
@@ -176,33 +180,31 @@
 
 	\begin{frame}
 		\frametitle{Writing an Equation in Terms of $\Phi$}
-		We substitute our definition of $\Phi$ into \eqref{finalu} to obtain
+		We substitute our definition of $\Phi$ into \eqref{finaleq} to obtain
 		\begin{equation}\label{Phieq}
 			\Phi_{\lambda \lambda} - \Phi_{\sigma} - W(\sigma) \Phi_\sigma = 0,
 		\end{equation}
 		where
 		\[
-			W(\sigma) = \frac{1 + F_\sigma}{F(\sigma)}.
+			W(\sigma) = \frac{2 + F_\sigma}{F(\sigma)}.
 		\]
-		We can think of $\sigma$ as a space-like variable and $\lambda$ as a time-like variable.
-		So we have initial conditions at $\lambda = 0$,
 	\end{frame}
 
 
-\begin{frame}
-	\frametitle{Finding $F$ and $W$ for U-shaped bays}
-	We need to find $F(\sigma)$ for the case of a U-shaped bay ($|y^m|$). Recalling that
-	\[
-		F(\sigma)= 2 \sqrt{gS \frac{dH}{dS}} \qquad \sigma = \int_0^H \sqrt{\frac{g}{S} \frac{dS}{dH}}dH.
-	\]
-	By integrating we can write $S(H)=2\frac{m}{m+1}H^{\frac{m+1}{m}}$ and also
-	\[
-		F(H)=2\sqrt{g} \sqrt{\frac{m}{m+1}} \sqrt{H} \text{ and } \sigma=2\sqrt{\frac{g(m+1)}{m}} H^{\frac12}
-	\]
-	So
-		\[ F(\sigma)=\frac{m}{(m+1)\sigma} \]
-	and
-		\[ W(\sigma) = \frac{1 + F_\sigma}{F(\sigma)}=\frac{m+1}{m\sigma}. \]
-
-\end{frame}
+	\begin{frame}
+		\frametitle{Finding $F$ and $W$ for U-shaped bays}
+		We need to find $F(\sigma)$ for the case of a U-shaped bay ($|y^m|$). Recalling that
+		\[
+			F(\sigma)= 2 \sqrt{gS \frac{dH}{dS}} \qquad \sigma = \int_0^H \sqrt{\frac{g}{S} \frac{dS}{dH}}dH.
+		\]
+		By integrating we can write $S(H)=2\frac{m}{m+1}H^{\frac{m+1}{m}}$ and also
+		\[
+			F(H)=2\sqrt{g} \sqrt{\frac{m}{m+1}} \sqrt{H} \text{ and } \sigma=2\sqrt{\frac{g(m+1)}{m}} H^{\frac12}
+		\]
+		So
+			\[ F(\sigma)=\frac{m}{(m+1)\sigma} \]
+		and
+			\[ W(\sigma) = \frac{2 + F_\sigma}{F(\sigma)}=\frac{m+2}{m\sigma}. \]
+	
+	\end{frame}
 
